@@ -117,10 +117,28 @@ primDiv.append("button")
 	primDraw();
 });
 
+var seaLevel = 0.5;
+
 primDiv.append("button")
 .text("Set sea level to median")
 .on("click", function () {
 	primH = setSeaLevel(primH, 0.5);
+	primDraw();
+});
+
+primDiv.append("button")
+.text("Sea higher")
+.on("click", function () {
+	seaLevel += 0.1;
+	primH = setSeaLevel(primH, seaLevel);
+	primDraw();
+});
+
+primDiv.append("button")
+.text("Sea lower")
+.on("click", function () {
+	seaLevel -= 0.1;
+	primH = setSeaLevel(primH, seaLevel);
 	primDraw();
 });
 
@@ -297,6 +315,8 @@ function newCityRender(h) {
 	};
 }
 var cityRender = newCityRender(physH);
+console.log('coastalSites', physH);
+
 function cityDraw() {
 	//cityRender.terr = getTerritories(cityRender);
 	if (cityViewScore) {
