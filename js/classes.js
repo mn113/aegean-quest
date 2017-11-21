@@ -86,7 +86,7 @@ class Sailor {
 	constructor() {
 		this.name = this.pickName();
 		this.origin = this.pickOrigin();
-		this.avatarSeed = this.pickAvatar();
+		this.avatarSeed = this.pickAvatarSeed();
 		this.skills = this.pickSkills();
 		this.age = 18 + Math.floor(30 * Math.random());
 		this.xp = Math.floor(this.age / 10) + Math.floor(5 * Math.random());
@@ -103,7 +103,7 @@ class Sailor {
 		return places.random();
 	}
 
-	pickAvatar() {
+	pickAvatarSeed() {
 		const avSeeds = "a,b,d,e,f,g,h,i,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,ii,jj,kk,ll,nn,oo,pp,tt,ww,yy,zz,2,3,5,6,7,8,12,14,15,16,17,19,20,22,24,25,27,28,29,31,32,33,34,35,36,37,39".split(",");
 		return avSeeds.random();
 	}
@@ -130,7 +130,7 @@ class Sailor {
 	}
 
 	renderAvatar() {
-		return `<img src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/100.png">`;
+		return `<img src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/50.png">`;
 	}
 }
 

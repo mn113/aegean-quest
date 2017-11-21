@@ -78,28 +78,28 @@ primDiv.append("button")
 });
 
 primDiv.append("button")
-.text("Add land top")
+.text("Add land @ top")
 .on("click", function () {
 	primH = add(primH, edgeLand(primH.mesh, 'top'));
 	primDraw();
 });
 
 primDiv.append("button")
-.text("Add land bottom")
+.text("Add land @ bottom")
 .on("click", function () {
 	primH = add(primH, edgeLand(primH.mesh, 'bottom'));
 	primDraw();
 });
 
 primDiv.append("button")
-.text("Add land right")
+.text("Add land @ right")
 .on("click", function () {
 	primH = add(primH, edgeLand(primH.mesh, 'right'));
 	primDraw();
 });
 
 primDiv.append("button")
-.text("Add land left")
+.text("Add land @ left")
 .on("click", function () {
 	primH = add(primH, edgeLand(primH.mesh, 'left'));
 	primDraw();
@@ -351,7 +351,7 @@ function newCityRender(h) {
 	};
 }
 var cityRender = newCityRender(physH);
-console.log('coastalSites', physH);
+console.log('coastalSites', coastalSites(physH));
 
 function cityDraw() {
 	//cityRender.terr = getTerritories(cityRender);
@@ -364,11 +364,12 @@ function cityDraw() {
 	}
 	*/
 	var scores = cityScores(cityRender.h, cityRender.cities);
-	visualizeVoronoi(citySVG, scores, d3.max(scores) - 0.5);
+	visualizeVoronoi(citySVG, scores);//, d3.max(scores) - 0.5);
 
 	drawPaths(citySVG, 'coast', contour(cityRender.h, 0));
 	drawPaths(citySVG, 'river', getRivers(cityRender.h, 0.01));
 	//drawPaths(citySVG, 'border', getBorders(cityRender));
+
 	visualizeSlopes(citySVG, cityRender);
 	visualizeCities(citySVG, cityRender);
 }
@@ -407,6 +408,13 @@ d3.select("#cityBtn5")
 .on("click", function () {
 	seaLevel -= 0.1;
 	cityRender.h = setSeaLevel(cityRender.h, seaLevel);
+	cityDraw();
+});
+
+d3.select("#cityBtn6")
+.text("Normalize heightmap")
+.on("click", function () {
+	cityRender.h = normalize(cityRender.h);
 	cityDraw();
 });
 

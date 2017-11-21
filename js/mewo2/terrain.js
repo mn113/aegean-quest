@@ -801,7 +801,6 @@ function visualizeVoronoi(svg, field, lo, hi) {
 	.attr('d', makeD3Path)
 	.style('fill', function (d, i) {
 		//return d3.interpolateViridis(mappedvals[i]);
-		//return d3.interpolateRdYlBu(mappedvals[i]);
 		var colorScale = d3.scaleLinear()
 			.domain([1, 0.5, 0])	// max, pivot, min
 			.range(["goldenrod", "lemonchiffon", "dodgerblue"]);
@@ -961,6 +960,8 @@ function generateCoast(params) {
 	h = doErosion(h, runif(0, 0.1), 2);	//5
 	h = setSeaLevel(h, runif(0.2, 0.6));
 	h = fillSinks(h);
+
+	//h = normalize(h);
 	// Smooth coast:
 	h = cleanCoast(h, 3);
 

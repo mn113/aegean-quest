@@ -13,6 +13,10 @@ body {
 	height: 600px;
 	border: 1px solid black;
 	overflow: hidden;
+	position: relative;
+}
+#gamearea > div {
+	position: absolute;
 }
 #map {
 	position: absolute;
