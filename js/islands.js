@@ -12,6 +12,6 @@ d3.select("#city").on("click", function() {
 	var coords = d3.mouse(this);
 	console.log('clicked', coords);
 	// Move ship to click
-	ship.style("left", coords[0]);
+	ship.style("left", coords[0]);	// DOES NOTHING
 	ship.style("top", coords[1]);
 });

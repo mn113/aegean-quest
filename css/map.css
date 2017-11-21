@@ -54,6 +54,7 @@ svg {
     background-color: #eef4ff;
 }
 #city {
+	position: relative;
 	border: 2px solid green;
 	width: 800px;
 	height: 600px;
@@ -69,6 +70,8 @@ button {
 #ship {
 	width: 64px;
 	height: 68px;
+	top: 50%;
+	left: 50%;
 	background: url(../img/triremeR.png);
 	position: absolute;
 	z-index: 1;

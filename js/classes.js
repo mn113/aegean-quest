@@ -6,18 +6,79 @@ class Ship {
 	constructor() {
 		this.name = "My Ship";
 		this.speed = 10;	// kmh
+		this.defence = 10;
 		this.upgrades = [];
 		this.max_crew = 20;
 		this.max_gold = 500;
 		this.max_food = 1000;
 		this.max_wine = 250;
 		this.gold = 25;
-		this.food = 75;
+		this.bread = 65;
+		this.chicken = 35;
+		this.fish = 0;
 		this.wine = 25;
 		this.health = 100;
 		this.captain = null;
 		this.crew = [];
 		this.morale = Math.ceil(70 + (30 * Math.random()));
+	}
+
+	// Add single or multiple crew members:
+	addCrew(newCrew) {
+		if (typeof newCrew === 'object') {
+			this.crew = this.crew.concat(newCrew);
+		}
+		else {
+			this.crew.push(newCrew);
+		}
+	}
+
+	getSpeed() {
+		// Test for Upgrades & Crew skills
+		var s = this.speed;
+		if (this.upgrades.includes("fastness")) s += 2;
+		return s;
+	}
+
+	getDefence() {
+		// Test for Upgrades & Crew skills
+	}
+
+	getFood() {
+		return this.chicken + this.fish + this.bread;
+	}
+
+	sail(distance) {
+
+	}
+
+	fish() {
+		var fishCaught = 5 * Math.ceil(10 * Math.random());
+		this.fish += fishCaught;
+		console.log("Caught", fishCaught, "kilos of fish");
+	}
+
+	buy(product, amount, cost) {
+
+	}
+
+	sell(product, amount, cost) {
+		// TODO: needs checks for max/min of each thing
+		this.gold += cost;
+		switch(product) {
+			case 'chicken':
+				this.chicken -= amount;
+				break;
+			case 'bread':
+				this.bread -= amount;
+				break;
+			case 'fish':
+				this.fish -= amount;
+				break;
+			case 'wine':
+				this.wine -= amount;
+				break;
+		}
 	}
 }
 

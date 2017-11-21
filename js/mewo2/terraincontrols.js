@@ -4,8 +4,9 @@ function addSVG(div) {
 	return div.insert("svg", ":first-child")
 	.attr("height", 600)
 	.attr("width", 800)
-	.attr("viewBox", "-500 -500 1000 1000");
+	.attr("viewBox", "-400 -400 800 800");
 }
+/*
 var meshDiv = d3.select("div#mesh");
 var meshSVG = addSVG(meshDiv);
 
@@ -36,6 +37,7 @@ meshDiv.append("button")
 	meshVxs = null;
 	meshDraw();
 });
+*/
 /*
 var vorBut = meshDiv.append("button")
 .text("Show Voronoi corners")
@@ -74,6 +76,35 @@ primDiv.append("button")
 	primH = add(primH, slope(primH.mesh, randomVector(4)));
 	primDraw();
 });
+
+primDiv.append("button")
+.text("Add land top")
+.on("click", function () {
+	primH = add(primH, edgeLand(primH.mesh, 'top'));
+	primDraw();
+});
+
+primDiv.append("button")
+.text("Add land bottom")
+.on("click", function () {
+	primH = add(primH, edgeLand(primH.mesh, 'bottom'));
+	primDraw();
+});
+
+primDiv.append("button")
+.text("Add land right")
+.on("click", function () {
+	primH = add(primH, edgeLand(primH.mesh, 'right'));
+	primDraw();
+});
+
+primDiv.append("button")
+.text("Add land left")
+.on("click", function () {
+	primH = add(primH, edgeLand(primH.mesh, 'left'));
+	primDraw();
+});
+
 /*
 primDiv.append("button")
 .text("Add cone")
@@ -85,7 +116,7 @@ primDiv.append("button")
 primDiv.append("button")
 .text("Add inverted cone")
 .on("click", function () {
-	primH = add(primH, cone(primH.mesh, 0.25));
+	primH = add(primH, cone(primH.mesh, 0.5));
 	primDraw();
 });
 

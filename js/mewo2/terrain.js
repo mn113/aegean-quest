@@ -217,6 +217,18 @@ function slope(mesh, direction) {
 	});
 }
 
+// Add some land on one side only:
+function edgeLand(mesh, side) {
+	return mesh.map(function (x) {
+		switch(side) {
+			case 'top':    return (x[1] < 0.1 * Math.random() - 0.3);
+			case 'left':   return (x[0] < 0.1 * Math.random() - 0.3);
+			case 'bottom': return (x[1] > 0.1 * Math.random() + 0.3);
+			case 'right':  return (x[0] > 0.1 * Math.random() + 0.3);
+		}
+	});
+}
+
 // Add a cone to the mesh (higher in centre):
 function cone(mesh, slope) {
 	return mesh.map(function (x) {
@@ -751,7 +763,9 @@ function makeD3Path(path) {
 function visualizeVoronoi(svg, field, lo, hi) {
 	if (hi === undefined) hi = d3.max(field) + 1e-9;
 	if (lo === undefined) lo = d3.min(field) - 1e-9;
-	var mappedvals = field.map(function (x) {return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);});
+	var mappedvals = field.map(function (x) {
+		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
+	});
 	var tris = svg.selectAll('path.field').data(field.mesh.tris);
 	tris.enter()
 	.append('path')
@@ -769,6 +783,9 @@ function visualizeVoronoi(svg, field, lo, hi) {
 			.domain([1, 0.5, 0])	// max, pivot, min
 			.range(["goldenrod", "lemonchiffon", "dodgerblue"]);
 		return colorScale(mappedvals[i]);	// defines colour scale of entire map
+	})
+	.on('click', function(d, i) {
+		console.log(this, d, i);	// WHERE IS THE HEIGHT ENCODED?
 	});
 }
 
