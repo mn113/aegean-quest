@@ -1,6 +1,6 @@
 Array.prototype.random = function() {
 	return this[Math.floor(Math.random() * this.length)];
-}
+};
 
 class Ship {
 	constructor() {
@@ -25,7 +25,7 @@ class Sailor {
 	constructor() {
 		this.name = this.pickName();
 		this.origin = this.pickOrigin();
-		this.avatarSeed = "a";
+		this.avatarSeed = this.pickAvatar();
 		this.skills = this.pickSkills();
 		this.age = 18 + Math.floor(30 * Math.random());
 		this.xp = Math.floor(this.age / 10) + Math.floor(5 * Math.random());
@@ -42,8 +42,9 @@ class Sailor {
 		return places.random();
 	}
 
-	makeAvatar() {
-
+	pickAvatar() {
+		const avSeeds = "a,b,d,e,f,g,h,i,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,ii,jj,kk,ll,nn,oo,pp,tt,ww,yy,zz,2,3,5,6,7,8,12,14,15,16,17,19,20,22,24,25,27,28,29,31,32,33,34,35,36,37,39".split(",");
+		return avSeeds.random();
 	}
 
 	pickSkills() {
@@ -58,7 +59,7 @@ class Sailor {
 	}
 
 	showStats() {
-		return `<h3>${this.name}</h3>
+		return this.renderAvatar() + `<h3>${this.name}</h3>
 		<span>of ${this.origin}</span>
 		<dl>
 			<dt>Age</dt><dd>${this.age}</dd>
@@ -68,17 +69,9 @@ class Sailor {
 	}
 
 	renderAvatar() {
-		return '<img src="avatar.png">';
+		return `<img src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/100.png">`;
 	}
 }
-
-var ship = new Ship();
-var man1 = new Sailor();
-var man2 = new Sailor();
-var man3 = new Sailor();
-console.log(man1);
-console.log(man2);
-console.log(man3.showStats());
 
 class Town {
 	constructor(x,y) {
