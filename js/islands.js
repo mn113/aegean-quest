@@ -10,6 +10,14 @@ d3.select("#city").on("click", function() {
 	ship.style("top", coords[1]);
 });
 
+// Add centred SVG ship to main SVG:
+var svgShip = citySVG.append("svg:image")
+.attr("xlink:href", "img/drakkar.svg")
+.attr("width", 50)
+.attr("height", 50)
+.attr("x", 0)
+.attr("y", 0);
+
 // NAVIGATION GRID
 //var naviSVG = addSVG(cityDiv);
 var naviPoints = generateGoodPoints(256);
