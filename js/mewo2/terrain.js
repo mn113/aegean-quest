@@ -46,7 +46,11 @@ function generatePoints(n, extent) {
 	extent = extent || defaultExtent;
 	var pts = [];
 	for (var i = 0; i < n; i++) {
-		pts.push([(Math.random() - 0.5) * extent.width, (Math.random() - 0.5) * extent.height]);
+		// Randomise x & y:
+		pts.push([
+			(Math.random() - 0.5) * extent.width,
+			(Math.random() - 0.5) * extent.height
+		]);
 	}
 	return pts;
 }
@@ -229,6 +233,11 @@ function edgeLand(mesh, side) {
 	});
 }
 
+// Add some land to one corner of the map:
+function cornerLand(mesh, corner) {
+
+}
+
 // Add a cone to the mesh (higher in centre):
 function cone(mesh, slope) {
 	return mesh.map(function (x) {
@@ -252,7 +261,7 @@ function normalize(h) {
 	});
 }
 
-// Normalize & square-root the mesh's heights (makes it flatter?):
+// Normalize & square-root the mesh's heights (makes hills smoother):
 function peaky(h) {
 	return map(normalize(h), Math.sqrt);
 }
@@ -528,26 +537,28 @@ function trislope(h, i) {
 		(-x2 * h1 + x1 * h2) / det];
 }
 
-// Calculate score for each city?
-function cityScore(h, cities) {
-	var score = map(getFlux(h), Math.sqrt);
+// Calculate city viability score for each point in the mesh:
+function cityScores(h, cities) {
+	var scores = map(getFlux(h), Math.sqrt);
 	// TODO: simply place cities on coasts
 	console.log(Math.min(cities), Math.max(cities));
 	for (var i = 0; i < h.length; i++) {
 		// No cities near edges:
 		if (h[i] <= 0 || h[i] > 0.1 || isnearedge(h.mesh, i)) {
-			score[i] = -999999;
+			scores[i] = -999999;
 			continue;
 		}
-		score[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][0]) - h.mesh.extent.width/2);
-		score[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][1]) - h.mesh.extent.height/2);
-		// Make a "well" around the city to avoid close cities:
-		for (var j = 0; j < cities.length; j++) {
-			score[i] -= 0.02 / (distance(h.mesh, cities[j], i) + 1e-9);
+		else {
+			scores[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][0]) - h.mesh.extent.width/2);
+			scores[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][1]) - h.mesh.extent.height/2);
+			// Make a "well" around the city to avoid close cities:
+			for (var j = 0; j < cities.length; j++) {
+				scores[i] -= 0.02 / (distance(h.mesh, cities[j], i) + 1e-9);
+			}
 		}
 	}
-	console.log('cityScore', score);
-	return score;
+	console.log('cityScores', scores);
+	return scores;
 }
 
 function coastalSites(h) {
@@ -556,23 +567,28 @@ function coastalSites(h) {
 	});
 }
 
+// Find the best location for the next city to be added:
 function placeCity(render) {
 	render.cities = render.cities || [];
-	var score = cityScore(render.h, render.cities);
-	var newcity = d3.scan(score, d3.descending);
+	// Recalculate city scores:
+	var scores = cityScores(render.h, render.cities);
+	// Get highest score:
+	var newcity = d3.scan(scores, d3.descending);
 	console.log('newCity', newcity);
 	render.cities.push(newcity);
 }
 
+// Find locations for all desired cities:
 function placeCities(render) {
 	var params = render.params;
-	var h = render.h;
+	var h = render.h;	// UNUSED h
 	var n = params.ncities;
 	for (var i = 0; i < n; i++) {
 		placeCity(render);
 	}
 }
 
+// Merge all edges which cross the sea level line:
 function contour(h, level) {
 	level = level || 0;
 	var edges = [];
@@ -662,6 +678,7 @@ function getTerritories(render) {
 	return terr;
 }
 */
+
 /*
 function getBorders(render) {
 	var terr = render.terr;
@@ -679,6 +696,7 @@ function getBorders(render) {
 	return mergeSegments(edges).map(relaxPath);
 }
 */
+
 function mergeSegments(segs) {
 	var adj = {};
 	for (var i = 0; i < segs.length; i++) {
@@ -729,11 +747,15 @@ function mergeSegments(segs) {
 	return paths;
 }
 
+// Smooth a path by averaging points:
 function relaxPath(path) {
 	var newpath = [path[0]];
 	for (var i = 1; i < path.length - 1; i++) {
-		var newpt = [0.25 * path[i-1][0] + 0.5 * path[i][0] + 0.25 * path[i+1][0],
-		0.25 * path[i-1][1] + 0.5 * path[i][1] + 0.25 * path[i+1][1]];
+		// Calculate new x & y as a weighted average:
+		var newpt = [
+			0.25 * path[i-1][0] + 0.5 * path[i][0] + 0.25 * path[i+1][0],
+			0.25 * path[i-1][1] + 0.5 * path[i][1] + 0.25 * path[i+1][1]
+		];
 		newpath.push(newpt);
 	}
 	newpath.push(path[path.length - 1]);
@@ -760,6 +782,7 @@ function makeD3Path(path) {
 	return p.toString();
 }
 
+// Add triangles to the SVG representing Voronoi cells:
 function visualizeVoronoi(svg, field, lo, hi) {
 	if (hi === undefined) hi = d3.max(field) + 1e-9;
 	if (lo === undefined) lo = d3.min(field) - 1e-9;
@@ -785,7 +808,7 @@ function visualizeVoronoi(svg, field, lo, hi) {
 		return colorScale(mappedvals[i]);	// defines colour scale of entire map
 	})
 	.on('click', function(d, i) {
-		console.log(this, d, i);	// WHERE IS THE HEIGHT ENCODED?
+		console.log('index', i, 'height', mappedvals[i]);
 	});
 }
 
@@ -794,17 +817,18 @@ function visualizeDownhill(h) {
 	drawPaths('river', links);
 }
 
-function drawPaths(svg, cls, paths) {
-	var paths = svg.selectAll('path.' + cls).data(paths)
-	paths.enter()
+function drawPaths(svg, className, paths) {
+	var $paths = svg.selectAll('path.' + className).data(paths);
+	$paths.enter()
 	.append('path')
-	.classed(cls, true);
-	paths.exit()
+	.classed(className, true);
+	$paths.exit()
 	.remove();
-	svg.selectAll('path.' + cls)
+	svg.selectAll('path.' + className)
 	.attr('d', makeD3Path);
 }
 
+// Draw little slope lines on the hills:
 function visualizeSlopes(svg, render) {
 	var h = render.h;
 	var strokes = [];
@@ -852,6 +876,7 @@ function visualizeSlopes(svg, render) {
 	.attr('y2', function (d) {return 1000*d[1][1];});
 }
 
+// Draw the coastline on paths with height 0:
 function visualizeContour(h, level) {
 	level = level || 0;
 	var links = contour(h, level);
@@ -899,7 +924,7 @@ function visualizeCities(svg, render) {
 
 // ?
 function dropEdge(h, p) {
-	p = p || 4
+	p = p || 4;
 	var newh = zero(h.mesh);
 	for (var i = 0; i < h.length; i++) {
 		var v = h.mesh.vxs[i];
@@ -919,12 +944,12 @@ function generateCoast(params) {
 
 	var h = add(
 		slope(mesh, rVec1),
-		slope(mesh, rVec2),
-		cone(mesh, runif(-1, -1)),	// only happens 50%
+		//slope(mesh, rVec2),
+		cone(mesh, runif(-1, -1)),	// random slope
 		// Multiple sets of mountains so they can superimpose:
-		mountains(mesh, 20),
-		mountains(mesh, 20),
-		mountains(mesh, 20),
+		//mountains(mesh, 20),
+		//mountains(mesh, 20),
+		//mountains(mesh, 20),
 		mountains(mesh, 20)
 	);
 	// Average heightmap several times:
@@ -933,7 +958,7 @@ function generateCoast(params) {
 	}
 	h = peaky(h);
 	// Erode terrain:
-	h = doErosion(h, runif(0, 0.1), 5);
+	h = doErosion(h, runif(0, 0.1), 2);	//5
 	h = setSeaLevel(h, runif(0.2, 0.6));
 	h = fillSinks(h);
 	// Smooth coast:
@@ -1151,11 +1176,11 @@ function drawLabels(svg, render) {
 
 // Render the map:
 function drawMap(svg, render) {
-	//render.rivers = getRivers(render.h, 0.01);
+	render.rivers = getRivers(render.h, 0.01);
 	render.coasts = contour(render.h, 0);
 	//render.terr = getTerritories(render);
 	//render.borders = getBorders(render);
-	//drawPaths(svg, 'river', render.rivers);
+	drawPaths(svg, 'river', render.rivers);
 	drawPaths(svg, 'coast', render.coasts);
 	//drawPaths(svg, 'border', render.borders);
 	visualizeSlopes(svg, render);

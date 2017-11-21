@@ -1,12 +1,6 @@
 /* global d3 */
 /* node-env browser */
 
-//console.log(generatePoints(250));
-
-citySVG.select("field").on('hover', function() {
-	console.log(this);
-});
-
 var ship = d3.select("#ship");
 d3.select("#city").on("click", function() {
 	var coords = d3.mouse(this);
@@ -15,3 +9,19 @@ d3.select("#city").on("click", function() {
 	ship.style("left", coords[0]);	// DOES NOTHING
 	ship.style("top", coords[1]);
 });
+
+// NAVIGATION GRID
+//var naviSVG = addSVG(cityDiv);
+var naviPoints = generateGoodPoints(256);
+//var navPoints =
+
+var naviGroup = citySVG.append("svg:g")
+.attr("width", 200)
+.attr("height", 200)
+.attr("stroke", "white")
+.attr("stroke-width", 3)
+.attr("fill", "orange");
+
+visualizePoints(naviGroup, naviPoints);
+// Find nearest map point to each naviPoint. Is it on land or sea?
+// Delete any naviPoint over land

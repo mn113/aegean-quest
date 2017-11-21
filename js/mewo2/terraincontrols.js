@@ -105,14 +105,13 @@ primDiv.append("button")
 	primDraw();
 });
 
-/*
 primDiv.append("button")
 .text("Add cone")
 .on("click", function () {
 	primH = add(primH, cone(primH.mesh, -0.5));
 	primDraw();
 });
-*/
+
 primDiv.append("button")
 .text("Add inverted cone")
 .on("click", function () {
@@ -173,6 +172,7 @@ primDiv.append("button")
 	primDraw();
 });
 
+// EROSION
 var erodeDiv = d3.select("div#erode");
 var erodeSVG = addSVG(erodeDiv);
 
@@ -335,6 +335,11 @@ var physHeightBut = physDiv.append("button")
 var cityDiv = d3.select("div#city");
 var citySVG = addSVG(cityDiv);
 
+// Pan & soom:
+citySVG.call(d3.zoom().scaleExtent([1, 1.75]).on("zoom", function() {
+	citySVG.attr("transform", d3.event.transform);
+}));
+
 var cityViewScore = true;
 
 function newCityRender(h) {
@@ -350,25 +355,24 @@ console.log('coastalSites', physH);
 
 function cityDraw() {
 	//cityRender.terr = getTerritories(cityRender);
+	/*
 	if (cityViewScore) {
-		var score = cityScore(cityRender.h, cityRender.cities);
-		visualizeVoronoi(citySVG, score, d3.max(score) - 0.5);
+		var scores = cityScores(cityRender.h, cityRender.cities);
+		visualizeVoronoi(citySVG, scores, d3.max(scores) - 0.5);
 	} else {
 		visualizeVoronoi(citySVG, cityRender.terr);
 	}
+	*/
+	var scores = cityScores(cityRender.h, cityRender.cities);
+	visualizeVoronoi(citySVG, scores, d3.max(scores) - 0.5);
+
 	drawPaths(citySVG, 'coast', contour(cityRender.h, 0));
 	drawPaths(citySVG, 'river', getRivers(cityRender.h, 0.01));
-//	drawPaths(citySVG, 'border', getBorders(cityRender));
+	//drawPaths(citySVG, 'border', getBorders(cityRender));
 	visualizeSlopes(citySVG, cityRender);
 	visualizeCities(citySVG, cityRender);
 }
 
-// Pan & soom:
-citySVG.call(d3.zoom().scaleExtent([1, 1.6]).on("zoom", function() {
-	citySVG.attr("transform", d3.event.transform);
-}));
-
-//cityDiv.append("button")
 d3.select("#cityBtn1")
 .text("Generate random heightmap")
 .on("click", function () {
@@ -376,7 +380,6 @@ d3.select("#cityBtn1")
 	cityDraw();
 });
 
-//cityDiv.append("button")
 d3.select("#cityBtn2")
 .text("Copy heightmap from above")
 .on("click", function () {
@@ -384,13 +387,29 @@ d3.select("#cityBtn2")
 	cityDraw();
 });
 
-//cityDiv.append("button")
 d3.select("#cityBtn3")
 .text("Add new city")
 .on("click", function () {
 	placeCity(cityRender);
 	cityDraw();
 });
+
+d3.select("#cityBtn4")
+.text("Sea higher")
+.on("click", function () {
+	seaLevel += 0.1;
+	cityRender.h = setSeaLevel(cityRender.h, seaLevel);
+	cityDraw();
+});
+
+d3.select("#cityBtn5")
+.text("Sea lower")
+.on("click", function () {
+	seaLevel -= 0.1;
+	cityRender.h = setSeaLevel(cityRender.h, seaLevel);
+	cityDraw();
+});
+
 /*
 var cityViewBut = cityDiv.append("button")
 .text("Show territories")
