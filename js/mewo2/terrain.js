@@ -896,35 +896,48 @@ function dropEdge(h, p) {
 // Main map generator used for final maps:
 function generateCoast(params) {
 	var mesh = generateGoodMesh(params.npts, params.extent);
+	// Make two opposite slopes:
+	var rVec1 = randomVector(3),
+		rVec2 = [-rVec1[0], -rVec1[1]];
+
 	var h = add(
-		slope(mesh, randomVector(4)),
+		slope(mesh, rVec1),
+		slope(mesh, rVec2),
 		cone(mesh, runif(-1, -1)),	// only happens 50%
-		mountains(mesh, 50)
+		// Multiple sets of mountains so they can superimpose:
+		mountains(mesh, 20),
+		mountains(mesh, 20),
+		mountains(mesh, 20),
+		mountains(mesh, 20)
 	);
+	// Average heightmap several times:
 	for (var i = 0; i < 10; i++) {
 		h = relax(h);
 	}
 	h = peaky(h);
+	// Erode terrain:
 	h = doErosion(h, runif(0, 0.1), 5);
 	h = setSeaLevel(h, runif(0.2, 0.6));
 	h = fillSinks(h);
+	// Smooth coast:
 	h = cleanCoast(h, 3);
+
 	return h;
 }
 
-// ?
+// Average all city sites?
 function terrCenter(h, terr, city, landOnly) {
-	var x = 0;
-	var y = 0;
+	var xsum = 0;
+	var ysum = 0;
 	var n = 0;
 	for (var i = 0; i < terr.length; i++) {
 		if (terr[i] !== city) continue;
 		if (landOnly && h[i] <= 0) continue;
-		x += terr.mesh.vxs[i][0];
-		y += terr.mesh.vxs[i][1];
+		xsum += terr.mesh.vxs[i][0];
+		ysum += terr.mesh.vxs[i][1];
 		n++;
 	}
-	return [x/n, y/n];
+	return [xsum/n, ysum/n];
 }
 
 // Apply text labels to the render:
@@ -1118,7 +1131,6 @@ function drawLabels(svg, render) {
 	drawCityLabels();
 	//drawRegionLabels();
 }
-
 
 // Render the map:
 function drawMap(svg, render) {
