@@ -551,6 +551,7 @@ function trislope(h, i) {
 		(-x2 * h1 + x1 * h2) / det];
 }
 
+
 // Calculate city viability score for each point in the mesh:
 function cityScores(h, cities) {
 	var scores = map(getFlux(h), Math.sqrt);
@@ -618,6 +619,7 @@ function contour(h, level) {
 	return mergeSegments(edges);
 }
 
+// Calculate rivers for the heightmap:
 function getRivers(h, limit) {
 	var dh = downhill(h);
 	var flux = getFlux(h);
@@ -776,6 +778,7 @@ function relaxPath(path) {
 	return newpath;
 }
 
+// Plot circles on the svg:
 function visualizePoints(svg, pts, showDebugText = false) {
 	var outerG = svg.append('g').attr('id', "visualizedPoints");
 	// Bind pts data:
@@ -801,6 +804,7 @@ function visualizePoints(svg, pts, showDebugText = false) {
 	groups.exit().remove();
 }
 
+// Convert a path (array of points) to svg string format:
 function makeD3Path(path) {
 	var p = d3.path();
 	p.moveTo(1000*path[0][0], 1000*path[0][1]);
@@ -848,15 +852,17 @@ function visualizeDownhill(h) {
 	drawPaths('river', links);
 }
 
+// Add path elements to the svg:
 function drawPaths(svg, className, paths) {
-	var $paths = svg.selectAll('path.' + className).data(paths);
-	$paths.enter()
-	.append('path')
-	.classed(className, true);
-	$paths.exit()
-	.remove();
-	svg.selectAll('path.' + className)
-	.attr('d', makeD3Path);
+	var outerG = svg.append('g').attr('id', className+'Paths');
+	var $bound = outerG.selectAll('path.' + className).data(paths);
+	$bound.enter()
+		.append('path')
+		.classed(className, true);
+	$bound.exit()
+		.remove();
+	outerG.selectAll('path.' + className)
+		.attr('d', makeD3Path);
 }
 
 // Draw little slope lines on the hills:
@@ -894,13 +900,15 @@ function visualizeSlopes(svg, render) {
 			strokes.push([[x-l, y+l*s], [x+l, y-l*s]]);
 		}
 	}
-	var lines = svg.selectAll('line.slope').data(strokes);
+
+	var outerG = svg.append('g').attr('id', 'slopes');
+	var lines = outerG.selectAll('line.slope').data(strokes);
 	lines.enter()
 	.append('line')
 	.classed('slope', true);
 	lines.exit()
 	.remove();
-	svg.selectAll('line.slope')
+	outerG.selectAll('line.slope')
 	.attr('x1', function (d) {return 1000*d[0][0];})
 	.attr('y1', function (d) {return 1000*d[0][1];})
 	.attr('x2', function (d) {return 1000*d[1][0];})

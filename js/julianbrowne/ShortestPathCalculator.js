@@ -13,7 +13,7 @@ var ShortestPathCalculator = function(nodes, paths) {
 	this.distances = []; // [ [ x, 100, 150 ], [ 100, x, 10] ]
 	this.graph = {};
 
-	var maxNodes = 20;
+	var maxNodes = 256;
 	var minNodes = 3;
 
 	if (!d3) throw new ShortestPathCalculator.SpcError(10, 'D3 library not found');

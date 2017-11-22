@@ -1,5 +1,8 @@
 /* global d3, $, Snap */
 
+// Enable Snap movement:
+var s = Snap("#city svg");
+
 // Add centred SVG ship to main SVG:
 var svgShip = citySVG.append("svg:image")
 .attr("id", "shipSVG")
@@ -10,27 +13,13 @@ var svgShip = citySVG.append("svg:image")
 .attr("y", 0)
 .raise();
 
-// NAVIGATION GRID:
-var naviPoints = generateGoodPoints(16);
-
-// Enable Snap movement:
-var s = Snap("#city svg");
-s.select("#shipSVG").animate({
-	x: naviPoints[0][0] * 1000,
-	y: naviPoints[0][1] * 1000
-}, 1000);
 var shipIndex = 0;
 
 var naviGroup = citySVG.append("svg:g")
-.attr("id", "naviGroup")
-//.attr("width", 200)
-//.attr("height", 200)
-//.attr("stroke", "white")
-//.attr("stroke-width", 3)
-//.attr("fill", "orange")
-//.
+.attr("id", "naviGroup");
 
-
+// NAVIGATION GRID:
+var naviPoints = generateGoodPoints(32);
 // Find nearest map point to each naviPoint. Is it on land or sea?
 // Delete any naviPoint over land
 var naviMesh = makeMesh(naviPoints);	// plenty of info, but cannot do voronoi
@@ -43,7 +32,7 @@ console.log('naviMesh', naviMesh);
 var nodes = naviPoints.map(function(p,i) {
 	return {
 		index: i,
-		value: p,
+		value: 'sea',
 		r: 10
 	};
 });
@@ -83,7 +72,7 @@ var minimalRender = {
 	h: naviMesh,
 	cities: []
 };
-visualizeVoronoi(naviGroup, naviMesh, -1, 1);
+//visualizeVoronoi(naviGroup, naviMesh, -1, 1);
 visualizePoints(naviGroup, naviPoints, true);
 
 citySVG.selectAll('circle').on("click", function(d, clickedIndex) {
