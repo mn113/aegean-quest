@@ -204,6 +204,7 @@ erodeDiv.append("button")
 .text("Generate random heightmap")
 .on("click", function () {
 	erodeH = generateUneroded();
+	console.log('erodeH', erodeH);
 	erodeDraw();
 });
 
@@ -211,6 +212,7 @@ erodeDiv.append("button")
 .text("Copy heightmap from above")
 .on("click", function () {
 	erodeH = primH;
+	console.log('erodeH', erodeH);
 	erodeDraw();
 });
 
@@ -286,6 +288,7 @@ physDiv.append("button")
 .text("Generate random heightmap")
 .on("click", function () {
 	physH = generateCoast({npts:4096, extent:defaultExtent});
+	console.log('physH', physH);
 	physDraw();
 });
 
@@ -293,6 +296,7 @@ physDiv.append("button")
 .text("Copy heightmap from above")
 .on("click", function () {
 	physH = erodeH;
+	console.log('physH', physH);
 	physDraw();
 });
 /*
@@ -342,6 +346,7 @@ citySVG.call(d3.zoom().scaleExtent([1, 1.75]).on("zoom", function() {
 
 var cityViewScore = true;
 
+// Just wraps the heightmap in preparation for cities data:
 function newCityRender(h) {
 	h = h || generateCoast({npts:4096, extent: defaultExtent});
 	return {
@@ -351,7 +356,7 @@ function newCityRender(h) {
 	};
 }
 var cityRender = newCityRender(physH);
-console.log('coastalSites', coastalSites(physH));
+//console.log('coastalSites', coastalSites(physH));
 
 function cityDraw() {
 	//cityRender.terr = getTerritories(cityRender);
@@ -364,7 +369,7 @@ function cityDraw() {
 	}
 	*/
 	var scores = cityScores(cityRender.h, cityRender.cities);
-	visualizeVoronoi(citySVG, scores);//, d3.max(scores) - 0.5);
+	visualizeVoronoi(citySVG, scores, d3.max(scores) - 0.5);
 
 	drawPaths(citySVG, 'coast', contour(cityRender.h, 0));
 	drawPaths(citySVG, 'river', getRivers(cityRender.h, 0.01));
@@ -378,6 +383,7 @@ d3.select("#cityBtn1")
 .text("Generate random heightmap")
 .on("click", function () {
 	cityRender = newCityRender();
+	console.log('cityRender', cityRender);
 	cityDraw();
 });
 
@@ -385,6 +391,7 @@ d3.select("#cityBtn2")
 .text("Copy heightmap from above")
 .on("click", function () {
 	cityRender = newCityRender(physH);
+	console.log('cityRender', cityRender);
 	cityDraw();
 });
 

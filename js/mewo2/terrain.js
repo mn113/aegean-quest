@@ -138,13 +138,13 @@ function makeMesh(pts, extent) {
 	}
 
 	var mesh = {
-		pts: pts,
-		vor: vor,
-		vxs: vxs,
-		adj: adj,
-		tris: tris,
-		edges: edges,
-		extent: extent
+		pts: pts,	// simple list of [x,y] points
+		vor: vor,	// Voronoi cells & edges
+		vxs: vxs,	// vertices
+		adj: adj,	// adjacent triangles
+		tris: tris,	// Delaunay triangles
+		edges: edges,	// point-point edges
+		extent: extent	// aspect ratio of mesh
 	};
 	mesh.map = function (f) {
 		var mapped = vxs.map(f);
@@ -161,7 +161,7 @@ function generateGoodMesh(n, extent) {
 	return makeMesh(pts, extent);
 }
 
-// Fewer than 3 adjacent cells -> must be on edge of bounding area
+// Fewer than 3 adjacent triangles -> must be on edge of bounding area
 function isedge(mesh, i) {
 	return (mesh.adj[i].length < 3);
 }
@@ -176,7 +176,7 @@ function isnearedge(mesh, i) {
 	return x < -ET * w || x > ET * w || y < -ET * h || y > ET * h;
 }
 
-// Get neighbouring:
+// Get 3 neighbouring triangles of a triangle:
 function neighbours(mesh, i) {
 	var onbs = mesh.adj[i];		// ?
 	var nbs = [];				// neighbours

@@ -22,7 +22,7 @@ var man4 = new Sailor();
 var man5 = new Sailor();
 var man6 = new Sailor();
 console.log(man1);
-console.log(man2.showStats());
+//console.log(man2.showStats());
 
 ship1.addCrew([man1, man2, man3, man4, man5, man6]);
 
