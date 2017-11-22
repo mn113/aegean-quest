@@ -29,7 +29,7 @@ var rnorm = (function () {
 	}
 	return rnorm;
 })();
-console.log('rNorm', rnorm());	// WHAT IS THIS?
+//console.log('rNorm', rnorm());	// WHAT IS THIS?
 
 function randomVector(scale) {
 	return [scale * rnorm(), scale * rnorm()];
@@ -186,11 +186,25 @@ function neighbours(mesh, i) {
 	return nbs;	// why not just return onbs?
 }
 
-// Get Pythagorean distance between points:
+// Get Pythagorean distance between vertices:
 function distance(mesh, i, j) {
 	var p = mesh.vxs[i];
 	var q = mesh.vxs[j];
-	return Math.sqrt((p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]));
+	var dx = p[0] - q[0];
+	var dy = p[1] - q[1];
+	//var dist = Math.sqrt((p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]));
+	var dist = Math.sqrt(dx*dx + dy*dy);
+	return dist;
+}
+
+// Get Pythagorean distance between points:
+function pointDistance(mesh, i, j) {
+	var p = mesh.pts[i];
+	var q = mesh.pts[j];
+	var dx = p[0] - q[0];
+	var dy = p[1] - q[1];
+	var dist = Math.sqrt(dx*dx + dy*dy);
+	return dist;
 }
 
 // Make some sort of quantile scale of sorted heights?
@@ -762,15 +776,29 @@ function relaxPath(path) {
 	return newpath;
 }
 
-function visualizePoints(svg, pts) {
-	var circle = svg.selectAll('circle').data(pts);
-	circle.enter()
-	.append('circle');
-	circle.exit().remove();
-	d3.selectAll('circle')
-	.attr('cx', function (d) {return 1000*d[0];})
-	.attr('cy', function (d) {return 1000*d[1];})
-	.attr('r', 100 / Math.sqrt(pts.length));
+function visualizePoints(svg, pts, showDebugText = false) {
+	var outerG = svg.append('g').attr('id', "visualizedPoints");
+	// Bind pts data:
+	var bound = outerG.selectAll('circle').data(pts);
+
+	// For each data point make a group containing circle and (optionally) text
+	var groups = bound.enter();
+	var innerG = groups.append('g')
+		.attr("transform", function (d) { return "translate("+ 1000*d[0]+","+ 1000*d[1]+")"; })
+		.attr('title', function (d,i) { return i; })
+		;
+	innerG.append('circle')
+		.attr('r', 100 / Math.sqrt(pts.length))
+		.style('fill', 'yellow')
+		.style('stroke', 'blue')
+		;
+	if (showDebugText) {
+		innerG.append('text')
+			.style('color', 'black')
+			.text(function(d,i) { return i; });
+	}
+	// Cleanup:
+	groups.exit().remove();
 }
 
 function makeD3Path(path) {
@@ -789,7 +817,11 @@ function visualizeVoronoi(svg, field, lo, hi) {
 	var mappedvals = field.map(function (x) {
 		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
 	});
-	var tris = svg.selectAll('path.field').data(field.mesh.tris);
+
+	var g = svg.append('g').attr('id', "visualizedVoronoi");
+	var tris = g.selectAll('path.field')
+	.data(field.mesh.tris);
+
 	tris.enter()
 	.append('path')
 	.classed('field', true);
@@ -921,7 +953,7 @@ function visualizeCities(svg, render) {
 	});
 }
 
-// ?
+/*
 function dropEdge(h, p) {
 	p = p || 4;
 	var newh = zero(h.mesh);
@@ -933,6 +965,7 @@ function dropEdge(h, p) {
 	}
 	return newh;
 }
+*/
 
 // Main map generator used for final maps:
 function generateCoast(params) {
