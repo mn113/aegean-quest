@@ -8,6 +8,10 @@
 	<link rel="stylesheet" href="css/ui.css">
 	<link rel="stylesheet" href="js/dataarts/dat.gui.css">
 	<script type="text/javascript" src="js/dataarts/dat.gui.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="css/semantic/semantic.css">
+	<script type="text/javascript" src="css/semantic/semantic.js"></script>
 </head>
 <body>
 	<h1>Aegean Quest</h1>
@@ -17,6 +21,10 @@
 	τραγούδας ποτέ του δάσους τα σημαδιά<br>
 	με τα χρώματα του ανέμου εσύ πέτας
 	</p>
+
+	<h4 class="ui horizontal divider header">
+  		<i class="tag icon"></i> Test Area
+	</h4>
 
 	<div id="mesh"></div>
 	<hr>
@@ -49,15 +57,55 @@
 	<button id="cityBtn6"></button>
 	<hr>
 
-	<div class="greek_banner">H</div>
 	<div id="gamearea">
-		<div id="map"></div>
-		<div id="sprites"></div>
-		<div id="ui_ships"></div>
+		<div class="greek_banner top">&nbsp;</div>
+		<div class="greek_banner bottom">&nbsp;</div>
+		<div class="ui left demo vertical inverted sidebar labeled icon menu visible">
+			<a class="item">
+				<i class="home icon"></i>
+				Home
+			</a>
+			<a class="item">
+				<i class="block layout icon"></i>
+				Topics
+			</a>
+			<a class="item">
+				<i class="smile icon"></i>
+				Friends
+				<ul class="crew">
+					<li></li>
+				</ul>
+			</a>
+		</div>
+		<div id="not-ui">
+			<div id="map"></div>
+		</div>
+		<!--div id="ui_ships"></div-->
 		<div id="ui"></div>
+		<div class="ui active small modal">
+			<div class="header">Header</div>
+			<div class="image content">
+				<img class="image" src="img/trireme.jpeg">
+				<div class="description">
+					<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+				</div>
+			</div>
+			<div class="content">
+				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua?</p>
+			</div>
+			<div class="actions">
+				<div class="ui approve button">Approve</div>
+				<div class="ui button">Neutral</div>
+				<div class="ui cancel button">Cancel</div>
+			</div>
+		</div>
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+	<a href="#" onclick="$('.ui.labeled.icon.sidebar').sidebar('toggle'); return false;">Toggle sidebar</a><br>
+	<a href="#" onclick="$('.small.modal').modal('show'); return false;">Show modal card</a>
+
+	<!-- end of HTML content -->
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js"></script>
 	<script src="js/julianbrowne/ShortestPathCalculator.js"></script>
@@ -76,17 +124,22 @@
 		this.speed = 0.8;
 		this.displayOutline = false;
 		this.newCity = function() {
-			new City();
+			var c = new City();
+			console.log(c);
 		};
 		this.newShip = function() {
-			new Ship();
+			players.ships.push(new Ship());
+			// re-render
 		};
 		this.newSailor = function() {
-			new Sailor();
+			var currentShip = player.ships[0];
+			currentShip.addCrew(new Sailor());
+			ui.renderShip(currentShip);
 		};
 		this.showHidePoints = function() {
-			$("#visualizedPoints").toggle();
+			$("#visualizedPoints").toggle();	// ok
 		};
+
 	};
 
 	window.onload = function() {
@@ -100,6 +153,9 @@
 		gui.add(text, 'newSailor');	// button
 		gui.add(text, 'showHidePoints');	// button
 	};
+
+	// Semantic UI setup:
+	$('#gamearea .ui .crew img').popup();
 
 	</script>
 </body>

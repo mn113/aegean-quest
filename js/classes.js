@@ -91,6 +91,7 @@ class Sailor {
 		this.age = 18 + Math.floor(30 * Math.random());
 		this.xp = Math.floor(this.age / 10) + Math.floor(5 * Math.random());
 		this.salary = this.xp;
+		return this;
 	}
 
 	pickName() {
@@ -130,7 +131,11 @@ class Sailor {
 	}
 
 	renderAvatar() {
-		return `<img src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/50.png">`;
+		// Includes tooltip text
+		return `<img class="ui avatar image"
+		data-title="${this.name} of ${this.origin}"
+		data-content="${this.skills.join(", ")}"
+		src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/50.png">`;
 	}
 }
 

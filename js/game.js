@@ -27,7 +27,7 @@ console.log(man1);
 ship1.addCrew([man1, man2, man3, man4, man5, man6]);
 
 var ui = {
-	ships: $("#ui_ships"),
+	ships: $(".ui .item:last-child"),
 
 	renderShip: function(s) {
 		console.log(s);

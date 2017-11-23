@@ -22,7 +22,7 @@ body {
 	position: absolute;
 	width: 800px;
 	height: 600px;
-	xbackground: #eef;
+	background: #eef url(../img/mapofgreece.jpg);
 }
 
 path, line {
