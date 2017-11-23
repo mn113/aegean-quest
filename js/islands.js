@@ -6,9 +6,9 @@ var s = Snap("#city svg");
 // Add centred SVG ship to main SVG:
 var svgShip = view.append("svg:image")
 .attr("id", "shipSVG")
-.attr("xlink:href", "img/drakkar.svg")
+.attr("xlink:href", "img/boatR.png")//"img/drakkar.svg")
 .attr("width", 50)
-.attr("height", 50)
+//.attr("height", 50)
 .attr("x", 0)
 .attr("y", 0)
 .raise();
