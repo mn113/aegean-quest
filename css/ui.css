@@ -72,6 +72,9 @@ ul, ol {
 .greek_banner.bottom { bottom: 0; }
 
 /* Semantic UI overrides */
+.ui.sidebar {
+	position: absolute !important;
+}
 .modal {
 	top: 40px !important;
 }

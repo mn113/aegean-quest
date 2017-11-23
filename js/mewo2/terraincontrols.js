@@ -238,19 +238,7 @@ erodeDiv.append("button")
 	erodeH = fillSinks(erodeH);
 	erodeDraw();
 });
-/*
-var erodeBut = erodeDiv.append("button")
-.text("Show erosion rate")
-.on("click", function () {
-	erodeViewErosion = !erodeViewErosion;
-	if (erodeViewErosion) {
-		erodeBut.text("Show heightmap");
-	} else {
-		erodeBut.text("Show erosion rate");
-	}
-	erodeDraw();
-});
-*/
+
 
 // PHYSICAL
 var physDiv = d3.select("div#phys");
@@ -362,26 +350,25 @@ function newStage5Render(h) {
 	};
 }
 var Stage5Render = newStage5Render(physH);
+var coast;
 
 function Stage5Draw() {
-	//Stage5Render.terr = getTerritories(Stage5Render);
-	/*
-	if (cityViewScore) {
-		var scores = cityScores(cityRender.h, Stage5Render.cities);
-		visualizeVoronoi(citySVG, scores, d3.max(scores) - 0.5);
-	} else {
-		visualizeVoronoi(citySVG, Stage5Render.terr);
-	}
-	*/
 	var scores = cityScores(Stage5Render.h, Stage5Render.cities);
 	visualizeVoronoi(view, scores, d3.max(scores) - 0.5);
 	visualizePoints(view, Stage5Render.h.mesh.pts, false);
+	colorizePoints(view, Stage5Render.h);
 
 	drawPaths(view, 'coast', contour(Stage5Render.h, 0));
 	drawPaths(view, 'river', getRivers(Stage5Render.h, 0.01));
 
 	visualizeSlopes(view, Stage5Render);
 	visualizeCities(view, Stage5Render);
+
+	// Try to make a town on the coast:
+	coast = coastPoints(Stage5Render.h, 0.5);
+	console.log('coast', coast);
+	testSite = coast.random();
+	view.select("#pt_"+testSite.index).attr('r', 30);
 }
 
 d3.select("#cityBtn1")

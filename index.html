@@ -58,51 +58,53 @@
 	<hr>
 
 	<div id="gamearea">
-		<div class="greek_banner top">&nbsp;</div>
-		<div class="greek_banner bottom">&nbsp;</div>
-		<div class="ui left demo vertical inverted sidebar labeled icon menu visible">
-			<a class="item">
-				<i class="home icon"></i>
-				Home
-			</a>
-			<a class="item">
-				<i class="block layout icon"></i>
-				Topics
-			</a>
-			<a class="item">
-				<i class="smile icon"></i>
-				Friends
-				<ul class="crew">
-					<li></li>
-				</ul>
-			</a>
-		</div>
 		<div id="not-ui">
 			<div id="map"></div>
+			<div class="greek_banner top">&nbsp;</div>
+			<div class="greek_banner bottom">&nbsp;</div>
 		</div>
-		<!--div id="ui_ships"></div-->
-		<div id="ui"></div>
-		<div class="ui active small modal">
-			<div class="header">Header</div>
-			<div class="image content">
-				<img class="image" src="img/trireme.jpeg">
-				<div class="description">
-					<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+		<div id="ui">
+			<div class="ui left demo vertical inverted sidebar labeled icon menu thin visible">
+				<a class="item">
+					<i class="home icon"></i>
+					Home
+				</a>
+				<a class="item">
+					<i class="block layout icon"></i>
+					Topics
+				</a>
+				<a class="item">
+					<i class="smile icon"></i>
+					Friends
+					<ul class="crew">
+						<li></li>
+					</ul>
+				</a>
+			</div>
+			<div class="pusher">
+				<div class="ui small modal">
+					<div class="header">Header</div>
+					<div class="image content">
+						<img class="image" src="img/trireme.jpeg">
+						<div class="description">
+							<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+						</div>
+					</div>
+					<div class="content">
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua?</p>
+					</div>
+					<div class="actions">
+						<div class="ui approve button">Approve</div>
+						<div class="ui button">Neutral</div>
+						<div class="ui cancel button">Cancel</div>
+					</div>
 				</div>
-			</div>
-			<div class="content">
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua?</p>
-			</div>
-			<div class="actions">
-				<div class="ui approve button">Approve</div>
-				<div class="ui button">Neutral</div>
-				<div class="ui cancel button">Cancel</div>
 			</div>
 		</div>
 	</div>
 
 	<a href="#" onclick="$('.ui.labeled.icon.sidebar').sidebar('toggle'); return false;">Toggle sidebar</a><br>
-	<a href="#" onclick="$('.small.modal').modal('show'); return false;">Show modal card</a>
+	<a href="#" onclick="$('.small.modal').modal('toggle'); return false;">Toggle modal card</a>
 
 	<!-- end of HTML content -->
 
@@ -155,6 +157,11 @@
 	};
 
 	// Semantic UI setup:
+	$('.ui.sidebar')
+	.sidebar({
+		context: $('#ui'),
+		dimPage: false
+	});
 	$('#gamearea .ui .crew img').popup();
 
 	</script>

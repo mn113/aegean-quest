@@ -426,6 +426,7 @@ function getFlux(h) {
 
 function getSlope(h) {
 	var dh = downhill(h);
+	// Clone mesh:
 	var slope = zero(h.mesh);
 	for (var i = 0; i < h.length; i++) {
 		var s = trislope(h, i);
@@ -547,19 +548,20 @@ function trislope(h, i) {
 	var h1 = h[nbs[1]] - h[nbs[0]];
 	var h2 = h[nbs[2]] - h[nbs[0]];
 
-	return [(y2 * h1 - y1 * h2) / det,
-		(-x2 * h1 + x1 * h2) / det];
+	return [
+		(y2 * h1 - y1 * h2) / det,
+		(-x2 * h1 + x1 * h2) / det
+	];
 }
-
 
 // Calculate city viability score for each point in the mesh:
 function cityScores(h, cities) {
 	var scores = map(getFlux(h), Math.sqrt);
 	// TODO: simply place cities on coasts
-	console.log(Math.min(cities), Math.max(cities));
+	console.log('minCity', Math.min(cities), 'maxCity', Math.max(cities));
 	for (var i = 0; i < h.length; i++) {
 		// No cities near edges:
-		if (h[i] <= 0 || h[i] > 0.1 || isnearedge(h.mesh, i)) {
+		if (h[i] <= 0 || isnearedge(h.mesh, i)) {
 			scores[i] = -999999;
 			continue;
 		}
@@ -574,12 +576,6 @@ function cityScores(h, cities) {
 	}
 	console.log('cityScores', scores);
 	return scores;
-}
-
-function coastalSites(h) {
-	return h.filter(function(p) {
-		return (p >= 0 && p < 0.05);
-	});
 }
 
 // Find the best location for the next city to be added:
@@ -603,20 +599,36 @@ function placeCities(render) {
 	}
 }
 
-// Merge all edges which cross the sea level line:
-function contour(h, level) {
-	level = level || 0;
+// Get all coastal edges:
+function coastEdges(h, seaLevel) {
+	seaLevel = seaLevel || 0;
 	var edges = [];
 	for (var i = 0; i < h.mesh.edges.length; i++) {
 		var e = h.mesh.edges[i];
 		if (e[3] === undefined) continue;
 		if (isnearedge(h.mesh, e[0]) || isnearedge(h.mesh, e[1])) continue;
-		if ((h[e[0]] > level && h[e[1]] <= level) ||
-		(h[e[1]] > level && h[e[0]] <= level)) {
+		// Check seaLevel crossings:
+		var p1Above = h[e[0]] > seaLevel,
+			p2Below = h[e[1]] <= seaLevel,
+			p2Above = h[e[1]] > seaLevel,
+			p1Below = h[e[0]] <= seaLevel;
+		if ((p1Above && p2Below) || (p1Below && p2Above)) {
 			edges.push([e[2], e[3]]);
 		}
 	}
-	return mergeSegments(edges);
+	return edges;
+}
+
+// Get all coastal points:
+function coastPoints(h, seaLevel) {
+	// Just use first point of every edge (hopefully no dupes?)
+	// TODO: take all the points and make a set
+	return coastEdges(h, seaLevel).map(e => e[0]);
+}
+
+// Merge all edges which cross the sea level line:
+function contour(h, seaLevel) {
+	return mergeSegments(coastEdges(h, seaLevel));
 }
 
 // Calculate rivers for the heightmap:
@@ -790,12 +802,14 @@ function visualizePoints(svg, pts, showDebugText = false) {
 		.attr("transform", function (d) { return "translate("+ 1000*d[0]+","+ 1000*d[1]+")"; })
 		.attr('title', function (d,i) { return i; })
 		;
+	var ptRadius = 100 / Math.sqrt(pts.length);
 	innerG.append('circle')
-		.attr('r', 100 / Math.sqrt(pts.length))
+		.attr('r', ptRadius)
+		.attr('id', function(d,i) { return 'pt_'+i; })
 		.classed('clickable', true)
 		.style('fill', 'yellow')
-		.style('stroke', 'blue')
-		.on('click', function(d, i) {
+		//.style('stroke', 'blue')
+		.on('click', function(d,i) {
 			console.log('index', i, 'height', pts[i]);
 		})
 		;
@@ -807,6 +821,14 @@ function visualizePoints(svg, pts, showDebugText = false) {
 	}
 	// Cleanup:
 	groups.exit().remove();
+}
+
+function colorizePoints(svg, h) {
+	svg.selectAll('circle')
+	.data(h)
+	.style('fill', function(d) {
+		return d3.interpolateViridis(d);
+	});
 }
 
 // Convert a path (array of points) to svg string format:

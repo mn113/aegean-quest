@@ -83,5 +83,3 @@ var ui = {
 };
 
 ui.renderShip(ship1);	// ok
-ui.renderSailorCard(man1);
-ui.renderModalCard();
