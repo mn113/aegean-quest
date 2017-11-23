@@ -6,6 +6,8 @@
 	<link href="https://fonts.googleapis.com/css?family=Flamenco|GFS+Neohellenic|Lancelot" rel="stylesheet">
 	<link rel="stylesheet" href="css/map.css">
 	<link rel="stylesheet" href="css/ui.css">
+	<link rel="stylesheet" href="js/dataarts/dat.gui.css">
+	<script type="text/javascript" src="js/dataarts/dat.gui.js"></script>
 </head>
 <body>
 	<h1>Aegean Quest</h1>
@@ -28,7 +30,17 @@
 	<div id="phys"></div>
 	<hr>
 
-	<div id="city"><!--div id="ship"></div--></div>
+	<div id="fifth">
+		<svg height="600" width="800" viewBox="-200 -200 400 400">
+			<defs>
+				<style type="text/css">
+				.clickable {
+					cursor: pointer;
+				}
+				</style>
+			</defs>
+		</svg>
+	</div>
 	<button id="cityBtn1"></button>
 	<button id="cityBtn2"></button>
 	<button id="cityBtn3"></button>
@@ -56,5 +68,38 @@
 	<script src="js/islands.js"></script>
 	<script src="js/classes.js"></script>
 	<script src="js/game.js"></script>
+	<script type="text/javascript">
+
+	var FizzyText = function() {
+		this.message = player.ships[0].name;
+		this.speed = 0.8;
+		this.displayOutline = false;
+		this.newCity = function() {
+			new City();
+		};
+		this.newShip = function() {
+			new Ship();
+		};
+		this.newSailor = function() {
+			new Sailor();
+		};
+		this.showHidePoints = function() {
+			$("#naviPoints").toggle();
+		};
+	};
+
+	window.onload = function() {
+		var text = new FizzyText();
+		var gui = new dat.GUI();
+		gui.add(text, 'message');
+		gui.add(text, 'speed', -5, 5);		// range
+		gui.add(text, 'displayOutline');	// checkbox
+		gui.add(text, 'newCity');	// button
+		gui.add(text, 'newShip');	// button
+		gui.add(text, 'newSailor');	// button
+		gui.add(text, 'showHidePoints');	// button
+	};
+
+	</script>
 </body>
 <html>

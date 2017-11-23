@@ -4,7 +4,7 @@ function addSVG(div) {
 	return div.insert("svg", ":first-child")
 	.attr("height", 600)
 	.attr("width", 800)
-	.attr("viewBox", "-400 -400 800 800");
+	.attr("viewBox", "-200 -200 400 400");
 }
 /*
 var meshDiv = d3.select("div#mesh");
@@ -284,6 +284,7 @@ function physDraw() {
 		visualizeSlopes(physSVG, {h:zero(physH.mesh)});
 	}
 }
+
 physDiv.append("button")
 .text("Generate random heightmap")
 .on("click", function () {
@@ -300,54 +301,59 @@ physDiv.append("button")
 	physDraw();
 });
 /*
-var physCoastBut = physDiv.append("button")
-.text("Show coastline")
-.on("click", function () {
-	physViewCoast = !physViewCoast;
-	physCoastBut.text(physViewCoast ? "Hide coastline" : "Show coastline");
-	physDraw();
-});
-*/
-var physRiverBut = physDiv.append("button")
-.text("Show rivers")
-.on("click", function () {
-	physViewRivers = !physViewRivers;
-	physRiverBut.text(physViewRivers ? "Hide rivers" : "Show rivers");
-	physDraw();
-});
+{
+	var physCoastBut = physDiv.append("button")
+	.text("Show coastline")
+	.on("click", function () {
+		physViewCoast = !physViewCoast;
+		physCoastBut.text(physViewCoast ? "Hide coastline" : "Show coastline");
+		physDraw();
+	});
 
-/*
-var physSlopeBut = physDiv.append("button")
-.text("Show slope shading")
-.on("click", function () {
-	physViewSlope = !physViewSlope;
-	physSlopeBut.text(physViewSlope ? "Hide slope shading" : "Show slope shading");
-	physDraw();
-});
-*/
-/*
-var physHeightBut = physDiv.append("button")
-.text("Hide heightmap")
-.on("click", function () {
-	physViewHeight = !physViewHeight;
-	physHeightBut.text(physViewHeight ? "Hide heightmap" : "Show heightmap");
-	physDraw();
-});
+	var physRiverBut = physDiv.append("button")
+	.text("Show rivers")
+	.on("click", function () {
+		physViewRivers = !physViewRivers;
+		physRiverBut.text(physViewRivers ? "Hide rivers" : "Show rivers");
+		physDraw();
+	});
+	*/
+	/*
+	var physSlopeBut = physDiv.append("button")
+	.text("Show slope shading")
+	.on("click", function () {
+		physViewSlope = !physViewSlope;
+		physSlopeBut.text(physViewSlope ? "Hide slope shading" : "Show slope shading");
+		physDraw();
+	});
+	*/
+	/*
+	var physHeightBut = physDiv.append("button")
+	.text("Hide heightmap")
+	.on("click", function () {
+		physViewHeight = !physViewHeight;
+		physHeightBut.text(physViewHeight ? "Hide heightmap" : "Show heightmap");
+		physDraw();
+	});
+}
 */
 
 // CITIES
-var cityDiv = d3.select("div#city");
-var citySVG = addSVG(cityDiv);
+//var cityDiv = '';
+var citySVG = d3.select("div#fifth svg");
+var view = citySVG.append('g').attr('id', 'view');
 
-// Pan & soom:
-citySVG.call(d3.zoom().scaleExtent([1, 1.75]).on("zoom", function() {
-	citySVG.attr("transform", d3.event.transform);
-}));
-
-var cityViewScore = true;
+// Pan & zoom:
+var zoom = d3.zoom()
+	.scaleExtent([1, 1.75])
+	//.translateExtent([[25,25],[775,575]])	// trap to bounds?
+	.on("zoom", function() {
+		view.attr("transform", d3.event.transform);	// includes translate & scale
+	});
+view.call(zoom);
 
 // Just wraps the heightmap in preparation for cities data:
-function newCityRender(h) {
+function newStage5Render(h) {
 	h = h || generateCoast({npts:4096, extent: defaultExtent});
 	return {
 		params: defaultParams,
@@ -355,74 +361,73 @@ function newCityRender(h) {
 		cities: []
 	};
 }
-var cityRender = newCityRender(physH);
-//console.log('coastalSites', coastalSites(physH));
+var Stage5Render = newStage5Render(physH);
 
-function cityDraw() {
-	//cityRender.terr = getTerritories(cityRender);
+function Stage5Draw() {
+	//Stage5Render.terr = getTerritories(Stage5Render);
 	/*
 	if (cityViewScore) {
-		var scores = cityScores(cityRender.h, cityRender.cities);
+		var scores = cityScores(cityRender.h, Stage5Render.cities);
 		visualizeVoronoi(citySVG, scores, d3.max(scores) - 0.5);
 	} else {
-		visualizeVoronoi(citySVG, cityRender.terr);
+		visualizeVoronoi(citySVG, Stage5Render.terr);
 	}
 	*/
-	var scores = cityScores(cityRender.h, cityRender.cities);
-	visualizeVoronoi(citySVG, scores, d3.max(scores) - 0.5);
+	var scores = cityScores(Stage5Render.h, Stage5Render.cities);
+	visualizeVoronoi(view, scores, d3.max(scores) - 0.5);
+	visualizePoints(view, Stage5Render.h.mesh.pts, false);
 
-	drawPaths(citySVG, 'coast', contour(cityRender.h, 0));
-	drawPaths(citySVG, 'river', getRivers(cityRender.h, 0.01));
-	//drawPaths(citySVG, 'border', getBorders(cityRender));
+	drawPaths(view, 'coast', contour(Stage5Render.h, 0));
+	drawPaths(view, 'river', getRivers(Stage5Render.h, 0.01));
 
-	visualizeSlopes(citySVG, cityRender);
-	visualizeCities(citySVG, cityRender);
+	visualizeSlopes(view, Stage5Render);
+	visualizeCities(view, Stage5Render);
 }
 
 d3.select("#cityBtn1")
 .text("Generate random heightmap")
 .on("click", function () {
-	cityRender = newCityRender();
-	console.log('cityRender', cityRender);
-	cityDraw();
+	Stage5Render = newStage5Render();
+	console.log('cityRender', Stage5Render);
+	Stage5Draw();
 });
 
 d3.select("#cityBtn2")
 .text("Copy heightmap from above")
 .on("click", function () {
-	cityRender = newCityRender(physH);
-	console.log('cityRender', cityRender);
-	cityDraw();
+	Stage5Render = newStage5Render(physH);
+	console.log('cityRender', Stage5Render);
+	Stage5Draw();
 });
 
 d3.select("#cityBtn3")
 .text("Add new city")
 .on("click", function () {
-	placeCity(cityRender);
-	cityDraw();
+	placeCity(Stage5Render);
+	Stage5Draw();
 });
 
 d3.select("#cityBtn4")
 .text("Sea higher")
 .on("click", function () {
 	seaLevel += 0.1;
-	cityRender.h = setSeaLevel(cityRender.h, seaLevel);
-	cityDraw();
+	Stage5Render.h = setSeaLevel(Stage5Render.h, seaLevel);
+	Stage5Draw();
 });
 
 d3.select("#cityBtn5")
 .text("Sea lower")
 .on("click", function () {
 	seaLevel -= 0.1;
-	cityRender.h = setSeaLevel(cityRender.h, seaLevel);
-	cityDraw();
+	Stage5Render.h = setSeaLevel(Stage5Render.h, seaLevel);
+	Stage5Draw();
 });
 
 d3.select("#cityBtn6")
 .text("Normalize heightmap")
 .on("click", function () {
-	cityRender.h = normalize(cityRender.h);
-	cityDraw();
+	Stage5Render.h = normalize(Stage5Render.h);
+	Stage5Draw();
 });
 
 /*
@@ -431,7 +436,7 @@ var cityViewBut = cityDiv.append("button")
 .on("click", function () {
 	cityViewScore = !cityViewScore;
 	cityViewBut.text(cityViewScore ? "Show territories" : "Show city location scores");
-	cityDraw();
+	Stage5Draw();
 });
 */
 

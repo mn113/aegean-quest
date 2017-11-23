@@ -792,12 +792,17 @@ function visualizePoints(svg, pts, showDebugText = false) {
 		;
 	innerG.append('circle')
 		.attr('r', 100 / Math.sqrt(pts.length))
+		.classed('clickable', true)
 		.style('fill', 'yellow')
 		.style('stroke', 'blue')
+		.on('click', function(d, i) {
+			console.log('index', i, 'height', pts[i]);
+		})
 		;
 	if (showDebugText) {
 		innerG.append('text')
 			.style('color', 'black')
+			.style('pointerEvents', 'none')
 			.text(function(d,i) { return i; });
 	}
 	// Cleanup:

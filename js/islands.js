@@ -4,7 +4,7 @@
 var s = Snap("#city svg");
 
 // Add centred SVG ship to main SVG:
-var svgShip = citySVG.append("svg:image")
+var svgShip = view.append("svg:image")
 .attr("id", "shipSVG")
 .attr("xlink:href", "img/drakkar.svg")
 .attr("width", 50)
@@ -13,21 +13,17 @@ var svgShip = citySVG.append("svg:image")
 .attr("y", 0)
 .raise();
 
-var shipIndex = 0;
-
-var naviGroup = citySVG.append("svg:g")
+var naviGroup = view.append("svg:g")
 .attr("id", "naviGroup");
 
 // NAVIGATION GRID:
-var naviPoints = generateGoodPoints(32);
-// Find nearest map point to each naviPoint. Is it on land or sea?
+var naviPoints = generateGoodPoints(256);
+// TODO: Find nearest map point to each naviPoint. Is it on land or sea?
 // Delete any naviPoint over land
 var naviMesh = makeMesh(naviPoints);	// plenty of info, but cannot do voronoi
 naviMesh = relax(cone(naviMesh, -0.75));
 console.log('naviMesh', naviMesh);
-//for (var j = 0; j < naviPoints.length; j++) {
-//	console.log(j, neighbours(naviMesh.mesh, j));
-//}
+
 // Build data structures for Dijkstra's algorithm:
 var nodes = naviPoints.map(function(p,i) {
 	return {
@@ -36,22 +32,24 @@ var nodes = naviPoints.map(function(p,i) {
 		r: 10
 	};
 });
-var paths = [];
-// Build point neighbours lookup table for pathfinding:
-var naviPointNeighbours = {};
-for (var edge of naviMesh.mesh.edges) {
-	if (edge[3] === undefined) continue;
-	var keys = Object.keys(naviPointNeighbours);
+//var paths = [];
+var paths = naviMesh.mesh.edges.map(function(edge) {
+	if (edge[3] === undefined) return null;
 	// Use strings to avoid key problems:
 	var a = ""+edge[2].index,
 		b = ""+edge[3].index;
-	//console.log(`Point ${a} connects to point ${b}`);
-	// Store b on a:
-	if (keys.includes(a)) naviPointNeighbours[a].push(b);
-	else naviPointNeighbours[a] = [b];
-	// Store a on b:
-	if (keys.includes(b)) naviPointNeighbours[b].push(a);
-	else naviPointNeighbours[b] = [a];
+	return {
+		source: a,
+		target: b,
+		distance: 1000 * pointDistance(naviMesh.mesh, a, b)
+	};
+}).filter(p => p);	// no nulls
+/*
+for (var edge of naviMesh.mesh.edges) {
+	if (edge[3] === undefined) continue;
+	// Use strings to avoid key problems:
+	var a = ""+edge[2].index,
+		b = ""+edge[3].index;
 
 	paths.push({
 		source: a,
@@ -59,23 +57,17 @@ for (var edge of naviMesh.mesh.edges) {
 		distance: 1000 * pointDistance(naviMesh.mesh, a, b)
 	});
 }
-//console.log('nPn', naviPointNeighbours);
+*/
 console.log('nodes', nodes);
 console.log('paths', paths);
 
 var sp1 = new ShortestPathCalculator(nodes, paths);
-var route = sp1.findRoute(0,9);
-console.log('route', route);
 
-var minimalRender = {
-	params: defaultParams,
-	h: naviMesh,
-	cities: []
-};
 //visualizeVoronoi(naviGroup, naviMesh, -1, 1);
 visualizePoints(naviGroup, naviPoints, true);
 
-citySVG.selectAll('circle').on("click", function(d, clickedIndex) {
+// Make circles clickable:
+view.selectAll('circle').on("click", function(d, clickedIndex) {
 	//var coords = d3.mouse(this);
 	//svgShip.attr("x", coords[0]).attr("y", coords[1]);
 	console.log(shipNode, naviPoints[shipNode]);	// from
@@ -85,6 +77,7 @@ citySVG.selectAll('circle').on("click", function(d, clickedIndex) {
 });
 
 var shipNode = 0;
+// Ship methods:
 function routeShip(dest) {
 	var route = sp1.findRoute(shipNode, dest);
 	var hopped = 0;
@@ -113,6 +106,3 @@ function moveShip(dest, callback) {
 		if (callback !== undefined) callback();
 	}, 500);
 }
-
-//var scores = cityScores(minimalRender.h, minimalRender.cities);
-//visualizeVoronoi(citySVG, scores);//, d3.max(scores) - 0.5);
