@@ -857,6 +857,8 @@ function relaxPath(path) {
 
 // Plot circles on the svg:
 function visualizePoints(svg, points, showDebugText = false) {
+	// Remove group if present:
+	svg.select("g#visualizedPoints").remove();
 	var outerG = svg.append('g').attr('id', "visualizedPoints");
 	// Bind pts data:
 	var bound = outerG.selectAll('circle').data(points);
@@ -916,37 +918,51 @@ function makeD3Path(path) {
 function visualizeVoronoi(svg, field, lo, hi) {
 	if (hi === undefined) hi = d3.max(field) + 1e-9;
 	if (lo === undefined) lo = d3.min(field) - 1e-9;
+
 	var mappedvals = field.map(function (x) {
 		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
 	});
 
+	// Remove group if present:
+	svg.select("g#visualizedVoronoi").remove();
 	var g = svg.append('g').attr('id', "visualizedVoronoi");
 	var tris = g.selectAll('path.field')
-	.data(field.mesh.tris);
+		.data(field.mesh.tris);
 
 	tris.enter()
-	.append('path')
-	.classed('field', true)
-	.classed(function(d,i) {
+		.append('path')
+		.classed('field', true)
 		// A Voronoi polygon can only be land or sea. Points can also be coast or city.
-		return (mappedvals[i] > 0.5) ? 'land' : 'sea';
-	}, true);
+		.classed('land', function(d,i) {
+			return (mappedvals[i] > 0.5);
+		})
+		.classed('sea', function(d,i) {
+			return (mappedvals[i] < 0.5);
+		});
 
 	tris.exit()
-	.remove();
+		.remove();
+
+	console.log(d3.max(mappedvals), d3.min(mappedvals), mappedvals.length);
 
 	svg.selectAll('path.field')
-	.attr('d', makeD3Path)
-	.style('fill', function (d, i) {
-		//return d3.interpolateViridis(mappedvals[i]);
-		var colorScale = d3.scaleLinear()
-			.domain([1, 0.5, 0])	// max, pivot, min
-			.range(["goldenrod", "lemonchiffon", "dodgerblue"]);
-		return colorScale(mappedvals[i]);	// defines colour scale of entire map
-	})
-	.on('click', function(d, i) {
-		console.log('index', i, 'height', mappedvals[i]);
-	});
+		.attr('d', makeD3Path)
+		.style('fill', function (d, i) {
+			//return d3.interpolateViridis(mappedvals[i]);
+			var colorScale = d3.scaleLinear()
+				.domain([1, 0.5, 0])	// max, pivot, min
+				.range(["goldenrod", "lemonchiffon", "dodgerblue"]);
+
+			var colorScale2 = d3.scaleLinear()
+				.domain([0,1])
+				.interpolate(d3.interpolateHcl)
+				.range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]);
+
+			return colorScale(mappedvals[i]);	// defines colour scale of entire map
+		})
+		.on('click', function(d, i) {
+			console.log('index', i, 'height', mappedvals[i]);
+		});
 }
 
 function visualizeDownhill(h) {
@@ -956,6 +972,8 @@ function visualizeDownhill(h) {
 
 // Add path elements to the svg:
 function drawPaths(svg, className, paths) {
+	// Remove group if present:
+	svg.select("g#"+className+"Paths").remove();
 	var outerG = svg.append('g').attr('id', className+'Paths');
 	var $bound = outerG.selectAll('path.' + className).data(paths);
 	$bound.enter()
@@ -1003,6 +1021,8 @@ function visualizeSlopes(svg, render) {
 		}
 	}
 
+	// Remove group if present:
+	svg.select("g#slopes").remove();
 	var outerG = svg.append('g').attr('id', 'slopes');
 	var lines = outerG.selectAll('line.slope').data(strokes);
 	lines.enter()
@@ -1340,9 +1360,9 @@ function doMap(svg, params) {
 	var width = svg.attr('width');
 	svg.attr('height', width * params.extent.height / params.extent.width);
 	svg.attr('viewBox', -1000 * params.extent.width/2 + ' ' +
-	-1000 * params.extent.height/2 + ' ' +
-	1000 * params.extent.width + ' ' +
-	1000 * params.extent.height);
+						-1000 * params.extent.height/2 + ' ' +
+						1000 * params.extent.width + ' ' +
+						1000 * params.extent.height);
 	svg.selectAll().remove();
 	render.h = params.generator(params);
 	placeCities(render);

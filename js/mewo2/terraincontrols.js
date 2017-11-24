@@ -6,7 +6,7 @@ function addSVG(div) {
 	.attr("width", 800)
 	.attr("viewBox", "-200 -200 400 400");
 }
-/*
+
 var meshDiv = d3.select("div#mesh");
 var meshSVG = addSVG(meshDiv);
 
@@ -37,7 +37,7 @@ meshDiv.append("button")
 	meshVxs = null;
 	meshDraw();
 });
-*/
+
 /*
 var vorBut = meshDiv.append("button")
 .text("Show Voronoi corners")
@@ -179,8 +179,8 @@ var erodeSVG = addSVG(erodeDiv);
 function generateUneroded() {
 	var mesh = generateGoodMesh(4096);
 	var h = add(slope(mesh, randomVector(4)),
-	cone(mesh, runif(-1, 1)),
-	mountains(mesh, 50));
+				cone(mesh, runif(-1, 1)),
+				mountains(mesh, 50));
 	h = peaky(h);
 	h = fillSinks(h);
 	h = setSeaLevel(h, 0.5);
