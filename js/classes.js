@@ -141,18 +141,68 @@ class Sailor {
 
 class Town {
 	constructor(x,y) {
-		this.name = "";
+		this.name = this.pickName();
 		this.location = {x: x, y: y};
-		this.buying = {};
-		this.selling = {};
 		this.sailors = 2;
-		this.demon = null;
+		this.buying = [];
+		this.selling = [];
+		this.status = "free";
 		this.size = 5;
-		this.event = this.pickEvent();
+		this.visited = false;
+		// Register in global array:
+		//towns.push[this];
+		return this;
 	}
 
-	pickEvent() {
-		const events = "Party, Harvest, Building work, Mining work, Religious festival, Fishing".split(", ");
-		return events.random();
+	pickName() {
+		return gameText.placeNames.list.random();
+	}
+
+	inventTrades() {
+		// Buying?
+		var items = ["bread", "fish", "chicken", "wine"];
+		//items.shuffle();
+		var b = [0,1,2].random();
+		while (b > 0) {
+			this.buying.push({
+				"item": items.pop(),
+				"quantity": 5 * Math.ceil(10 * Math.random()),	// 5-50
+				"price": 1 // TODO
+			});
+		}
+		// Selling?
+		items = ["bread", "fish", "chicken", "wine"];
+		//items.shuffle();
+		b = [0,1,2].random();
+		while (b > 0) {
+			this.selling.push({
+				"item": items.pop(),
+				"quantity": 5 * Math.ceil(10 * Math.random()),	// 5-50
+				"price": 1 // TODO
+			});
+		}
+	}
+
+	peaceTimeEvent() {
+		var params = gameText.peaceTimeEvents.random();
+		params.title = "You have been invited to a "+params.title;
+		params.buttons = {
+			yes: "Accept",
+			no: "Decline"
+		};
+		ui.renderModalCard(params);
+		return this;
+	}
+
+	underAttack() {
+		var params = gameText.peaceTimeEvents.random();
+		console.log(params);
+		params.title = this.name+" is under attack by a/an/the "+params.title;
+		params.buttons = {
+			yes: "Fight",
+			no: "Flee"
+		};
+		ui.renderModalCard(params);
+		return this;
 	}
 }

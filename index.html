@@ -7,11 +7,17 @@
 	<link rel="stylesheet" href="css/map.css">
 	<link rel="stylesheet" href="css/ui.css">
 	<link rel="stylesheet" href="js/dataarts/dat.gui.css">
-	<script type="text/javascript" src="js/dataarts/dat.gui.js"></script>
+	<script src="js/dataarts/dat.gui.js"></script>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="css/semantic/semantic.css">
-	<script type="text/javascript" src="css/semantic/semantic.js"></script>
+	<script src="css/semantic/semantic.js"></script>
+	<script type="text/javascript">
+		var gameText;
+		$.getJSON("js/gameText.json", function(res) {
+			gameText = res[0];
+		});
+	</script>
 </head>
 <body>
 	<h1>Aegean Quest</h1>
@@ -82,29 +88,11 @@
 				</a>
 			</div>
 			<div class="pusher">
-				<div class="ui small modal">
-					<div class="header">Header</div>
-					<div class="image content">
-						<img class="image" src="img/trireme.jpeg">
-						<div class="description">
-							<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-						</div>
-					</div>
-					<div class="content">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua?</p>
-					</div>
-					<div class="actions">
-						<div class="ui approve button">Approve</div>
-						<div class="ui button">Neutral</div>
-						<div class="ui cancel button">Cancel</div>
-					</div>
-				</div>
 			</div>
 		</div>
 	</div>
 
 	<a href="#" onclick="$('.ui.labeled.icon.sidebar').sidebar('toggle'); return false;">Toggle sidebar</a><br>
-	<a href="#" onclick="$('.small.modal').modal('toggle'); return false;">Toggle modal card</a>
 
 	<!-- end of HTML content -->
 
@@ -121,17 +109,21 @@
 	<script src="js/game.js"></script>
 	<script type="text/javascript">
 
+	var towns = [];	// game global
+
 	var FizzyText = function() {
-		this.message = player.ships[0].name;
-		this.speed = 0.8;
-		this.displayOutline = false;
-		this.newCity = function() {
-			var c = new City();
-			console.log(c);
+		this.shipName = player.ships[0].name;
+		this.poseidon = 0.8;
+		this.uranus = -1.5;
+		this.demeter = 0;
+		this.newTown = function() {		// ok
+			var t = new Town();
+			towns.push(t);
+			console.log(t);
 		};
 		this.newShip = function() {
 			players.ships.push(new Ship());
-			// re-render
+			// re-render sidebar
 		};
 		this.newSailor = function() {
 			var currentShip = player.ships[0];
@@ -141,19 +133,29 @@
 		this.showHidePoints = function() {
 			$("#visualizedPoints").toggle();	// ok
 		};
-
+		this.visitTown = function() {
+			towns[0].peaceTimeEvent();
+		};
+		this.visitSea = function() {
+			ui.makeModal(seaEvent());
+		};
 	};
 
 	window.onload = function() {
 		var text = new FizzyText();
 		var gui = new dat.GUI();
-		gui.add(text, 'message');
-		gui.add(text, 'speed', -5, 5);		// range
-		gui.add(text, 'displayOutline');	// checkbox
-		gui.add(text, 'newCity');	// button
-		gui.add(text, 'newShip');	// button
-		gui.add(text, 'newSailor');	// button
+		gui.add(text, 'shipName');
+		var f1 = gui.addFolder('Gods');
+		f1.add(text, 'poseidon', -5, 5);	// range
+		f1.add(text, 'uranus', -5, 5);		// range
+		f1.add(text, 'demeter', -5, 5);		// range
 		gui.add(text, 'showHidePoints');	// button
+		var f2 = gui.addFolder('Functions');
+		f2.add(text, 'newTown');	// button
+		f2.add(text, 'newShip');	// button
+		f2.add(text, 'newSailor');	// button
+		f2.add(text, 'visitTown');	// button
+		f2.add(text, 'visitSea');	// button
 	};
 
 	// Semantic UI setup:
@@ -162,6 +164,7 @@
 		context: $('#ui'),
 		dimPage: false
 	});
+	// Crew tooltips:
 	$('#gamearea .ui .crew img').popup();
 
 	</script>

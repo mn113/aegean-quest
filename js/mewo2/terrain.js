@@ -41,6 +41,70 @@ var defaultExtent = {
 	height: 0.75
 };
 
+class Points {
+	constructor(extent) {
+		this.points = [];
+		this.extent = extent || defaultExtent;
+		return this;
+	}
+
+	// Create a load of random points within a rectangular area:
+	generate(n) {
+		for (var i = 0; i < n; i++) {
+			// Randomise x & y:
+			this.points.push([
+				(Math.random() - 0.5) * this.extent.width,
+				(Math.random() - 0.5) * this.extent.height
+			]);
+		}
+		return this;
+	}
+
+	// Move each point closer to its cell's centroid, n times:
+	// ( https://en.wikipedia.org/wiki/Lloyd%27s_algorithm )
+	improve(times) {
+		times = times || 1;
+		for (var i = 0; i < times; i++) {
+			var d3polys = Points.voronoi(this.points).polygons(this.points);
+			this.points = d3polys.map(Points.centroid);
+		}
+		return this;
+	}
+
+	// Generate points and separate them nicely:
+	static generateGood(n) {
+		var pts = new Points().generate(n);
+		pts = pts.sort(function (a, b) {
+			return a[0] - b[0];
+		});
+		return pts.improve(1);
+	}
+
+	// Find the average point of several:
+	static centroid(pts) {
+		var points = pts || this.points;
+		var numPoints = points.length;
+		var sum = {
+			x: 0,
+			y: 0
+		};
+		for (var i = 0; i < numPoints; i++) {
+			sum.x += points[i][0];
+			sum.y += points[i][1];
+		}
+		return [sum.x/numPoints, sum.y/numPoints];
+	}
+
+	// Create a D3 Voronoi set from the set of points:
+	static voronoi(pts, extent) {
+		extent = extent || this.extent;
+		var w = extent.width/2;
+		var h = extent.height/2;
+		return d3.voronoi().extent([[-w, -h], [w, h]])(pts);
+	}
+
+}
+
 // Create a load of random points within a rectangular area:
 function generatePoints(n, extent) {
 	extent = extent || defaultExtent;
@@ -146,8 +210,9 @@ function makeMesh(pts, extent) {
 		edges: edges,	// point-point edges
 		extent: extent	// aspect ratio of mesh
 	};
+	// BUG: HOW DOES h END UP WITH SO MANY LOOSE POINTS?
 	mesh.map = function (f) {
-		var mapped = vxs.map(f);
+		var mapped = vxs.map(f);	// LOOSE POINTS CREATED HERE
 		mapped.mesh = mesh;
 		return mapped;
 	};
@@ -791,18 +856,18 @@ function relaxPath(path) {
 }
 
 // Plot circles on the svg:
-function visualizePoints(svg, pts, showDebugText = false) {
+function visualizePoints(svg, points, showDebugText = false) {
 	var outerG = svg.append('g').attr('id', "visualizedPoints");
 	// Bind pts data:
-	var bound = outerG.selectAll('circle').data(pts);
+	var bound = outerG.selectAll('circle').data(points);
 
 	// For each data point make a group containing circle and (optionally) text
 	var groups = bound.enter();
 	var innerG = groups.append('g')
-		.attr("transform", function (d) { return "translate("+ 1000*d[0]+","+ 1000*d[1]+")"; })
+		.attr("transform", function (d) {return "translate("+ 1000*d[0]+","+ 1000*d[1]+")"; })
 		.attr('title', function (d,i) { return i; })
 		;
-	var ptRadius = 100 / Math.sqrt(pts.length);
+	var ptRadius = 100 / Math.sqrt(points.length);
 	innerG.append('circle')
 		.attr('r', ptRadius)
 		.attr('id', function(d,i) { return 'pt_'+i; })
@@ -810,7 +875,7 @@ function visualizePoints(svg, pts, showDebugText = false) {
 		.style('fill', 'yellow')
 		//.style('stroke', 'blue')
 		.on('click', function(d,i) {
-			console.log('index', i, 'height', pts[i]);
+			console.log('index', i, 'height', d[i]);
 		})
 		;
 	if (showDebugText) {
@@ -823,12 +888,18 @@ function visualizePoints(svg, pts, showDebugText = false) {
 	groups.exit().remove();
 }
 
+// Colour the svg circles according to height:
 function colorizePoints(svg, h) {
 	svg.selectAll('circle')
 	.data(h)
 	.style('fill', function(d) {
 		return d3.interpolateViridis(d);
 	});
+}
+
+// Add classes to svg nodes: sea, coast or land:
+function classifyPoints(svg, h) {
+
 }
 
 // Convert a path (array of points) to svg string format:
@@ -855,7 +926,11 @@ function visualizeVoronoi(svg, field, lo, hi) {
 
 	tris.enter()
 	.append('path')
-	.classed('field', true);
+	.classed('field', true)
+	.classed(function(d,i) {
+		// A Voronoi polygon can only be land or sea. Points can also be coast or city.
+		return (mappedvals[i] > 0.5) ? 'land' : 'sea';
+	}, true);
 
 	tris.exit()
 	.remove();

@@ -350,13 +350,13 @@ function newStage5Render(h) {
 	};
 }
 var Stage5Render = newStage5Render(physH);
-var coast;
+var coast, testSite;
 
 function Stage5Draw() {
 	var scores = cityScores(Stage5Render.h, Stage5Render.cities);
-	visualizeVoronoi(view, scores, d3.max(scores) - 0.5);
-	visualizePoints(view, Stage5Render.h.mesh.pts, false);
-	colorizePoints(view, Stage5Render.h);
+	visualizeVoronoi(view, scores, 0.5);//d3.max(scores) - 0.5);
+	//visualizePoints(view, Stage5Render.h.mesh.pts, false);
+	//colorizePoints(view, Stage5Render.h);
 
 	drawPaths(view, 'coast', contour(Stage5Render.h, 0));
 	drawPaths(view, 'river', getRivers(Stage5Render.h, 0.01));
@@ -368,7 +368,7 @@ function Stage5Draw() {
 	coast = coastPoints(Stage5Render.h, 0.5);
 	console.log('coast', coast);
 	testSite = coast.random();
-	view.select("#pt_"+testSite.index).attr('r', 30);
+	//view.select("#pt_"+testSite.index).attr('r', 30);
 }
 
 d3.select("#cityBtn1")

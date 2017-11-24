@@ -71,14 +71,25 @@ var ui = {
 
 	renderModalCard: function(params) {
 		var cardHtml = `
-			<div class="card modal">
-				<h1>Title</h1>
-				<p>Text</p>
-				<img src="">
-				<button value="1">OK</button>
-				<button value="2">Cancel</button>
-			</div>`;
-		$("#ui").append(cardHtml);
+		<div class="ui small modal">
+			<div class="header">${params.title}</div>
+			<div class="image content">
+				<img class="image" src="http://lorempixel.com/200/200/animals">
+				<div class="description">
+					<p>${params.desc}</p>
+				</div>
+			</div>
+			<div class="content">
+				<p>${params.content}</p>
+			</div>
+			<div class="actions">
+				<div class="ui approve button">${params.buttons.yes}</div>
+				<div class="ui cancel button">${params.buttons.no}</div>
+			</div>
+		</div>
+		`;
+		$(".pushable").append(cardHtml);
+		$(".small.modal").modal('show');
 	}
 };
 

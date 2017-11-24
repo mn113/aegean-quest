@@ -55,6 +55,7 @@ colorizePoints(naviGroup, naviMesh);
 view.selectAll('circle').on("click", function(d, clickedIndex) {
 	//var coords = d3.mouse(this);
 	//svgShip.attr("x", coords[0]).attr("y", coords[1]);
+	// TODO: pass click through nav layer and return polygon height -> land or sea?
 	console.log(shipNode, naviPoints[shipNode]);	// from
 	console.log(clickedIndex, d);					// to
 	console.log(naviMesh[clickedIndex]);
