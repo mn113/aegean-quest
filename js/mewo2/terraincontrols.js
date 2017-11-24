@@ -1,4 +1,4 @@
-/* global d3, meshTransforms, makeMesh, visualizePoints, generatePoints, improvePoints, zero, generateGoodMesh, visualizeVoronoi, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, runif, fillSinks, erosionRate, doErosion, cleanCoast, getRivers, visualizeSlopes, generateCoast, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, coastPoints, colorizePoints, visualizeCentroids */
+/* global d3, meshTransforms, makeMesh, visualizePoints, generatePoints, improvePoints, zero, generateGoodMesh, visualizeVoronoi, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, randomFrom, fillSinks, erosionRate, doErosion, cleanCoast, getRivers, visualizeSlopes, generateCoast, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, coastPoints, colorizePoints, visualizeCentroids, addNaviLayer, addShipSvg, landSeaRatio */
 
 function addSVG(div) {
 	return div.insert("svg", ":first-child")
@@ -7,6 +7,7 @@ function addSVG(div) {
 	.attr("viewBox", "-200 -200 400 400");
 }
 
+var seaLevel = 0.5;	// global
 
 // BASIC POINTS
 var meshDiv = d3.select("div#mesh");
@@ -68,8 +69,6 @@ function primDraw() {
 	drawPaths(primSVG, 'coast', contour(primH, 0));
 }
 primDraw();
-
-var seaLevel = 0.5;
 
 (function() {
 	primDiv.append("br");
@@ -190,11 +189,12 @@ var erodeSVG = addSVG(erodeDiv);
 function generateUneroded() {
 	var mesh = generateGoodMesh(4096);
 	var h = add(slope(mesh, randomVector(4)),
-				cone(mesh, runif(-1, 1)),
+				cone(mesh, randomFrom(-1, 1)),
 				mountains(mesh, 50));
 	h = peaky(h);
 	h = fillSinks(h);
-	h = setSeaLevel(h, 0.5);
+	seaLevel = 0.5;
+	h = setSeaLevel(h, seaLevel);
 	return h;
 }
 
@@ -239,7 +239,8 @@ function erodeDraw() {
 	erodeDiv.append("button")
 	.text("Set sea level to median")
 	.on("click", function () {
-		erodeH = setSeaLevel(erodeH, 0.5);
+		seaLevel = 0.5;
+		erodeH = setSeaLevel(erodeH, seaLevel);
 		erodeDraw();
 	});
 
@@ -358,14 +359,14 @@ function newStage5Render(type, h) {
 	};
 }
 var Stage5Render = newStage5Render(physH);
-var coast, testSite;
+var coast, testSite, svgShip;
 
 function Stage5Draw() {
 	var scores = cityScores(Stage5Render.h, Stage5Render.cities);
 	visualizeVoronoi(view, scores, d3.max(scores) - 0.5);
-	visualizeCentroids(view, Stage5Render.h);
-	visualizePoints(view, Stage5Render.h.mesh.pts, false);
-	colorizePoints(view, Stage5Render.h);
+	//visualizeCentroids(view, Stage5Render.h);
+	//visualizePoints(view, Stage5Render.h.mesh.pts, false);
+	//colorizePoints(view, Stage5Render.h);
 
 	drawPaths(view, 'coast', contour(Stage5Render.h, 0));
 	drawPaths(view, 'river', getRivers(Stage5Render.h, 0.01));
@@ -378,6 +379,12 @@ function Stage5Draw() {
 	console.log('coast', coast);
 	testSite = coast.random();
 	//view.select("#pt_"+testSite.index).attr('r', 30);
+
+}
+
+function addNavAndShip() {
+	addNaviLayer(view);
+	svgShip = addShipSvg(view);
 }
 
 function generateBaseMap(type, params) {
@@ -419,7 +426,7 @@ function generateBaseMap(type, params) {
 	else {
 		h = add(
 			slope(mesh, randomVector(4)),
-			cone(mesh, runif(-1, -1)),	// random slope
+			cone(mesh, randomFrom(-1, -1)),	// random slope
 			mountains(mesh, 20)
 		);
 	}
@@ -429,13 +436,16 @@ function generateBaseMap(type, params) {
 	}
 	h = peaky(h);
 	// Erode terrain:
-	h = doErosion(h, runif(0, 0.1), 2);	//5
-	h = setSeaLevel(h, runif(0.2, 0.6));
-	h = fillSinks(h);
+	h = doErosion(h, randomFrom(0, 0.1), 2);	//5
+	seaLevel = randomFrom(0.2, 0.6);
+	h = setSeaLevel(h, seaLevel);
+
+	//h = fillSinks(h);
 	//h = normalize(h);
 	// Smooth coast:
 	h = cleanCoast(h, 3);
 
+	console.log('land:sea', landSeaRatio(h, seaLevel));
 	return h;
 }
 
@@ -527,6 +537,12 @@ view.call(zoom);
 	.on("click", function () {
 		Stage5Render.h = normalize(Stage5Render.h);
 		Stage5Draw();
+	});
+
+	cityDiv.append("button")
+	.text("Add nav & ship")
+	.on("click", function () {
+		addNavAndShip();
 	});
 
 	/*

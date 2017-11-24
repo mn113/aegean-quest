@@ -2,7 +2,7 @@
 
 "use strict";
 
-function runif(lo, hi) {
+function randomFrom(lo, hi) {
 	return lo + Math.random() * (hi - lo);
 }
 
@@ -19,8 +19,8 @@ var rnorm = (function () {
 		var x2 = 0;
 		var w = 2.0;
 		while (w >= 1) {
-			x1 = runif(-1, 1);
-			x2 = runif(-1, 1);
+			x1 = randomFrom(-1, 1);
+			x2 = randomFrom(-1, 1);
 			w = x1 * x1 + x2 * x2;
 		}
 		w = Math.sqrt(-2 * Math.log(w) / w);
@@ -237,7 +237,7 @@ function isnearedge(mesh, i) {
 	var y = mesh.vxs[i][1];
 	var w = mesh.extent.width;
 	var h = mesh.extent.height;
-	const ET = 0.485;	// Edge Threshold, must not exceed 0.5
+	const ET = 0.497;	// Edge Threshold, must not exceed 0.5
 	return x < -ET * w || x > ET * w || y < -ET * h || y > ET * h;
 }
 
@@ -328,7 +328,6 @@ var meshTransforms = {
 		});
 	}
 };
-
 
 // Add a cone to the mesh (higher in centre):
 function cone(mesh, slope) {
@@ -684,7 +683,7 @@ function coastEdges(h, seaLevel) {
 	for (var i = 0; i < h.mesh.edges.length; i++) {
 		var e = h.mesh.edges[i];
 		if (e[3] === undefined) continue;
-		if (isnearedge(h.mesh, e[0]) || isnearedge(h.mesh, e[1])) continue;
+		//if (isnearedge(h.mesh, e[0]) || isnearedge(h.mesh, e[1])) continue;
 		// Check seaLevel crossings:
 		var p1Above = h[e[0]] > seaLevel,
 			p2Below = h[e[1]] <= seaLevel,
@@ -707,6 +706,14 @@ function coastPoints(h, seaLevel) {
 // Merge all edges which cross the sea level line:
 function contour(h, seaLevel) {
 	return mergeSegments(coastEdges(h, seaLevel));
+}
+
+// Return ratio of land to sea (0.5 is ideal):
+function landSeaRatio(h, seaLevel) {
+	seaLevel = seaLevel || 0.5;
+	var landTris = h.filter(t => t > seaLevel),
+		seaTris = h.filter(t => t < seaLevel);
+	return landTris.length / seaTris.length;
 }
 
 // Calculate rivers for the heightmap:
@@ -1057,8 +1064,8 @@ function visualizeSlopes(svg, render) {
 		}
 		s /= nbs.length;
 		s2 /= nbs.length;
-		if (Math.abs(s) < runif(0.1, 0.4)) continue;
-		var l = r * runif(1, 2) * (1 - 0.2 * Math.pow(Math.atan(s), 2)) * Math.exp(s2/100);
+		if (Math.abs(s) < randomFrom(0.1, 0.4)) continue;
+		var l = r * randomFrom(1, 2) * (1 - 0.2 * Math.pow(Math.atan(s), 2)) * Math.exp(s2/100);
 		var x = h.mesh.vxs[i][0];
 		var y = h.mesh.vxs[i][1];
 		if (Math.abs(l*s) > 2 * r) {
@@ -1155,13 +1162,13 @@ function dropEdge(h, p) {
 function generateCoast(params) {
 	var mesh = generateGoodMesh(params.npts, params.extent);
 	// Make two opposite slopes:
-	var rVec1 = randomVector(3),
-		rVec2 = [-rVec1[0], -rVec1[1]];
+	var rVec1 = randomVector(3);
+		//rVec2 = [-rVec1[0], -rVec1[1]];
 
 	var h = add(
 		slope(mesh, rVec1),
 		//slope(mesh, rVec2),
-		cone(mesh, runif(-1, -1)),	// random slope
+		cone(mesh, randomFrom(-1, -1)),	// random slope
 		// Multiple sets of mountains so they can superimpose:
 		//mountains(mesh, 20),
 		//mountains(mesh, 20),
@@ -1174,8 +1181,8 @@ function generateCoast(params) {
 	}
 	h = peaky(h);
 	// Erode terrain:
-	h = doErosion(h, runif(0, 0.1), 2);	//5
-	h = setSeaLevel(h, runif(0.2, 0.6));
+	h = doErosion(h, randomFrom(0, 0.1), 2);	//5
+	h = setSeaLevel(h, randomFrom(0.2, 0.6));
 	h = fillSinks(h);
 
 	//h = normalize(h);
