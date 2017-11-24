@@ -1,4 +1,4 @@
-/* global d3 */
+/* global d3, meshTransforms, makeMesh, visualizePoints, generatePoints, improvePoints, zero, generateGoodMesh, visualizeVoronoi, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, runif, fillSinks, erosionRate, doErosion, cleanCoast, getRivers, visualizeSlopes, generateCoast, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, coastPoints, colorizePoints, visualizeCentroids */
 
 function addSVG(div) {
 	return div.insert("svg", ":first-child")
@@ -21,36 +21,38 @@ function meshDraw() {
 	visualizePoints(meshSVG, meshDual ? meshVxs : meshPts);
 }
 
-meshDiv.append("br");
+(function() {
+	meshDiv.append("br");
 
-meshDiv.append("button")
-.text("Generate random points")
-.on("click", function () {
-	meshDual = false;
-	meshVxs = null;
-	meshPts = generatePoints(256);
-	meshDraw();
-});
+	meshDiv.append("button")
+	.text("Generate random points")
+	.on("click", function () {
+		meshDual = false;
+		meshVxs = null;
+		meshPts = generatePoints(256);
+		meshDraw();
+	});
 
-meshDiv.append("button")
-.text("Improve points")
-.on("click", function () {
-	meshPts = improvePoints(meshPts);
-	meshVxs = null;
-	meshDraw();
-});
+	meshDiv.append("button")
+	.text("Improve points")
+	.on("click", function () {
+		meshPts = improvePoints(meshPts);
+		meshVxs = null;
+		meshDraw();
+	});
 
-var vorBut = meshDiv.append("button")
-.text("Show Voronoi corners")
-.on("click", function () {
-	meshDual = !meshDual;
-	if (meshDual) {
-		vorBut.text("Show original points");
-	} else {
-		vorBut.text("Show Voronoi corners");
-	}
-	meshDraw();
-});
+	var vorBut = meshDiv.append("button")
+	.text("Show Voronoi corners")
+	.on("click", function () {
+		meshDual = !meshDual;
+		if (meshDual) {
+			vorBut.text("Show original points");
+		} else {
+			vorBut.text("Show Voronoi corners");
+		}
+		meshDraw();
+	});
+}());
 
 
 // PRIMITIVES
@@ -65,116 +67,119 @@ function primDraw() {
 }
 primDraw();
 
-primDiv.append("br");
-
-primDiv.append("button")
-.text("Reset to flat")
-.on("click", function () {
-	primH = zero(primH.mesh);
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Add random slope")
-.on("click", function () {
-	primH = add(primH, slope(primH.mesh, randomVector(4)));
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Add land @ top")
-.on("click", function () {
-	primH = add(primH, edgeLand(primH.mesh, 'top'));
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Add land @ bottom")
-.on("click", function () {
-	primH = add(primH, edgeLand(primH.mesh, 'bottom'));
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Add land @ right")
-.on("click", function () {
-	primH = add(primH, edgeLand(primH.mesh, 'right'));
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Add land @ left")
-.on("click", function () {
-	primH = add(primH, edgeLand(primH.mesh, 'left'));
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Add cone")
-.on("click", function () {
-	primH = add(primH, cone(primH.mesh, -0.5));
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Add inverted cone")
-.on("click", function () {
-	primH = add(primH, cone(primH.mesh, 0.5));
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Add 25 blobs")
-.on("click", function () {
-	primH = add(primH, mountains(primH.mesh, 25, 0.02));
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Normalize heightmap")
-.on("click", function () {
-	primH = normalize(primH);
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Round hills")
-.on("click", function () {
-	primH = peaky(primH);
-	primDraw();
-});
-
-primDiv.append("button")
-.text("Relax")
-.on("click", function () {
-	primH = relax(primH);
-	primDraw();
-});
-
 var seaLevel = 0.5;
 
-primDiv.append("button")
-.text("Set sea level to median")
-.on("click", function () {
-	primH = setSeaLevel(primH, 0.5);
-	primDraw();
-});
+(function() {
+	primDiv.append("br");
 
-primDiv.append("button")
-.text("Sea higher")
-.on("click", function () {
-	seaLevel += 0.1;
-	primH = setSeaLevel(primH, seaLevel);
-	primDraw();
-});
+	primDiv.append("button")
+	.text("Reset to flat")
+	.on("click", function () {
+		primH = zero(primH.mesh);
+		primDraw();
+	});
 
-primDiv.append("button")
-.text("Sea lower")
-.on("click", function () {
-	seaLevel -= 0.1;
-	primH = setSeaLevel(primH, seaLevel);
-	primDraw();
-});
+	primDiv.append("button")
+	.text("Add random slope")
+	.on("click", function () {
+		primH = add(primH, slope(primH.mesh, randomVector(4)));
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Add land @ top")
+	.on("click", function () {
+		primH = add(primH, meshTransforms.edgeLand(primH.mesh, 'top'));
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Add land @ bottom")
+	.on("click", function () {
+		primH = add(primH, meshTransforms.edgeLand(primH.mesh, 'bottom'));
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Add land @ right")
+	.on("click", function () {
+		primH = add(primH, meshTransforms.edgeLand(primH.mesh, 'right'));
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Add land @ left")
+	.on("click", function () {
+		primH = add(primH, meshTransforms.edgeLand(primH.mesh, 'left'));
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Add cone")
+	.on("click", function () {
+		primH = add(primH, cone(primH.mesh, -0.5));
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Add inverted cone")
+	.on("click", function () {
+		primH = add(primH, cone(primH.mesh, 0.5));
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Add 25 blobs")
+	.on("click", function () {
+		primH = add(primH, mountains(primH.mesh, 25, 0.02));
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Normalize heightmap")
+	.on("click", function () {
+		primH = normalize(primH);
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Round hills")
+	.on("click", function () {
+		primH = peaky(primH);
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Relax")
+	.on("click", function () {
+		primH = relax(primH);
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Set sea level to median")
+	.on("click", function () {
+		primH = setSeaLevel(primH, 0.5);
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Sea higher")
+	.on("click", function () {
+		seaLevel += 0.1;
+		primH = setSeaLevel(primH, seaLevel);
+		primDraw();
+	});
+
+	primDiv.append("button")
+	.text("Sea lower")
+	.on("click", function () {
+		seaLevel -= 0.1;
+		primH = setSeaLevel(primH, seaLevel);
+		primDraw();
+	});
+}());
+
 
 // EROSION
 var erodeDiv = d3.select("div#erode");
@@ -204,46 +209,47 @@ function erodeDraw() {
 	drawPaths(erodeSVG, "coast", contour(erodeH, 0));
 }
 
-erodeDiv.append("br");
+(function(){
+	erodeDiv.append("br");
 
-erodeDiv.append("button")
-.text("Generate random heightmap")
-.on("click", function () {
-	erodeH = generateUneroded();
-	console.log('erodeH', erodeH);
-	erodeDraw();
-});
+	erodeDiv.append("button")
+	.text("Generate random heightmap")
+	.on("click", function () {
+		erodeH = generateUneroded();
+		console.log('erodeH', erodeH);
+		erodeDraw();
+	});
 
-erodeDiv.append("button")
-.text("Copy from above")
-.on("click", function () {
-	erodeH = primH;
-	console.log('erodeH', erodeH);
-	erodeDraw();
-});
+	erodeDiv.append("button")
+	.text("Copy from above")
+	.on("click", function () {
+		erodeH = primH;
+		console.log('erodeH', erodeH);
+		erodeDraw();
+	});
 
-erodeDiv.append("button")
-.text("Erode")
-.on("click", function () {
-	erodeH = doErosion(erodeH, 0.1);
-	erodeDraw();
-});
+	erodeDiv.append("button")
+	.text("Erode")
+	.on("click", function () {
+		erodeH = doErosion(erodeH, 0.1);
+		erodeDraw();
+	});
 
-erodeDiv.append("button")
-.text("Set sea level to median")
-.on("click", function () {
-	erodeH = setSeaLevel(erodeH, 0.5);
-	erodeDraw();
-});
+	erodeDiv.append("button")
+	.text("Set sea level to median")
+	.on("click", function () {
+		erodeH = setSeaLevel(erodeH, 0.5);
+		erodeDraw();
+	});
 
-
-erodeDiv.append("button")
-.text("Clean coastlines")
-.on("click", function () {
-	erodeH = cleanCoast(erodeH, 1);
-	erodeH = fillSinks(erodeH);
-	erodeDraw();
-});
+	erodeDiv.append("button")
+	.text("Clean coastlines")
+	.on("click", function () {
+		erodeH = cleanCoast(erodeH, 1);
+		erodeH = fillSinks(erodeH);
+		erodeDraw();
+	});
+}());
 
 
 // PHYSICAL
@@ -279,25 +285,25 @@ function physDraw() {
 	}
 }
 
-physDiv.append("br");
+(function() {
+	physDiv.append("br");
 
-physDiv.append("button")
-.text("Generate random heightmap")
-.on("click", function () {
-	physH = generateCoast({npts:4096, extent:defaultExtent});
-	console.log('physH', physH);
-	physDraw();
-});
+	physDiv.append("button")
+	.text("Generate random heightmap")
+	.on("click", function () {
+		physH = generateCoast({npts:4096, extent:defaultExtent});
+		console.log('physH', physH);
+		physDraw();
+	});
 
-physDiv.append("button")
-.text("Copy from above")
-.on("click", function () {
-	physH = erodeH;
-	console.log('physH', physH);
-	physDraw();
-});
-/*
-{
+	physDiv.append("button")
+	.text("Copy from above")
+	.on("click", function () {
+		physH = erodeH;
+		console.log('physH', physH);
+		physDraw();
+	});
+	/*
 	var physCoastBut = physDiv.append("button")
 	.text("Show coastline")
 	.on("click", function () {
@@ -331,8 +337,8 @@ physDiv.append("button")
 		physHeightBut.text(physViewHeight ? "Hide heightmap" : "Show heightmap");
 		physDraw();
 	});
-}
-*/
+	*/
+});
 
 // CITIES
 var cityDiv = d3.select("div#fifth");
@@ -394,22 +400,22 @@ function generateBaseMap(type, params) {
 	}
 	else if (type === 2) {	// Top-bottom + 25
 		h = add(
-			edgeLand(mesh, 'top'),
-			edgeLand(mesh, 'bottom'),
+			meshTransforms.edgeLand(mesh, 'top'),
+			meshTransforms.edgeLand(mesh, 'bottom'),
 			mountains(mesh, 10, 0.04),
 			mountains(mesh, 15, 0.06)
 		);
 	}
 	else if (type === 3) {	// Right-left + 25
 		h = add(
-			edgeLand(mesh, 'right'),
-			edgeLand(mesh, 'left'),
+			meshTransforms.edgeLand(mesh, 'right'),
+			meshTransforms.edgeLand(mesh, 'left'),
 			mountains(mesh, 10, 0.04),
 			mountains(mesh, 15, 0.06)
 		);
 	}
 	else {
-		var h = add(
+		h = add(
 			slope(mesh, randomVector(4)),
 			cone(mesh, runif(-1, -1)),	// random slope
 			mountains(mesh, 20)
@@ -431,87 +437,89 @@ function generateBaseMap(type, params) {
 	return h;
 }
 
-cityDiv.append("br");
+(function(){
+	cityDiv.append("br");
 
-cityDiv.append("button")
-.text("Generate random heightmap")
-.on("click", function () {
-	Stage5Render = newStage5Render();
-	console.log('cityRender', Stage5Render);
-	Stage5Draw();
-});
+	cityDiv.append("button")
+	.text("Generate random heightmap")
+	.on("click", function () {
+		Stage5Render = newStage5Render();
+		console.log('cityRender', Stage5Render);
+		Stage5Draw();
+	});
 
-cityDiv.append("button")
-.text("Generate Type 1")
-.on("click", function () {
-	Stage5Render = newStage5Render(1);
-	console.log('cityRender_type1', Stage5Render);
-	Stage5Draw();
-});
+	cityDiv.append("button")
+	.text("Generate Type 1")
+	.on("click", function () {
+		Stage5Render = newStage5Render(1);
+		console.log('cityRender_type1', Stage5Render);
+		Stage5Draw();
+	});
 
-cityDiv.append("button")
-.text("Generate Type 2")
-.on("click", function () {
-	Stage5Render = newStage5Render(2);
-	console.log('cityRender_type2', Stage5Render);
-	Stage5Draw();
-});
+	cityDiv.append("button")
+	.text("Generate Type 2")
+	.on("click", function () {
+		Stage5Render = newStage5Render(2);
+		console.log('cityRender_type2', Stage5Render);
+		Stage5Draw();
+	});
 
-cityDiv.append("button")
-.text("Generate Type 3")
-.on("click", function () {
-	Stage5Render = newStage5Render(3);
-	console.log('cityRender_type3', Stage5Render);
-	Stage5Draw();
-});
+	cityDiv.append("button")
+	.text("Generate Type 3")
+	.on("click", function () {
+		Stage5Render = newStage5Render(3);
+		console.log('cityRender_type3', Stage5Render);
+		Stage5Draw();
+	});
 
-cityDiv.append("button")
-.text("Copy from above")
-.on("click", function () {
-	Stage5Render = newStage5Render(physH);
-	console.log('cityRender', Stage5Render);
-	Stage5Draw();
-});
+	cityDiv.append("button")
+	.text("Copy from above")
+	.on("click", function () {
+		Stage5Render = newStage5Render(physH);
+		console.log('cityRender', Stage5Render);
+		Stage5Draw();
+	});
 
-cityDiv.append("button")
-.text("Add new city")
-.on("click", function () {
-	placeCity(Stage5Render);
-	Stage5Draw();
-});
+	cityDiv.append("button")
+	.text("Add new city")
+	.on("click", function () {
+		placeCity(Stage5Render);
+		Stage5Draw();
+	});
 
-cityDiv.append("button")
-.text("Sea higher")
-.on("click", function () {
-	seaLevel += 0.1;
-	Stage5Render.h = setSeaLevel(Stage5Render.h, seaLevel);
-	Stage5Draw();
-});
+	cityDiv.append("button")
+	.text("Sea higher")
+	.on("click", function () {
+		seaLevel += 0.1;
+		Stage5Render.h = setSeaLevel(Stage5Render.h, seaLevel);
+		Stage5Draw();
+	});
 
-cityDiv.append("button")
-.text("Sea lower")
-.on("click", function () {
-	seaLevel -= 0.1;
-	Stage5Render.h = setSeaLevel(Stage5Render.h, seaLevel);
-	Stage5Draw();
-});
+	cityDiv.append("button")
+	.text("Sea lower")
+	.on("click", function () {
+		seaLevel -= 0.1;
+		Stage5Render.h = setSeaLevel(Stage5Render.h, seaLevel);
+		Stage5Draw();
+	});
 
-cityDiv.append("button")
-.text("Normalize heightmap")
-.on("click", function () {
-	Stage5Render.h = normalize(Stage5Render.h);
-	Stage5Draw();
-});
+	cityDiv.append("button")
+	.text("Normalize heightmap")
+	.on("click", function () {
+		Stage5Render.h = normalize(Stage5Render.h);
+		Stage5Draw();
+	});
 
-/*
-var cityViewBut = cityDiv.append("button")
-.text("Show territories")
-.on("click", function () {
-	cityViewScore = !cityViewScore;
-	cityViewBut.text(cityViewScore ? "Show territories" : "Show city location scores");
-	Stage5Draw();
+	/*
+	var cityViewBut = cityDiv.append("button")
+	.text("Show territories")
+	.on("click", function () {
+		cityViewScore = !cityViewScore;
+		cityViewBut.text(cityViewScore ? "Show territories" : "Show city location scores");
+		Stage5Draw();
+	});
+	*/
 });
-*/
 
 // FINAL
 /*

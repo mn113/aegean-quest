@@ -300,22 +300,24 @@ function slope(mesh, direction) {
 	});
 }
 
-// Add some land on one side only:
-function edgeLand(mesh, side) {
-	return mesh.map(function (x) {
-		switch(side) {
-			case 'top':    return (x[1] < 0.1 * Math.random() - 0.3);
-			case 'left':   return (x[0] < 0.1 * Math.random() - 0.3);
-			case 'bottom': return (x[1] > 0.1 * Math.random() + 0.3);
-			case 'right':  return (x[0] > 0.1 * Math.random() + 0.3);
-		}
-	});
-}
+var meshTransforms = {
+	// Add some land on one side only:
+	edgeLand: function(mesh, side) {
+		return mesh.map(function (x) {
+			switch(side) {
+				case 'top':    return (x[1] < 0.1 * Math.random() - 0.3);
+				case 'left':   return (x[0] < 0.1 * Math.random() - 0.3);
+				case 'bottom': return (x[1] > 0.1 * Math.random() + 0.3);
+				case 'right':  return (x[0] > 0.1 * Math.random() + 0.3);
+			}
+		});
+	},
+	// Add some land to one corner of the map:
+	cornerLand: function(mesh, corner) {
 
-// Add some land to one corner of the map:
-function cornerLand(mesh, corner) {
+	}
+};
 
-}
 
 // Add a cone to the mesh (higher in centre):
 function cone(mesh, slope) {
