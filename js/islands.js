@@ -9,13 +9,29 @@ function addNaviLayer(target) {
 	naviPoints = generateGoodPoints(256);
 	// TODO: Find nearest map point to each naviPoint. Is it on land or sea?
 	// Delete any naviPoint over land
+	// TODO: remove navi points which are above land, using x & y:
+	naviPoints.forEach(function(p) {
+		var x = 1000 * p[0], y = 1000 * p[1];
+		// Pseudo click:
+		var e2 = view.select("#visualizedVoronoi").createEvent('MouseEvent');
+		e2.initMouseEvent(e.type, e.bubbles, e.cancelable, e.view,  e.detail, e.screenX, e.screenY, e.clientX, e.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, e.button, e.relatedTarget);
+		el.dispatchEvent(e2);
+		// NOW WHAT?
+		//var el = document.elementFromPoint(x,y);
+		/*var rect = citySVG.append("rect")
+			.attr("x", x)
+			.attr("y", y)
+			.attr("width", 1)
+			.attr("height", 1);*/
+		//console.log('p', [p], 'iL', citySVG.getIntersectionList(rect, view.select("#visualizedVoronoi")));
+		//rect.remove();
+	});
+
 	naviMesh = makeMesh(naviPoints);
 	//naviMesh = normalize(relax(cone(naviMesh, -0.75)));
 	console.log('naviMesh', naviMesh);
 	console.log('maxH', d3.max(naviMesh), 'minH', d3.min(naviMesh));
 
-	// TODO: remove navi points which are above land, using x & y:
-	
 
 	// Build data structures for Dijkstra's algorithm:
 	var nodes = naviPoints.map(function(p,i) {
@@ -25,7 +41,7 @@ function addNaviLayer(target) {
 			r: 10
 		};
 	});
-	var paths = naviMesh.mesh.edges.map(function(edge) {
+	var paths = naviMesh.edges.map(function(edge) {
 		if (edge[3] === undefined) return null;
 		// Use strings to avoid key problems: //FIXME
 		var a = ""+edge[2].index,
@@ -33,7 +49,7 @@ function addNaviLayer(target) {
 		return {
 			source: a,
 			target: b,
-			distance: 1000 * pointDistance(naviMesh.mesh, a, b)
+			distance: 1000 * pointDistance(naviMesh, a, b)
 		};
 	}).filter(p => p);	// no nulls por favor
 	console.log('nodes', nodes);
@@ -95,7 +111,7 @@ function routeShip(dest) {
 }
 function moveShip(destNode, callback) {
 	// Get Pythagorean distance and use with ship's speed for animation duration:
-	var distance = 2500 * pointDistance(naviMesh.mesh, shipNode, destNode),
+	var distance = 2500 * pointDistance(naviMesh, shipNode, destNode),
 		duration = distance / ship1.speed;
 	console.log('distance', distance, 'duration', duration);
 

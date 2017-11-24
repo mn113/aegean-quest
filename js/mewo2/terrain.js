@@ -2,10 +2,6 @@
 
 "use strict";
 
-function randomFrom(lo, hi) {
-	return lo + Math.random() * (hi - lo);
-}
-
 // Random number function?
 var rnorm = (function () {
 	var z2 = null;
@@ -30,6 +26,10 @@ var rnorm = (function () {
 	return rnorm;
 })();
 //console.log('rNorm', rnorm());	// WHAT IS THIS?
+
+function randomFrom(lo, hi) {
+	return lo + Math.random() * (hi - lo);
+}
 
 function randomVector(scale) {
 	return [scale * rnorm(), scale * rnorm()];
@@ -631,51 +631,6 @@ function trislope(h, i) {
 	];
 }
 
-// Calculate city viability score for each point in the mesh:
-function cityScores(h, cities) {
-	var scores = map(getFlux(h), Math.sqrt);
-	// TODO: simply place cities on coasts
-	console.log('minCity', Math.min(cities), 'maxCity', Math.max(cities));
-	for (var i = 0; i < h.length; i++) {
-		// No cities near edges:
-		if (h[i] <= 0 || isnearedge(h.mesh, i)) {
-			scores[i] = -999999;
-			continue;
-		}
-		else {
-			scores[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][0]) - h.mesh.extent.width/2);
-			scores[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][1]) - h.mesh.extent.height/2);
-			// Make a "well" around the city to avoid close cities:
-			for (var j = 0; j < cities.length; j++) {
-				scores[i] -= 0.02 / (distance(h.mesh, cities[j], i) + 1e-9);
-			}
-		}
-	}
-	console.log('cityScores', scores);
-	return scores;
-}
-
-// Find the best location for the next city to be added:
-function placeCity(render) {
-	render.cities = render.cities || [];
-	// Recalculate city scores:
-	var scores = cityScores(render.h, render.cities);
-	// Get highest score:
-	var newcity = d3.scan(scores, d3.descending);
-	console.log('newCity', newcity);
-	render.cities.push(newcity);
-}
-
-// Find locations for all desired cities:
-function placeCities(render) {
-	var params = render.params;
-	var h = render.h;	// UNUSED h
-	var n = params.ncities;
-	for (var i = 0; i < n; i++) {
-		placeCity(render);
-	}
-}
-
 // Get all coastal edges:
 function coastEdges(h, seaLevel) {
 	seaLevel = seaLevel || 0;
@@ -1112,36 +1067,93 @@ function visualizeBorders(h, cities, n) {
 }
 */
 
+// Calculate city viability score for each point in the mesh:
+function cityScores(h, cities) {
+	var scores = map(getFlux(h), Math.sqrt);
+	// Discard names:
+	cities = cities.map(c => c.ptIndex);
+	// TODO: simply place cities on coasts
+	console.log('minCity', Math.min(cities), 'maxCity', Math.max(cities));
+	for (var i = 0; i < h.length; i++) {
+		// No cities near edges:
+		if (h[i] <= 0 || isnearedge(h.mesh, i)) {
+			scores[i] = -999999;
+			continue;
+		}
+		else {
+			scores[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][0]) - h.mesh.extent.width/2);
+			scores[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][1]) - h.mesh.extent.height/2);
+			// Make a "well" around the city to avoid close cities:
+			for (var j = 0; j < cities.length; j++) {
+				scores[i] -= 0.02 / (distance(h.mesh, cities[j], i) + 1e-9);
+			}
+		}
+	}
+	//console.log('cityScores', scores);
+	return scores;
+}
+
+// Find the best location for the next city to be added:
+// Pass in Town object so as to attach name to be rendered
+function placeCity(render, t) {
+	render.cities = render.cities || [];
+	// Recalculate city scores:
+	var scores = cityScores(render.h, render.cities);
+	// Get highest score:
+	var newcityIndex = d3.scan(scores, d3.descending);
+	console.log('topCity', newcityIndex);
+
+	render.cities.push({
+		ptIndex: newcityIndex,
+		name: t.name
+	});
+}
+
+// Find locations for all desired cities:
+function placeCities(render) {
+	var params = render.params;
+	var h = render.h;	// UNUSED h
+	var n = params.ncities;
+	for (var i = 0; i < n; i++) {
+		placeCity(render);
+	}
+}
+
 // Draw a dot for each placed city, attach behaviours:
 function visualizeCities(svg, render) {
 	var cities = render.cities;
 	var h = render.h;
 	var n = render.params.nterrs;
 
-	var circs = svg.selectAll('circle.city').data(cities);
+	// Remove group if present:
+	svg.select("g#cities").remove();
+	var outerG = svg.append('g').attr('id', "cities");
+	// Bind pts data:
+	var circs = outerG.selectAll('circle.city').data(cities);
 	circs.enter()
-	.append('circle')
-	.classed('city', true);
+		.append('circle')
+		.classed('city', true);
 	circs.exit()
-	.remove();
+		.remove();
 	svg.selectAll('circle.city')
-	.attr('cx', function (d) {return 1000*h.mesh.vxs[d][0];})
-	.attr('cy', function (d) {return 1000*h.mesh.vxs[d][1];})
-	.attr('r', function (d, i) {return i >= n ? 4 : 10;})
-	.style('fill', 'red')
-	.style('stroke-width', 5)
-	.style('stroke-linecap', 'round')
-	.style('stroke', 'black')
-	.raise()
-	.on('click', function(d) {
-		console.log(this, d);	// city clicked, logs html / id
-	})
-	.on('mouseover', function(d) {
-		d3.select(this).style('fill', 'yellow');
-	})
-	.on('mouseout', function(d) {
-		d3.select(this).style('fill', 'red');
-	});
+		.attr('cx', function (d) {return 1000*h.mesh.vxs[d.ptIndex][0];})
+		.attr('cy', function (d) {return 1000*h.mesh.vxs[d.ptIndex][1];})
+		.attr('r', function (d, i) {return i >= n ? 5 : 8;})	// allow n capitals and then minor towns
+		.attr('data-name', function (d) {return d.name;})
+		.style('fill', 'red')
+		.style('stroke-width', 5)
+		.style('stroke-linecap', 'round')
+		.style('stroke', 'black')
+		.raise()
+		.on('click', function(d) {
+			console.log(d.ptIndex, d.name);	// city clicked, logs html / id
+		})
+		.on('mouseover', function(d) {
+			d3.select(this).style('fill', 'yellow');
+		})
+		.on('mouseout', function(d) {
+			d3.select(this).style('fill', 'red');
+		});
 }
 
 /*
@@ -1216,7 +1228,8 @@ function drawLabels(svg, render) {
 	var nterrs = render.params.nterrs;
 	var avoids = [render.rivers, render.coasts];//, render.borders];
 
-	var lang = makeRandomLanguage();
+	var lang = makeRandomLanguage();	// TODO: replace with static list
+	console.log('lang', lang);
 	var citylabels = [];
 
 	// Penalise non-optimal label placements:
@@ -1237,7 +1250,7 @@ function drawLabels(svg, render) {
 		}
 
 		for (var i = 0; i < cities.length; i++) {
-			var c = h.mesh.vxs[cities[i]];
+			var c = h.mesh.vxs[cities[i].ptIndex];
 			if (label.x0 < c[0] && label.x1 > c[0] && label.y0 < c[1] && label.y1 > c[1]) {
 				pen += 100;
 			}
@@ -1259,13 +1272,15 @@ function drawLabels(svg, render) {
 
 	function drawCityLabels() {
 		for (var i = 0; i < cities.length; i++) {
-			var x = h.mesh.vxs[cities[i]][0];
-			var y = h.mesh.vxs[cities[i]][1];
-			var text = makeName(lang, 'city');
+			var cityIndex = cities[i].ptIndex;
+			var x = h.mesh.vxs[cityIndex][0];
+			var y = h.mesh.vxs[cityIndex][1];
+			//var text = makeName(lang, 'city');	// TODO: replace with city name
+			var text = cities[i].name;
 			var size = i < nterrs ? params.fontsizes.city : params.fontsizes.town;
-			var sx = 0.65 * size/1000 * text.length;
+			var sx = 0.65 * (size/1000) * text.length;
 			var sy = size/1000;
-			var posslabels = [
+			var possLabels = [
 				{
 					x: x + 0.8 * sy,
 					y: y + 0.3 * sy,
@@ -1303,7 +1318,11 @@ function drawLabels(svg, render) {
 					y1: y + 1.3*sy
 				}
 			];
-			var label = posslabels[d3.scan(posslabels, function (a, b) {return penalty(a) - penalty(b);})];
+			// Select optimal label site:
+			var topSiteId = d3.scan(possLabels, function (a, b) {
+				return penalty(a) - penalty(b);
+			});
+			var label = possLabels[topSiteId];
 			label.text = text;
 			label.size = size;
 			citylabels.push(label);

@@ -151,8 +151,6 @@ class Town {
 		this.status = "free";
 		this.size = 5;
 		this.visited = false;
-		// Register in global array:
-		//towns.push[this];
 		return this;
 	}
 

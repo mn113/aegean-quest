@@ -1,4 +1,4 @@
-/* global d3, meshTransforms, makeMesh, visualizePoints, generatePoints, improvePoints, zero, generateGoodMesh, visualizeVoronoi, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, randomFrom, fillSinks, erosionRate, doErosion, cleanCoast, getRivers, visualizeSlopes, generateCoast, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, coastPoints, colorizePoints, visualizeCentroids, addNaviLayer, addShipSvg, landSeaRatio */
+/* global d3, meshTransforms, makeMesh, visualizePoints, generatePoints, improvePoints, zero, generateGoodMesh, visualizeVoronoi, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, randomFrom, fillSinks, erosionRate, doErosion, cleanCoast, getRivers, visualizeSlopes, generateCoast, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, coastPoints, colorizePoints, visualizeCentroids, addNaviLayer, addShipSvg, landSeaRatio, drawLabels, Town */
 
 function addSVG(div) {
 	return div.insert("svg", ":first-child")
@@ -8,6 +8,8 @@ function addSVG(div) {
 }
 
 var seaLevel = 0.5;	// global
+var towns = [];
+var svgShip;
 
 // BASIC POINTS
 var meshDiv = d3.select("div#mesh");
@@ -344,7 +346,7 @@ function physDraw() {
 
 
 // CITIES
-var cityDiv = d3.select("div#fifth");
+var postCityDiv = d3.select("div#post-fifth");
 var citySVG = d3.select("div#fifth svg");
 var view = citySVG.append('g').attr('id', 'view');
 
@@ -352,14 +354,17 @@ var view = citySVG.append('g').attr('id', 'view');
 function newStage5Render(type, h) {
 	type = type || 1;
 	h = h || generateBaseMap(type, {npts:4096, extent: defaultExtent});
-	return {
+	var render = {
 		params: defaultParams,
 		h: h,
 		cities: []
 	};
+	render.rivers = getRivers(h, 0.01);
+	render.coasts = contour(h, 0);
+	return render;
 }
-var Stage5Render = newStage5Render(physH);
-var coast, testSite, svgShip;
+var Stage5Render = newStage5Render(null, physH);
+var coast;
 
 function Stage5Draw() {
 	var scores = cityScores(Stage5Render.h, Stage5Render.cities);
@@ -370,16 +375,11 @@ function Stage5Draw() {
 
 	drawPaths(view, 'coast', contour(Stage5Render.h, 0));
 	drawPaths(view, 'river', getRivers(Stage5Render.h, 0.01));
-
 	visualizeSlopes(view, Stage5Render);
-	visualizeCities(view, Stage5Render);
 
 	// Try to make a town on the coast:
 	coast = coastPoints(Stage5Render.h, 0.5);
 	console.log('coast', coast);
-	testSite = coast.random();
-	//view.select("#pt_"+testSite.index).attr('r', 30);
-
 }
 
 function addNavAndShip() {
@@ -459,9 +459,9 @@ var zoom = d3.zoom()
 view.call(zoom);
 
 (function(){
-	cityDiv.append("br");
+	postCityDiv.append("br");
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Generate random heightmap")
 	.on("click", function () {
 		Stage5Render = newStage5Render();
@@ -469,7 +469,7 @@ view.call(zoom);
 		Stage5Draw();
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Generate Type 1")
 	.on("click", function () {
 		Stage5Render = newStage5Render(1);
@@ -477,7 +477,7 @@ view.call(zoom);
 		Stage5Draw();
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Generate Type 2")
 	.on("click", function () {
 		Stage5Render = newStage5Render(2);
@@ -485,7 +485,7 @@ view.call(zoom);
 		Stage5Draw();
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Generate Type 3")
 	.on("click", function () {
 		Stage5Render = newStage5Render(3);
@@ -493,7 +493,7 @@ view.call(zoom);
 		Stage5Draw();
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Generate Type 4")
 	.on("click", function () {
 		Stage5Render = newStage5Render(4);
@@ -501,7 +501,7 @@ view.call(zoom);
 		Stage5Draw();
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Copy from above")
 	.on("click", function () {
 		Stage5Render = newStage5Render(physH);
@@ -509,14 +509,27 @@ view.call(zoom);
 		Stage5Draw();
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Add new city")
 	.on("click", function () {
 		placeCity(Stage5Render);
-		Stage5Draw();
+		visualizeCities(view, Stage5Render);
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
+	.text("Add 10 cities")
+	.on("click", function () {
+		for (var c = 10; c > 0; c--) {
+			var t = new Town();
+			towns.push(t);
+			placeCity(Stage5Render, t);
+		}
+		console.log('Stage5Render', Stage5Render);
+		visualizeCities(view, Stage5Render);
+		drawLabels(view, Stage5Render);
+	});
+
+	postCityDiv.append("button")
 	.text("Sea higher")
 	.on("click", function () {
 		seaLevel += 0.1;
@@ -524,7 +537,7 @@ view.call(zoom);
 		Stage5Draw();
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Sea lower")
 	.on("click", function () {
 		seaLevel -= 0.1;
@@ -532,21 +545,21 @@ view.call(zoom);
 		Stage5Draw();
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Normalize heightmap")
 	.on("click", function () {
 		Stage5Render.h = normalize(Stage5Render.h);
 		Stage5Draw();
 	});
 
-	cityDiv.append("button")
+	postCityDiv.append("button")
 	.text("Add nav & ship")
 	.on("click", function () {
 		addNavAndShip();
 	});
 
 	/*
-	var cityViewBut = cityDiv.append("button")
+	var cityViewBut = postCityDiv.append("button")
 	.text("Show territories")
 	.on("click", function () {
 		cityViewScore = !cityViewScore;

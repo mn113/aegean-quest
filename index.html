@@ -12,12 +12,10 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="css/semantic/semantic.css">
 	<script src="css/semantic/semantic.js"></script>
-	<script type="text/javascript">
-		var gameText;
-		$.getJSON("js/gameText.json", function(res) {
-			gameText = res[0];
-		});
-	</script>
+	<script src="js/gameText.js"></script>
+	<script type="text/javascript" src="http://canvg.github.io/canvg/rgbcolor.js"></script>
+	<script type="text/javascript" src="http://canvg.github.io/canvg/StackBlur.js"></script>
+	<script type="text/javascript" src="http://canvg.github.io/canvg/canvg.js"></script>
 </head>
 <body>
 	<h1>Aegean Quest</h1>
@@ -45,7 +43,7 @@
 	<hr>
 
 	<div id="fifth">
-		<svg height="600" width="800" viewBox="-200 -200 400 400">
+		<svg id="gamesvg" height="600" width="800" viewBox="-200 -200 400 400">
 			<defs>
 				<style type="text/css">
 				.clickable {
@@ -55,6 +53,7 @@
 			</defs>
 		</svg>
 	</div>
+	<div id="post-fifth"></div>
 	<hr>
 
 	<div id="gamearea">
@@ -85,6 +84,8 @@
 			</div>
 		</div>
 	</div>
+
+	<canvas id="canvas" width="800px" height="600px"></canvas>
 
 	<!-- end of HTML content -->
 
@@ -164,6 +165,13 @@
 		});
 		// Crew tooltips:
 		$('#gamearea .ui .crew img').popup();
+
+		function svgToCanvas() {
+			var svgString = $("#fifth").html();
+			console.log(svgString);
+			//load a svg snippet in the canvas with id = 'drawingArea'
+			canvg(document.querySelector('#canvas'), svgString, {});
+		}
 
 	</script>
 </body>
