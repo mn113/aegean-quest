@@ -53,7 +53,7 @@ function addNaviLayer(target) {
 		routeShip(clickedIndex);
 	});
 }
-addNaviLayer();
+addNaviLayer(view);
 
 // Enable Snap movement:
 var s = Snap("#fifth svg");

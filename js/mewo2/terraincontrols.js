@@ -7,6 +7,8 @@ function addSVG(div) {
 	.attr("viewBox", "-200 -200 400 400");
 }
 
+
+// BASIC POINTS
 var meshDiv = d3.select("div#mesh");
 var meshSVG = addSVG(meshDiv);
 
@@ -196,7 +198,6 @@ function generateUneroded() {
 	return h;
 }
 
-// ERODE
 var erodeH = primH;
 var erodeViewErosion = false;
 
@@ -338,21 +339,13 @@ function physDraw() {
 		physDraw();
 	});
 	*/
-});
+}());
+
 
 // CITIES
 var cityDiv = d3.select("div#fifth");
 var citySVG = d3.select("div#fifth svg");
 var view = citySVG.append('g').attr('id', 'view');
-
-// Pan & zoom:
-var zoom = d3.zoom()
-	.scaleExtent([0.5, 1.75])
-	//.translateExtent([[25,25],[775,575]])	// trap to bounds?
-	.on("zoom", function() {
-		view.attr("transform", d3.event.transform);	// includes translate & scale
-	});
-view.call(zoom);
 
 // Just wraps the heightmap in preparation for cities data:
 function newStage5Render(type, h) {
@@ -414,6 +407,15 @@ function generateBaseMap(type, params) {
 			mountains(mesh, 15, 0.06)
 		);
 	}
+	else if (type === 4) {	// Opposite corners + 35
+		h = add(
+			meshTransforms.cornerLand(mesh, 'topRight'),
+			meshTransforms.cornerLand(mesh, 'bottomLeft'),
+			mountains(mesh, 10, 0.04),
+			mountains(mesh, 15, 0.06),
+			mountains(mesh, 10, 0.08)
+		);
+	}
 	else {
 		h = add(
 			slope(mesh, randomVector(4)),
@@ -436,6 +438,15 @@ function generateBaseMap(type, params) {
 
 	return h;
 }
+
+// Pan & zoom:
+var zoom = d3.zoom()
+	.scaleExtent([0.5, 1.75])
+	//.translateExtent([[25,25],[775,575]])	// trap to bounds?
+	.on("zoom", function() {
+		view.attr("transform", d3.event.transform);	// includes translate & scale
+	});
+view.call(zoom);
 
 (function(){
 	cityDiv.append("br");
@@ -469,6 +480,14 @@ function generateBaseMap(type, params) {
 	.on("click", function () {
 		Stage5Render = newStage5Render(3);
 		console.log('cityRender_type3', Stage5Render);
+		Stage5Draw();
+	});
+
+	cityDiv.append("button")
+	.text("Generate Type 4")
+	.on("click", function () {
+		Stage5Render = newStage5Render(4);
+		console.log('cityRender_type4', Stage5Render);
 		Stage5Draw();
 	});
 
@@ -519,7 +538,8 @@ function generateBaseMap(type, params) {
 		Stage5Draw();
 	});
 	*/
-});
+}());
+
 
 // FINAL
 /*

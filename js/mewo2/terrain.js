@@ -303,18 +303,29 @@ function slope(mesh, direction) {
 var meshTransforms = {
 	// Add some land on one side only:
 	edgeLand: function(mesh, side) {
-		return mesh.map(function (x) {
+		return mesh.map(function (pt) {
 			switch(side) {
-				case 'top':    return (x[1] < 0.1 * Math.random() - 0.3);
-				case 'left':   return (x[0] < 0.1 * Math.random() - 0.3);
-				case 'bottom': return (x[1] > 0.1 * Math.random() + 0.3);
-				case 'right':  return (x[0] > 0.1 * Math.random() + 0.3);
+				// dealing with an [x,y] point in a [-0.5,0.5] extent for each axis
+				case 'left':   return pt[0] < (0.1 * Math.random() - 0.25);
+				case 'right':  return pt[0] > (0.1 * Math.random() + 0.25);
+				case 'top':    return pt[1] < (0.1 * Math.random() - 0.25);
+				case 'bottom': return pt[1] > (0.1 * Math.random() + 0.25);
 			}
 		});
 	},
 	// Add some land to one corner of the map:
 	cornerLand: function(mesh, corner) {
-
+		return mesh.map(function (pt) {
+			var r1 = (0.1 * Math.random()) - 0.25,
+				r2 = (0.1 * Math.random()) + 0.25;
+			switch(corner) {
+				// dealing with an [x,y] point in a [-0.5,0.5] extent for each axis
+				case 'topLeft':     return pt[0] < r1 && pt[1] < r1;
+				case 'topRight':    return pt[0] > r2 && pt[1] < r1;
+				case 'bottomLeft':  return pt[0] < r1 && pt[1] > r2;
+				case 'bottomRight': return pt[0] > r2 && pt[1] > r2;
+			}
+		});
 	}
 };
 
