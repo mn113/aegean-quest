@@ -901,7 +901,48 @@ function colorizePoints(svg, h) {
 
 // Add classes to svg nodes: sea, coast or land:
 function classifyPoints(svg, h) {
+	svg.selectAll("circle")
+		.classed('land', function(d,i) {
+			return h[i];// difficult to do...
+		});
+}
 
+function visualizeCentroids(svg, h, lo, hi) {
+	if (hi === undefined) hi = d3.max(h) + 1e-9;
+	if (lo === undefined) lo = d3.min(h) - 1e-9;
+
+	var mappedvals = h.map(function (x) {
+		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
+	});
+
+	// Remove group if present:
+	svg.select("g#visualizedCentroids").remove();
+	var outerG = svg.append('g').attr('id', "visualizedCentroids");
+	// Bind pts data:
+	var bound = outerG.selectAll('circle').data(h.mesh.vor.cells);
+
+	var ptRadius = 100 / Math.sqrt(h.mesh.vor.cells.length);
+	// For each data point make a group containing circle and (optionally) text
+	var groups = bound.enter();
+	groups.append('circle')
+		.attr("transform", function (d) {return "translate("+ 1000*d.site[0]+","+ 1000*d.site[1]+")"; })
+		.attr('r', ptRadius)
+		.attr('id', function(d,i) { return 'cent_'+i; })
+		.classed('clickable', true)
+		// A Voronoi polygon can only be land or sea. Points can also be coast or city.
+		.classed('land', function(d,i) {
+			return (mappedvals[i] > 0.5);
+		})
+		.classed('sea', function(d,i) {
+			return (mappedvals[i] < 0.5);
+		})
+		.style('fill', 'lawngreen')
+		.on('click', function(d,i) {
+			console.log('index', i, 'height', mappedvals[i]);	// not the right data!
+		})
+		;
+	// Cleanup:
+	groups.exit().remove();
 }
 
 // Convert a path (array of points) to svg string format:

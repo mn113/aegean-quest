@@ -21,6 +21,8 @@ function meshDraw() {
 	visualizePoints(meshSVG, meshDual ? meshVxs : meshPts);
 }
 
+meshDiv.append("br");
+
 meshDiv.append("button")
 .text("Generate random points")
 .on("click", function () {
@@ -38,7 +40,6 @@ meshDiv.append("button")
 	meshDraw();
 });
 
-/*
 var vorBut = meshDiv.append("button")
 .text("Show Voronoi corners")
 .on("click", function () {
@@ -49,7 +50,8 @@ var vorBut = meshDiv.append("button")
 		vorBut.text("Show Voronoi corners");
 	}
 	meshDraw();
-});*/
+});
+
 
 // PRIMITIVES
 var primDiv = d3.select("div#prim");
@@ -62,6 +64,8 @@ function primDraw() {
 	drawPaths(primSVG, 'coast', contour(primH, 0));
 }
 primDraw();
+
+primDiv.append("br");
 
 primDiv.append("button")
 .text("Reset to flat")
@@ -200,6 +204,8 @@ function erodeDraw() {
 	drawPaths(erodeSVG, "coast", contour(erodeH, 0));
 }
 
+erodeDiv.append("br");
+
 erodeDiv.append("button")
 .text("Generate random heightmap")
 .on("click", function () {
@@ -209,7 +215,7 @@ erodeDiv.append("button")
 });
 
 erodeDiv.append("button")
-.text("Copy heightmap from above")
+.text("Copy from above")
 .on("click", function () {
 	erodeH = primH;
 	console.log('erodeH', erodeH);
@@ -273,6 +279,8 @@ function physDraw() {
 	}
 }
 
+physDiv.append("br");
+
 physDiv.append("button")
 .text("Generate random heightmap")
 .on("click", function () {
@@ -282,7 +290,7 @@ physDiv.append("button")
 });
 
 physDiv.append("button")
-.text("Copy heightmap from above")
+.text("Copy from above")
 .on("click", function () {
 	physH = erodeH;
 	console.log('physH', physH);
@@ -327,13 +335,13 @@ physDiv.append("button")
 */
 
 // CITIES
-//var cityDiv = '';
+var cityDiv = d3.select("div#fifth");
 var citySVG = d3.select("div#fifth svg");
 var view = citySVG.append('g').attr('id', 'view');
 
 // Pan & zoom:
 var zoom = d3.zoom()
-	.scaleExtent([1, 1.75])
+	.scaleExtent([0.5, 1.75])
 	//.translateExtent([[25,25],[775,575]])	// trap to bounds?
 	.on("zoom", function() {
 		view.attr("transform", d3.event.transform);	// includes translate & scale
@@ -341,8 +349,9 @@ var zoom = d3.zoom()
 view.call(zoom);
 
 // Just wraps the heightmap in preparation for cities data:
-function newStage5Render(h) {
-	h = h || generateCoast({npts:4096, extent: defaultExtent});
+function newStage5Render(type, h) {
+	type = type || 1;
+	h = h || generateBaseMap(type, {npts:4096, extent: defaultExtent});
 	return {
 		params: defaultParams,
 		h: h,
@@ -354,9 +363,10 @@ var coast, testSite;
 
 function Stage5Draw() {
 	var scores = cityScores(Stage5Render.h, Stage5Render.cities);
-	visualizeVoronoi(view, scores, 0.5);//d3.max(scores) - 0.5);
-	//visualizePoints(view, Stage5Render.h.mesh.pts, false);
-	//colorizePoints(view, Stage5Render.h);
+	visualizeVoronoi(view, scores, d3.max(scores) - 0.5);
+	visualizeCentroids(view, Stage5Render.h);
+	visualizePoints(view, Stage5Render.h.mesh.pts, false);
+	colorizePoints(view, Stage5Render.h);
 
 	drawPaths(view, 'coast', contour(Stage5Render.h, 0));
 	drawPaths(view, 'river', getRivers(Stage5Render.h, 0.01));
@@ -371,7 +381,59 @@ function Stage5Draw() {
 	//view.select("#pt_"+testSite.index).attr('r', 30);
 }
 
-d3.select("#cityBtn1")
+function generateBaseMap(type, params) {
+	var mesh = generateGoodMesh(params.npts, params.extent);
+	var h = mesh;
+
+	if (type === 1) {	// Inverted cone + 25
+		h = add(
+			cone(mesh, -3),
+			mountains(mesh, 10, 0.04),
+			mountains(mesh, 15, 0.06)
+		);
+	}
+	else if (type === 2) {	// Top-bottom + 25
+		h = add(
+			edgeLand(mesh, 'top'),
+			edgeLand(mesh, 'bottom'),
+			mountains(mesh, 10, 0.04),
+			mountains(mesh, 15, 0.06)
+		);
+	}
+	else if (type === 3) {	// Right-left + 25
+		h = add(
+			edgeLand(mesh, 'right'),
+			edgeLand(mesh, 'left'),
+			mountains(mesh, 10, 0.04),
+			mountains(mesh, 15, 0.06)
+		);
+	}
+	else {
+		var h = add(
+			slope(mesh, randomVector(4)),
+			cone(mesh, runif(-1, -1)),	// random slope
+			mountains(mesh, 20)
+		);
+	}
+	// Average heightmap several times:
+	for (var i = 0; i < 10; i++) {
+		h = relax(h);
+	}
+	h = peaky(h);
+	// Erode terrain:
+	h = doErosion(h, runif(0, 0.1), 2);	//5
+	h = setSeaLevel(h, runif(0.2, 0.6));
+	h = fillSinks(h);
+	//h = normalize(h);
+	// Smooth coast:
+	h = cleanCoast(h, 3);
+
+	return h;
+}
+
+cityDiv.append("br");
+
+cityDiv.append("button")
 .text("Generate random heightmap")
 .on("click", function () {
 	Stage5Render = newStage5Render();
@@ -379,22 +441,46 @@ d3.select("#cityBtn1")
 	Stage5Draw();
 });
 
-d3.select("#cityBtn2")
-.text("Copy heightmap from above")
+cityDiv.append("button")
+.text("Generate Type 1")
+.on("click", function () {
+	Stage5Render = newStage5Render(1);
+	console.log('cityRender_type1', Stage5Render);
+	Stage5Draw();
+});
+
+cityDiv.append("button")
+.text("Generate Type 2")
+.on("click", function () {
+	Stage5Render = newStage5Render(2);
+	console.log('cityRender_type2', Stage5Render);
+	Stage5Draw();
+});
+
+cityDiv.append("button")
+.text("Generate Type 3")
+.on("click", function () {
+	Stage5Render = newStage5Render(3);
+	console.log('cityRender_type3', Stage5Render);
+	Stage5Draw();
+});
+
+cityDiv.append("button")
+.text("Copy from above")
 .on("click", function () {
 	Stage5Render = newStage5Render(physH);
 	console.log('cityRender', Stage5Render);
 	Stage5Draw();
 });
 
-d3.select("#cityBtn3")
+cityDiv.append("button")
 .text("Add new city")
 .on("click", function () {
 	placeCity(Stage5Render);
 	Stage5Draw();
 });
 
-d3.select("#cityBtn4")
+cityDiv.append("button")
 .text("Sea higher")
 .on("click", function () {
 	seaLevel += 0.1;
@@ -402,7 +488,7 @@ d3.select("#cityBtn4")
 	Stage5Draw();
 });
 
-d3.select("#cityBtn5")
+cityDiv.append("button")
 .text("Sea lower")
 .on("click", function () {
 	seaLevel -= 0.1;
@@ -410,7 +496,7 @@ d3.select("#cityBtn5")
 	Stage5Draw();
 });
 
-d3.select("#cityBtn6")
+cityDiv.append("button")
 .text("Normalize heightmap")
 .on("click", function () {
 	Stage5Render.h = normalize(Stage5Render.h);
