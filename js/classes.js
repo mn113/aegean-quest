@@ -17,6 +17,7 @@ console.log([1,2,3,4,5,6].shuffle());
 class Ship {
 	constructor() {
 		this.name = "My Ship";
+		this.type = "Trireme";
 		this.speed = 10;	// kmh
 		this.defence = 10;
 		this.upgrades = [];
@@ -32,7 +33,7 @@ class Ship {
 		this.health = 100;
 		this.captain = null;
 		this.crew = [];
-		this.morale = Math.ceil(70 + (30 * Math.random()));
+		this.morale = Math.ceil(70 + (30 * Math.random()));	// TODO: average crewmen
 	}
 
 	// Add single or multiple crew members:
@@ -96,8 +97,8 @@ class Ship {
 
 class Sailor {
 	constructor() {
-		this.name = this.pickName();
-		this.origin = this.pickOrigin();
+		this.name = gameText.mensNames.random();
+		this.origin = gameText.placeNames.list.random();
 		this.avatarSeed = this.pickAvatarSeed();
 		this.skills = this.pickSkills();
 		this.age = 18 + Math.floor(30 * Math.random());
@@ -105,16 +106,6 @@ class Sailor {
 		this.morale = Math.ceil(7 + 3 * Math.random());
 		this.salary = this.xp;
 		return this;
-	}
-
-	pickName() {
-		const maleNames = "Kostas Odysseus Christos Giorgos Giannis Pavlos Petros Telemachus Achilles Heracles Panos Alexis".split(" ");
-		return maleNames.random();
-	}
-
-	pickOrigin() {
-		const places = "Rhōmanía, Abydos, Agathḗ Týkhē, Áŋkyra, Adrianoúpolis, Athḗnai, Aigaíon Pélagos, Aígyptos, Aithiopía, Aiolís, Aítna, Aitōlía, Akarnanía, Akrágas, Albanía, Aleksándreia, Aleksandrétta, Halikarnassós, Amphípolis, Anatolḗ, Antarktikḗ, Antiókheia, Antípolis, Apoulía, Arabía, Argolís, Árgos, Arkadía, Armenía, Asía, Attikḗ, Australía, Aphrikḗ, Akhaḯa, Babylōn, Babylōnía, Baktrίa, Benetía, Bēthleém, Bērytós, Bithynía, Blakhía, Boiōtía, Boulgaría, Bretanía, Bysdántion, Galatía, Galilaía, Gallía, Germanía, Geōrgía, Dakía, Damaskós, Delphoí, Dyrrhákhion, Dōdekánēsa, Elaía, Helbetía, Helíkē, Hellás, Empórion, Erétria, Erythraía, Eúboia, Eurṓpē, Éphesos, Ḗpeiros, Hērákleia, Theodosía, Thessalía, Thessaloníkē, Thḗbai, Thḗra, Thoúrioi, Thrákē, Ialyssós, Ibería, Ierichṓ, Hierousalḗm, Ithákē, Ikónion, Illyría, Indíai, Indonēsía, Ióppē, Ioudaía, Hispanía, Israḗl, Italía, Iōnía, Kaisareia, Kalabría, Kámeiros, Kampánia, Kappadokía, Karía, Karpáthia, Kárpathos, Karkhēdṓn, Kaspía, Katánē, Kérkyra, Kilikía, Knidos, Knōssόs, Kolophṓn, Kόrinthos, Krḗtē, Krótōn, Kýsdikos, Kykládes, Kýmē, Kýpros, Kyrēnaïkḗ, Kyrḗnē, Kōnstantinoúpolis, Kōs, Lakōnía, Lamía, Lámpsakos, Laodikeia, Lésbos, Leukōsía, Líbanos, Libýē, Líndos, Lokrís, Lokroí, Lydía, Lykía, Magnēsía, Makedonía, Makedṓn, Massalía, Maurētanía, Mauroboúnion, Mégara, Megarís, Melanēsía, Melítē, Mesopotamía, Messḗnē, Messēnía, Mēdía, Mḗlos, Mikronēsía, Mílētos, Moisía, Mykḗnai, Mýkonos, Mysía, Mōréas, Názara, Náksos, Naúplion, Neápolis, Níkaia, Nikopolis, Nísyros, Noumidía, Paionía, Palaistínē, Pamphylía, Pánormos, Pantikapaion, Parthía, Parísioi, Pátmos, Pátrai, Paphlagonía, Pelopónnēsos, Persía, Pisidia, Polynēsía, Póntos, Proúsa, Rhḗgion, Rhódos, Rhṓmē, Samareia, Sámos, Sampsoúnta, Santorínē, Seleukeia, Serbía, Sidṓn, Sikelía, Sinṓpē, Skythía, Smýrnē, Sóphia, Spártē, Sýmē, Syrakoúsai, Syría, Táras, Tarsόs, Tḗlos, Tiberiás, Tourkía, Trapesdoúnta, Trípolis, Troía, Trṓas, Týros, Phthiṓtis, Philadélpheia, Philippínai, Phoiníkē, Phrygía, Phōkaia, Phōkís, Khalkēdōn, Khersónēsos, Khíos, Ōkeanía".split(", ");
-		return places.random();
 	}
 
 	pickAvatarSeed() {

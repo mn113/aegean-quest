@@ -78,10 +78,6 @@
 					Home
 				</a>
 				<a class="item">
-					<i class="block layout icon"></i>
-					Topics
-				</a>
-				<a class="item">
 					<i class="smile icon"></i>
 					Friends
 					<ul class="crew">
@@ -144,6 +140,16 @@
 			this.visitSea = function() {
 				ui.makeModal(seaEvent());
 			};
+			this.insufficient = function() {
+				ui.renderPopup({
+					title: "Sorry",
+					content: "You don't have sufficient men to sail. You should hire more men.",
+					buttons: {no: "OK"}
+				});
+			}
+			this.godlike = function() {
+				ui.godReaction("Uranus", 1);
+			};
 		};
 
 		window.onload = function() {
@@ -160,9 +166,11 @@
 			f2.add(text, 'newSailor');	// button
 			f2.add(text, 'visitTown');	// button
 			f2.add(text, 'visitSea');	// button
+			f2.add(text, 'insufficient'); // button
+			f2.add(text, 'godlike'); // button
 			var f3 = gui.addFolder('UI');
 			f3.add(text, 'showHidePoints');	// button
-			f3.add(text, 'toggleSidebar');		// button
+			f3.add(text, 'toggleSidebar');	// button
 			gui.close();
 		};
 

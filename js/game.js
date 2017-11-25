@@ -1,4 +1,4 @@
-/* global $ */
+/* global $, gameText */
 
 var ship1 = new Ship();
 var player = {
@@ -22,19 +22,26 @@ var man4 = new Sailor();
 var man5 = new Sailor();
 var man6 = new Sailor();
 console.log(man1);
-//console.log(man2.showStats());
 
-ship1.addCrew([man1, man2, man3, man4, man5, man6]);
+player.ships[0].addCrew([man1, man2, man3, man4, man5, man6]);
 
 var ui = {
-	ships: $(".ui .item:last-child"),
+	shipDiv: $(".ui .item:last-child"),
 
-	renderShip: function(s) {
+	renderShip: function(sid) {
 		console.log(s);
+		var s = player.ships[sid];
+		var l = player.ships.length;
+		var prev = player.ships[sid-1] % l;
+		var next = player.ships[sid+1] % l;
 		var html = `
-		<div class="ship_stats" id="ship1">
+		<div class="ship_stats" id="ship${sid}">
+			<div>
+				<i class="angle double left icon" onclick="ui.renderShip(${prev})"></i>
+				<i class="angle double right icon" onclick="ui.renderShip(${next})"></i>
+			</div>
 			<h2>${s.name}</h2>
-			<h3>Trireme</h3>
+			<h3>${s.type}</h3>
 			<p>Speed: ${s.speed}</p>
 			<dl>
 				<dt>Gold</dt><dd>${s.gold}</dd>
@@ -42,14 +49,12 @@ var ui = {
 				<dt>Wine</dt><dd>${s.wine}</dd>
 			</dl>
 			<h4>Crew</h4>
-			<h5>Captain</h5>
-			<div>?</div>
 			<ul class="crew">
 				${ui.renderCrew(s.crew)}
 			</ul>
 		</div>`;
 		// Render
-		ui.ships.html(html);
+		ui.shipDiv.html(html);
 	},
 
 	renderCrew: function(sailors) {
@@ -59,8 +64,6 @@ var ui = {
 		});
 		return html;
 	},
-
-	focusShip: function(id) {},
 
 	renderSailorCard: function(sailor) {
 		var card = $("<div>")
@@ -88,12 +91,64 @@ var ui = {
 			</div>
 		</div>
 		`;
+		$(".modal").remove();
 		$(".pushable").append(cardHtml);
 		$(".small.modal").modal('show');
+	},
+
+	// A smaller modal with text and a dismissal button
+	renderPopup: function(params) {
+		var cardHtml = `
+		<div class="ui tiny modal">
+			<div class="header">${params.title}</div>
+			<div class="content">
+				<p>${params.content}</p>
+			</div>
+			<div class="actions">
+				<div class="ui cancel button">${params.buttons.no}</div>
+			</div>
+		</div>
+		`;
+		// TODO: allow different number of buttons
+		$(".modal").remove();
+		$(".pushable").append(cardHtml);
+		$(".tiny.modal").modal('show');
+	},
+
+	godReaction: function(god, delta) {
+		// TODO: random gods
+		ui.renderPopup({
+			title: "The Oracle says...",
+			content: (delta > 0) ? god + " liked this! 👌" : god + " didn't like that! 😡",
+			buttons: {yes: "OK", no: "more..."}
+		});
+		// TODO: add delta to God's counter
+	},
+
+	godInfo: function(god) {
+		var params = gameText.gods.filter(g => g.name === god)[0];
+		params.buttons = {yes: "OK", no: "OK"};
+		ui.renderModalCard(params);
+	},
+
+	trophyInfo: function(trophy) {
+		var params = gameText.trophies.filter(t => t.name === trophy)[0];
+		params.buttons = {yes: "OK", no: "OK"};
+		ui.renderModalCard(params);
+	},
+
+	gift: function(gift, quantity, from) {
+		ui.renderPopup({
+			title: "You received a gift from " + from,
+			content: `${from} gave you ${quantity} ${gift}!`,
+			buttons: {yes: "OK", no: "OK"}
+		});
+		// TODO: add gift to player
 	}
+
 };
 
-ui.renderShip(ship1);	// ok
+ui.renderShip(0);	// ok
 
 // Test combat:
 var mEvent = gameText.monsterEvents.random();

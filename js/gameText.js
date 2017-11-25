@@ -2,12 +2,13 @@ var gameText = {
 	"placeNames": {
 		"list": ["Athens","Knossos","Rhōmanía","Abydos","Agathḗ Týkhē","Áŋkyra","Adrianoúpolis","Athḗnai","Aigaíon Pélagos","Aígyptos","Aithiopía","Aiolís","Aítna","Aitōlía","Akarnanía","Akrágas","Albanía","Aleksándreia","Aleksandrétta","Halikarnassós","Amphípolis","Anatolḗ","Antarktikḗ","Antiókheia","Antípolis","Apoulía","Arabía","Argolís","Árgos","Arkadía","Armenía","Asía","Attikḗ","Australía","Aphrikḗ","Akhaḯa","Babylōn","Babylōnía","Baktrίa","Benetía","Bēthleém","Bērytós","Bithynía","Blakhía","Boiōtía","Boulgaría","Bretanía","Bysdántion","Galatía","Galilaía","Gallía","Germanía","Geōrgía","Dakía","Damaskós","Delphoí","Dyrrhákhion","Dōdekánēsa","Elaía","Helbetía","Helíkē","Hellás","Empórion","Erétria","Erythraía","Eúboia","Eurṓpē","Éphesos","Ḗpeiros","Hērákleia","Theodosía","Thessalía","Thessaloníkē","Thḗbai","Thḗra","Thoúrioi","Thrákē","Ialyssós","Ibería","Ierichṓ","Hierousalḗm","Ithákē","Ikónion","Illyría","Indíai","Indonēsía","Ióppē","Ioudaía","Hispanía","Israḗl","Italía","Iōnía","Kaisareia","Kalabría","Kámeiros","Kampánia","Kappadokía","Karía","Karpáthia","Kárpathos","Karkhēdṓn","Kaspía","Katánē","Kérkyra","Kilikía","Knidos","Knōssόs","Kolophṓn","Kόrinthos","Krḗtē","Krótōn","Kýsdikos","Kykládes","Kýmē","Kýpros","Kyrēnaïkḗ","Kyrḗnē","Kōnstantinoúpolis","Kōs","Lakōnía","Lamía","Lámpsakos","Laodikeia","Lésbos","Leukōsía","Líbanos","Libýē","Líndos","Lokrís","Lokroí","Lydía","Lykía","Magnēsía","Makedonía","Makedṓn","Massalía","Maurētanía","Mauroboúnion","Mégara","Megarís","Melanēsía","Melítē","Mesopotamía","Messḗnē","Messēnía","Mēdía","Mḗlos","Mikronēsía","Mílētos","Moisía","Mykḗnai","Mýkonos","Mysía","Mōréas","Názara","Náksos","Naúplion","Neápolis","Níkaia","Nikopolis","Nísyros","Noumidía","Paionía","Palaistínē","Pamphylía","Pánormos","Pantikapaion","Parthía","Parísioi","Pátmos","Pátrai","Paphlagonía","Pelopónnēsos","Persía","Pisidia","Polynēsía","Póntos","Proúsa","Rhḗgion","Rhódos","Rhṓmē","Samareia","Sámos","Sampsoúnta","Santorínē","Seleukeia","Serbía","Sidṓn","Sikelía","Sinṓpē","Skythía","Smýrnē","Sóphia","Spártē","Sýmē","Syrakoúsai","Syría","Táras","Tarsόs","Tḗlos","Tiberiás","Tourkía","Trapesdoúnta","Trípolis","Troía","Trṓas","Týros","Phthiṓtis","Philadélpheia","Philippínai","Phoiníkē","Phrygía","Phōkaia","Phōkís","Khalkēdōn","Khersónēsos","Khíos","Ōkeanía"]
 	},
-	"mensNames": {
-		"list": []
-	},
+
+	"mensNames": ["Kostas", "Odysseus", "Christos", "Giorgos", "Giannis", "Pavlos", "Petros", "Telemachus", "Achilles", "Heracles", "Panos", "Alexis", "Vasos", "Hector", "Archimedes", "Socrates", "Pelleas", "Jason", "Psyrias"],
+
 	"shipNames": {
 		"list": []
 	},
+
 	"peaceTimeEvents": [
 		{
 			"name": "Grape Harvest",
@@ -68,8 +69,19 @@ var gameText = {
 				"min": 20,
 				"max": 50
 			}
+		},
+		{
+			"name": "Athletic Games",
+			"img": "",
+			"desc": "",
+			"reward": {
+				"types": ["gold", "wine"],
+				"min": 10,
+				"max": 20
+			}
 		}
 	],
+
 	"monsterEvents": [
 		{
 			"name": "Kerberos",
@@ -312,6 +324,7 @@ var gameText = {
 			"weakness": ""
 		}
 	],
+
 	"seaBattles": [
 		{
 			"name": "Kraken",
@@ -319,6 +332,7 @@ var gameText = {
 			"desc": ""
 		}
 	],
+
 	"seaGifts": [
 		{
 			"name": "Phoenician Traders",
@@ -331,6 +345,7 @@ var gameText = {
 			}
 		},
 	],
+
 	"trophies": [
 		{
 			"name": "Golden Fleece",
@@ -429,30 +444,47 @@ var gameText = {
 			"desc": ""
 		}
 	],
+
 	"gods": [
 		{
 			"name": "Poseidon",
-			"desc": "God of the sea"
+			"desc": "God of the sea",
+			"content": "",
+			"img": ""
 		},
 		{
 			"name": "Demeter",
-			"desc": "God of the harvest"
+			"desc": "God of the harvest",
+			"content": "",
+			"img": ""
 		},
 		{
 			"name": "Hephaestus",
-			"desc": "God of fire"
+			"desc": "God of fire",
+			"content": "",
+			"img": ""
 		},
 		{
 			"name": "Artemis",
-			"desc": "Goddess of hunting"
+			"desc": "Goddess of hunting",
+			"content": "",
+			"img": ""
 		},
 		{
 			"name": "Ares",
-			"desc": "God of war"
+			"desc": "God of war",
+			"content": "",
+			"img": ""
 		},
 		{
 			"name": "Uranus",
-			"desc": "God of the winds"
+			"desc": "God of the winds",
+			"content": "",
+			"img": ""
 		}
+	],
+
+	"benefactors": [
+		"Passing traders", "A nobleman", "Hades", "Phoenicians", "The great hero Achilles", "The great hero Odysseus", "A kindly philospher", "A local farmer"
 	]
 };
