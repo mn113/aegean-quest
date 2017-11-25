@@ -19,7 +19,6 @@
 </head>
 <body>
 	<h1>Aegean Quest</h1>
-	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 	<p>έχεις δει ποτέ σου μαύρος αετους που ορμουν<br>
 	ρώτας γιατί ο λύκος αλυχτά<br>
 	τραγούδας ποτέ του δάσους τα σημαδιά<br>
@@ -42,7 +41,7 @@
 	<div id="phys"></div>
 	<hr>
 
-	<div id="fifth">
+	<!--div id="fifth">
 		<svg id="gamesvg" height="600" width="800" viewBox="-200 -200 400 400">
 			<defs>
 				<style type="text/css">
@@ -52,13 +51,23 @@
 				</style>
 			</defs>
 		</svg>
-	</div>
+	</div-->
 	<div id="post-fifth"></div>
 	<hr>
 
 	<div id="gamearea">
 		<div id="not-ui">
-			<div id="map"></div>
+			<div id="fifth">
+				<svg id="gamesvg" height="600" width="800" viewBox="-200 -200 400 400">
+					<defs>
+						<style type="text/css">
+						.clickable {
+							cursor: pointer;
+						}
+						</style>
+					</defs>
+				</svg>
+			</div>
 			<div class="greek_banner top">&nbsp;</div>
 			<div class="greek_banner bottom">&nbsp;</div>
 		</div>
@@ -85,7 +94,7 @@
 		</div>
 	</div>
 
-	<canvas id="canvas" width="800px" height="600px"></canvas>
+	<!--canvas id="canvas" width="800px" height="600px"></canvas-->
 
 	<!-- end of HTML content -->
 
@@ -167,6 +176,7 @@
 		$('#gamearea .ui .crew img').popup();
 
 		function svgToCanvas() {
+			// NOT IN USE
 			var svgString = $("#fifth").html();
 			console.log(svgString);
 			//load a svg snippet in the canvas with id = 'drawingArea'

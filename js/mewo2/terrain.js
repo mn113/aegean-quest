@@ -1073,7 +1073,6 @@ function cityScores(h, cities) {
 	// Discard names:
 	cities = cities.map(c => c.ptIndex);
 	// TODO: simply place cities on coasts
-	console.log('minCity', Math.min(cities), 'maxCity', Math.max(cities));
 	for (var i = 0; i < h.length; i++) {
 		// No cities near edges:
 		if (h[i] <= 0 || isnearedge(h.mesh, i)) {

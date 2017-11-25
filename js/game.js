@@ -94,3 +94,9 @@ var ui = {
 };
 
 ui.renderShip(ship1);	// ok
+
+// Test combat:
+var mEvent = gameText.monsterEvents.random();
+var m = new Enemy(mEvent);
+var res = combat(ship1.crew, m);
+console.log(res);

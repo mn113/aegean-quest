@@ -2,7 +2,7 @@ html {
 
 }
 body {
-	font-family: 'Lancelot', serif;
+	font-family: 'Lancelot', serif !important;
 }
 .greek {
 	font-family: 'GFS Neohellenic', serif;

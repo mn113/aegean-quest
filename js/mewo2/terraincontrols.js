@@ -12,13 +12,13 @@ var towns = [];
 var svgShip;
 
 // BASIC POINTS
-var meshDiv = d3.select("div#mesh");
-var meshSVG = addSVG(meshDiv);
+//var meshDiv = d3.select("div#mesh");
+//var meshSVG = addSVG(meshDiv);
 
 var meshPts = null;
 var meshVxs = null;
 var meshDual = false;
-
+/*
 function meshDraw() {
 	if (meshDual && !meshVxs) {
 		meshVxs = makeMesh(meshPts).vxs;
@@ -58,7 +58,7 @@ function meshDraw() {
 		meshDraw();
 	});
 }());
-
+*/
 
 // PRIMITIVES
 var primDiv = d3.select("div#prim");
@@ -185,6 +185,7 @@ primDraw();
 
 
 // EROSION
+/*
 var erodeDiv = d3.select("div#erode");
 var erodeSVG = addSVG(erodeDiv);
 
@@ -211,7 +212,8 @@ function erodeDraw() {
 	}
 	drawPaths(erodeSVG, "coast", contour(erodeH, 0));
 }
-
+*/
+/*
 (function(){
 	erodeDiv.append("br");
 
@@ -254,18 +256,19 @@ function erodeDraw() {
 		erodeDraw();
 	});
 }());
-
+*/
 
 // PHYSICAL
-var physDiv = d3.select("div#phys");
-var physSVG = addSVG(physDiv);
-var physH = erodeH;
+//var physDiv = d3.select("div#phys");
+//var physSVG = addSVG(physDiv);
+//var physH = erodeH;
 
 var physViewCoast = false;
 var physViewRivers = false;
 var physViewSlope = false;
 var physViewHeight = true;
 
+/*
 function physDraw() {
 	if (physViewHeight) {
 		visualizeVoronoi(physSVG, physH, 0);
@@ -288,7 +291,7 @@ function physDraw() {
 		visualizeSlopes(physSVG, {h:zero(physH.mesh)});
 	}
 }
-
+/*
 (function() {
 	physDiv.append("br");
 
@@ -341,9 +344,8 @@ function physDraw() {
 		physHeightBut.text(physViewHeight ? "Hide heightmap" : "Show heightmap");
 		physDraw();
 	});
-	*/
 }());
-
+*/
 
 // CITIES
 var postCityDiv = d3.select("div#post-fifth");
@@ -363,7 +365,7 @@ function newStage5Render(type, h) {
 	render.coasts = contour(h, 0);
 	return render;
 }
-var Stage5Render = newStage5Render(null, physH);
+var Stage5Render = newStage5Render();
 var coast;
 
 function Stage5Draw() {

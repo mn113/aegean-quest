@@ -4,6 +4,16 @@ Array.prototype.random = function() {
 	return this[Math.floor(Math.random() * this.length)];
 };
 
+Array.prototype.shuffle = function() {
+	for (let i = this.length - 1; i > 0; i--) {
+		let j = Math.floor(Math.random() * (i + 1));
+		[this[i], this[j]] = [this[j], this[i]];
+	}
+	return this;
+};
+
+console.log([1,2,3,4,5,6].shuffle());
+
 class Ship {
 	constructor() {
 		this.name = "My Ship";
@@ -92,6 +102,7 @@ class Sailor {
 		this.skills = this.pickSkills();
 		this.age = 18 + Math.floor(30 * Math.random());
 		this.xp = Math.floor(this.age / 10) + Math.floor(5 * Math.random());
+		this.morale = Math.ceil(7 + 3 * Math.random());
 		this.salary = this.xp;
 		return this;
 	}
@@ -205,4 +216,70 @@ class Town {
 		ui.renderModalCard(params);
 		return this;
 	}
+}
+
+class Enemy {
+	constructor(params) {
+		this.name = params.name;
+		this.desc = params.desc;
+		this.img = params.img;
+		this.attack = params.attack;
+		this.health = params.health;
+		this.bravery = params.bravery;
+		this.strength = params.strength;
+		this.weakness = params.weakness;
+		console.log(this);
+		return this;
+	}
+
+	renderCard() {
+
+	}
+
+	die() {
+
+	}
+}
+
+function combat(sailors, enemy) {
+	var att1 = sailors.map(s => s.xp - s.age / 15).reduce((a,b) => a+b) / (sailors.length / 2);
+	var def1 = sailors.map(s => s.morale + s.age / 12).reduce((a,b) => a+b) / (sailors.length / 2);
+	var att2 = enemy.attack;
+	var def2 = enemy.health;
+	var brav2 = enemy.bravery;
+	console.log('Combat stats:', 'att1', att1, 'def1', def1, 'att2', att2, 'def2', def2, 'brav2', brav2);
+
+	// TODO: account for weapon skills & weaknesses
+
+	while (def1 > 0 && def2 > 0) {
+		// We attack:
+		var a = (att1 / 3) * (4 * Math.random() + 4) / 8;
+		console.log('a', a);
+		def2 -= a;
+		brav2 -= a / 3;
+		// He ded?
+		if (def2 <= 0) return {
+			status: "Victory!",
+			desc: "The enemy was vanquished!"
+		};
+		// He chicken out?
+		if (brav2 < a) return {
+			status: "Victory!",
+			desc: "The enemy ran away."
+		};
+		// Enemy attacks:
+		def1 -= att2 / 3 * (4 * Math.random() + 4) / 8;
+		// We ded?
+		if (def1 <= 0) {
+			var lossQuota = Math.floor(Math.sqrt(sailors.length * Math.random()));
+			var lost = sailors.shuffle().slice(0,lossQuota);
+			return {
+				status: "Defeat.",
+				desc: "The enemy was too strong.",
+				losses: lost
+			};
+		}
+		// Repeat
+	}
+	// Both combatants cannot be dead
 }
