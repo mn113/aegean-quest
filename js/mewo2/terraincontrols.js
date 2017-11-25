@@ -1,4 +1,4 @@
-/* global d3, meshTransforms, makeMesh, visualizePoints, generatePoints, improvePoints, zero, generateGoodMesh, visualizeVoronoi, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, randomFrom, fillSinks, erosionRate, doErosion, cleanCoast, getRivers, visualizeSlopes, generateCoast, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, coastPoints, colorizePoints, visualizeCentroids, addNaviLayer, addShipSvg, landSeaRatio, drawLabels, Town */
+/* global $, d3, meshTransforms, makeMesh, visualizePoints, generatePoints, improvePoints, zero, generateGoodMesh, visualizeVoronoi, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, randomFrom, fillSinks, erosionRate, doErosion, cleanCoast, getRivers, visualizeSlopes, generateCoast, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, coastPoints, colorizePoints, visualizeCentroids, addNaviLayer, addShipSvg, landSeaRatio, drawLabels, Town */
 
 function addSVG(div) {
 	return div.insert("svg", ":first-child")
@@ -369,6 +369,7 @@ var Stage5Render = newStage5Render();
 var coast;
 
 function Stage5Draw() {
+	$("#game-loader").addClass("active dimmer");
 	var scores = cityScores(Stage5Render.h, Stage5Render.cities);
 	visualizeVoronoi(view, scores, d3.max(scores) - 0.5);
 	//visualizeCentroids(view, Stage5Render.h);
@@ -378,6 +379,7 @@ function Stage5Draw() {
 	drawPaths(view, 'coast', contour(Stage5Render.h, 0));
 	drawPaths(view, 'river', getRivers(Stage5Render.h, 0.01));
 	visualizeSlopes(view, Stage5Render);
+	$("#game-loader").removeClass("active dimmer");
 
 	// Try to make a town on the coast:
 	coast = coastPoints(Stage5Render.h, 0.5);

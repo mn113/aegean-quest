@@ -29,6 +29,13 @@ body {
 	height: 100%;
 }
 
+.compass {
+	position: absolute;
+	bottom: 36px;
+	right: 0;
+	pointer-events: none;
+}
+
 path, line {
     fill: none;
     stroke: black;

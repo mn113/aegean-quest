@@ -67,25 +67,116 @@
 						</style>
 					</defs>
 				</svg>
+				<img class="compass" src="img/compass.png">
 			</div>
 			<div class="greek_banner top">&nbsp;</div>
 			<div class="greek_banner bottom">&nbsp;</div>
 		</div>
+
 		<div id="ui">
+			<button class="ui icon button left static massive inverted orange">
+				<img src="img/trireme-icon.png">
+			</button>
+			<button class="ui icon button right static massive inverted orange">
+				<i class="cloud icon"></i>
+			</button>
+
 			<div class="ui left demo vertical inverted sidebar labeled icon menu thin visible">
-				<a class="item">
-					<i class="home icon"></i>
-					Home
+				<a class="ui message close inverted">
+					<i class="close icon"></i>
+				</a>
+				<a class="item" id="ship-ui"><!-- ship renders here -->
+				</a>
+			</div>
+			<div class="ui right demo vertical inverted sidebar labeled icon menu visible">
+				<a class="ui message close inverted">
+					<i class="close icon"></i>
 				</a>
 				<a class="item">
-					<i class="smile icon"></i>
-					Friends
-					<ul class="crew">
-						<li></li>
-					</ul>
+					Time...
+				</a>
+				<a class="item">
+					<div class="yellow inverted statistic">
+						<div class="value" id="gold-ui">100</div>
+						<div class="label">Gold</div>
+					</div>
+				</a>
+				<a class="item">
+					Trophies
+					<div id="trophies-ui">
+					</div>
+				</a>
+				<a class="item">
+					Gods
+					<div id="gods-ui">
+					</div>
 				</a>
 			</div>
 			<div class="pusher">
+				<!--div class="ui segment" id="game-loader">
+					<div class="ui indeterminate text loader">Generating ancient world</div>
+				</div-->
+			</div>
+		</div>
+	</div>
+
+	<div class="ui floating labeled icon dropdown button">
+		<span class="text">Buy...</span>
+		<div class="menu">
+			<div class="header">
+				<i class="tags icon"></i>
+				Buy
+			</div>
+			<div class="divider"></div>
+			<div class="item">
+				<i class="attention icon"></i>
+				Wine
+			</div>
+			<div class="item">
+				<i class="comment icon"></i>
+				Bread
+			</div>
+			<div class="item">
+				<i class="conversation icon"></i>
+				Chicken
+			</div>
+		</div>
+	</div>
+
+	<div class="ui floating labeled icon dropdown button">
+		<span class="text">Sell...</span>
+		<div class="menu">
+			<div class="header">
+				<i class="tags icon"></i>
+				Buy
+			</div>
+			<div class="divider"></div>
+			<div class="item">
+				<i class="attention icon"></i>
+				Wine
+				<div class="menu">
+					<div class="item">1 flagon</div>
+					<div class="item">5 flagons</div>
+					<div class="item">10 flagons</div>
+				</div>
+			</div>
+			<div class="item">
+				<i class="comment icon"></i>
+				Bread
+				<div class="menu">
+					<div class="item">1 tray</div>
+					<div class="item">5 trays</div>
+					<div class="item">10 trays</div>
+				</div>
+			</div>
+			<div class="item">
+				<i class="conversation icon"></i>
+				Chicken
+				<div class="menu">
+					<div class="item">1 batch</div>
+					<div class="item">5 batches</div>
+					<div class="item">10 batches</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -178,8 +269,17 @@
 		$('.ui.sidebar')
 		.sidebar({
 			context: $('#ui'),
-			dimPage: false
+			dimPage: false,
+			transition: "overlay"
 		});
+		// Open & close buttons:
+		var $left_sb = $('.left.sidebar');
+		var $right_sb = $('.right.sidebar');
+		$left_sb.sidebar('attach events', '.left a.close', 'close');
+		$left_sb.sidebar('attach events', '#ui > .button.left', 'open');
+		$right_sb.sidebar('attach events', '.right a.close', 'close');
+		$right_sb.sidebar('attach events', '#ui > .button.right', 'open');
+
 		// Crew tooltips:
 		$('#gamearea .ui .crew img').popup();
 

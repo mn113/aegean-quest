@@ -12,7 +12,8 @@ var player = {
 		"Artemis": 0,
 		"Ares": 0
 	},
-	trophies: []
+	trophies: [],
+	gold: 100
 };
 
 var man1 = new Sailor();
@@ -26,9 +27,9 @@ console.log(man1);
 player.ships[0].addCrew([man1, man2, man3, man4, man5, man6]);
 
 var ui = {
-	shipDiv: $(".ui .item:last-child"),
+	shipDiv: $("#ship-ui"),
 
-	renderShip: function(sid) {
+	renderShipInfo: function(sid) {
 		console.log(s);
 		var s = player.ships[sid];
 		var l = player.ships.length;
@@ -44,22 +45,22 @@ var ui = {
 			<h3>${s.type}</h3>
 			<p>Speed: ${s.speed}</p>
 			<dl>
-				<dt>Gold</dt><dd>${s.gold}</dd>
-				<dt>Food</dt><dd>${s.food}</dd>
+				<dt>Bread</dt><dd>${s.bread}</dd>
 				<dt>Wine</dt><dd>${s.wine}</dd>
 			</dl>
 			<h4>Crew</h4>
 			<ul class="crew">
-				${ui.renderCrew(s.crew)}
+				${ui.renderCrew(s.captain, s.crew)}
 			</ul>
 		</div>`;
 		// Render
 		ui.shipDiv.html(html);
 	},
 
-	renderCrew: function(sailors) {
-		var html = "";
-		sailors.forEach(function(s) {
+	renderCrew: function(captain, sailors) {
+		var html = "<li class='avatar gold'>" + captain.renderAvatar() + "</li>";
+		sailors.filter(s => s !== captain)
+		.forEach(function(s) {
 			html += "<li class='avatar'>" + s.renderAvatar(); + "</li>";
 		});
 		return html;
@@ -86,8 +87,11 @@ var ui = {
 				<p>${params.content}</p>
 			</div>
 			<div class="actions">
-				<div class="ui approve button">${params.buttons.yes}</div>
-				<div class="ui cancel button">${params.buttons.no}</div>
+				<div class="large buttons">
+					<div class="ui approve button">${params.buttons.yes}</div>
+					<div class="or"></div>
+					<div class="ui cancel button">${params.buttons.no}</div>
+				</div>
 			</div>
 		</div>
 		`;
@@ -148,7 +152,7 @@ var ui = {
 
 };
 
-ui.renderShip(0);	// ok
+ui.renderShipInfo(0);	// ok
 
 // Test combat:
 var mEvent = gameText.monsterEvents.random();

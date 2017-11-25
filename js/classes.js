@@ -20,12 +20,10 @@ class Ship {
 		this.type = "Trireme";
 		this.speed = 10;	// kmh
 		this.defence = 10;
-		this.upgrades = [];
+		this.upgrades = [];	// TODO
 		this.max_crew = 20;
-		this.max_gold = 500;
 		this.max_food = 1000;
 		this.max_wine = 250;
-		this.gold = 25;
 		this.bread = 65;
 		this.chicken = 35;
 		this.fish = 0;
@@ -44,6 +42,8 @@ class Ship {
 		else {
 			this.crew.push(newCrew);
 		}
+		// Captainify someone:
+		if (this.captain === null) this.captain = this.crew.random();
 	}
 
 	getSpeed() {
