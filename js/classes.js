@@ -155,7 +155,7 @@ class Town {
 	}
 
 	pickName() {
-		return gameText.placeNames.list.random();
+		return gameText.places.random();
 	}
 
 	inventTrades() {

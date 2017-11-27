@@ -1052,8 +1052,8 @@ function visualizeTriangles(svg, h, lo, hi, showDebugText = false) {
 		.attr('d', makeD3Path)
 		.style('fill', function(d, i) {
 			var colorScale = d3.scaleLinear()
-				.domain([1, 0.5, 0.49, 0.47, 0.1, 0])	// max, pivot, min
-				.range(["sienna", "lemonchiffon", "white", "dodgerblue", "dodgerblue", "steelblue"]);
+				.domain([1, 0.5, 0.4999, 0.1, 0])	// max, pivot, min
+				.range(["sienna", "lemonchiffon", "dodgerblue", "dodgerblue", "steelblue"]);
 
 			return colorScale(mappedvals[i]);	// defines colour scale of entire map
 		})
