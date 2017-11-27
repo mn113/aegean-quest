@@ -3,7 +3,7 @@
 "use strict";
 
 // Random number function?
-var rnorm = (function () {
+var rnorm = (function() {
 	var z2 = null;
 	function rnorm() {
 		if (z2 !== null) {
@@ -74,7 +74,7 @@ class Points {
 	// Generate points and separate them nicely:
 	static generateGood(n) {
 		var pts = new Points().generate(n);
-		pts = pts.sort(function (a, b) {
+		pts = pts.sort(function(a, b) {
 			return a[0] - b[0];
 		});
 		return pts.improve(1);
@@ -150,7 +150,7 @@ function improvePoints(pts, n, extent) {
 function generateGoodPoints(n, extent) {
 	extent = extent || defaultExtent;
 	var pts = generatePoints(n, extent);
-	pts = pts.sort(function (a, b) {
+	pts = pts.sort(function(a, b) {
 		return a[0] - b[0];
 	});
 	return improvePoints(pts, 1, extent);
@@ -211,7 +211,7 @@ function makeMesh(pts, extent) {
 		extent: extent	// aspect ratio of mesh
 	};
 	// BUG: HOW DOES h END UP WITH SO MANY LOOSE POINTS?
-	mesh.map = function (f) {
+	mesh.map = function(f) {
 		var mapped = vxs.map(f);	// LOOSE POINTS CREATED HERE
 		mapped.mesh = mesh;
 		return mapped;
@@ -282,6 +282,19 @@ function triCentreDistance(mesh, i, j) {
 	return dist;
 }
 
+// Average 3 point co-ordinates to get co-ords of centroid:
+function addCentresToTriangles(h) {
+	h.mesh.triCentres = h.mesh.tris.map(function(tri) {
+		if (tri.length === 3) {
+			var sumX = tri[0][0] + tri[1][0] + tri[2][0];
+			var sumY = tri[0][1] + tri[1][1] + tri[2][1];
+			return [sumX/3, sumY/3];
+		}
+		else return null;
+	});
+	return h;
+}
+
 // Make some sort of quantile scale of sorted heights?
 function quantile(h, q) {
 	var sortedh = [];
@@ -305,7 +318,7 @@ function zero(mesh) {
 
 // Add a random slope to the mesh:
 function slope(mesh, direction) {
-	return mesh.map(function (x) {
+	return mesh.map(function(x) {
 		return x[0] * direction[0] + x[1] * direction[1];
 	});
 }
@@ -313,7 +326,7 @@ function slope(mesh, direction) {
 var meshTransforms = {
 	// Add some land on one side only:
 	edgeLand: function(mesh, side) {
-		return mesh.map(function (pt) {
+		return mesh.map(function(pt) {
 			switch(side) {
 				// dealing with an [x,y] point in a [-0.5,0.5] extent for each axis
 				case 'left':   return pt[0] < (0.1 * Math.random() - 0.35);
@@ -325,7 +338,7 @@ var meshTransforms = {
 	},
 	// Add some land to one corner of the map:
 	cornerLand: function(mesh, corner) {
-		return mesh.map(function (pt) {
+		return mesh.map(function(pt) {
 			var r1 = (0.1 * Math.random()) - 0.25,
 				r2 = (0.1 * Math.random()) + 0.25;
 			switch(corner) {
@@ -341,7 +354,7 @@ var meshTransforms = {
 
 // Add a cone to the mesh (higher in centre):
 function cone(mesh, slope) {
-	return mesh.map(function (x) {
+	return mesh.map(function(x) {
 		return Math.pow(x[0] * x[0] + x[1] * x[1], 0.5) * slope;
 	});
 }
@@ -357,7 +370,7 @@ function map(h, f) {
 function normalize(h) {
 	var lo = d3.min(h);
 	var hi = d3.max(h);
-	return map(h, function (x) {
+	return map(h, function(x) {
 		return (x - lo) / (hi - lo);
 	});
 }
@@ -407,7 +420,7 @@ function relax(h) {
 			newh[i] = 0;
 			continue;
 		}
-		newh[i] = d3.mean(nbs.map(function (j) {return h[j];}));
+		newh[i] = d3.mean(nbs.map(function(j) { return h[j]; }));
 	}
 	return newh;
 }
@@ -491,19 +504,23 @@ function fillSinks(h, epsilon) {
 	}
 }
 
+// Calculate water flux rate for all triangles, by placing water uniformly and sending it downhill:
 function getFlux(h) {
 	var dh = downhill(h);
 	var idxs = [];
 	var flux = zero(h.mesh);
+	// Initialise:
 	for (var i = 0; i < h.length; i++) {
 		idxs[i] = i;
-		flux[i] = 1/h.length;
+		flux[i] = 1/h.length;	// uniform distribution, with sum == 1
 	}
-	idxs.sort(function (a, b) {
+	// Sort triangles highest to lowest:
+	idxs.sort(function(a, b) {
 		return h[b] - h[a];
 	});
 	for (var i = 0; i < h.length; i++) {
 		var j = idxs[i];
+		// Add water value to downhill triangle:
 		if (dh[j] >= 0) {
 			flux[dh[j]] += flux[j];
 		}
@@ -511,6 +528,7 @@ function getFlux(h) {
 	return flux;
 }
 
+// Calculate slopes of all triangles, using heights & distances:
 function getSlope(h) {
 	var dh = downhill(h);
 	// Clone mesh:
@@ -648,7 +666,7 @@ function coastEdges(h, seaLevel) {
 	var hi = d3.max(h) + 1e-9;
 	var lo = d3.min(h) - 1e-9;
 
-	var mappedvals = h.map(function (x) {
+	var mappedvals = h.map(function(x) {
 		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
 	});
 
@@ -701,6 +719,7 @@ function getRivers(h, limit) {
 	}
 	limit *= above / h.length;
 	for (var i = 0; i < dh.length; i++) {
+		if (h[i] < seaLevel) continue;
 		if (isnearedge(h.mesh, i)) continue;
 		if (flux[i] > limit && h[i] > 0 && dh[i] >= 0) {
 			var up = h.mesh.vxs[i];
@@ -723,7 +742,7 @@ function getTerritories(render) {
 	if (n > render.cities.length) n = render.cities.length;
 	var flux = getFlux(h);
 	var terr = [];
-	var queue = new PriorityQueue({comparator: function (a, b) {return a.score - b.score}});
+	var queue = new PriorityQueue({comparator: function(a, b) { return a.score - b.score}});
 	function weight(u, v) {
 		var horiz = distance(h.mesh, u, v);
 		var vert = h[v] - h[u];
@@ -860,8 +879,8 @@ function visualizePoints(svg, points, showDebugText = false) {
 	// For each data point make a group containing circle and (optionally) text
 	var groups = bound.enter();
 	var innerG = groups.append('g')
-		.attr("transform", function (d) {return "translate("+ 1000*d[0]+","+ 1000*d[1]+")"; })
-		.attr('title', function (d,i) { return i; })
+		.attr("transform", function(d) { return "translate("+ 1000*d[0]+","+ 1000*d[1]+")"; })
+		.attr('title', function(d,i) { return i; })
 		;
 	var ptRadius = 100 / Math.sqrt(points.length);
 	innerG.append('circle')
@@ -899,7 +918,7 @@ function visualizeCentroids(svg, h, lo, hi) {
 	if (lo === undefined) lo = d3.min(h) - 1e-9;
 
 	// Normalize:
-	var mappedvals = h.map(function (x) {
+	var mappedvals = h.map(function(x) {
 		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
 	});
 	// var mappedvals = normalize(h);
@@ -915,7 +934,7 @@ function visualizeCentroids(svg, h, lo, hi) {
 	// For each data point make a group containing circle and (optionally) text
 	circles.enter()
 		.append('circle')
-		.attr("transform", function (d) {
+		.attr("transform", function(d) {
 			return "translate("+ 1000*d[0]+","+ 1000*d[1]+")";
 		})
 		.attr('r', ptRadius)
@@ -990,7 +1009,7 @@ function visualizeTriangles(svg, h, lo, hi, showDebugText = false) {
 	if (hi === undefined) hi = d3.max(h) + 1e-9;
 	if (lo === undefined) lo = d3.min(h) - 1e-9;
 
-	var mappedvals = h.map(function (x) {
+	var mappedvals = h.map(function(x) {
 		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
 	});
 	console.log('vT', h.length, h.mesh);
@@ -1016,7 +1035,7 @@ function visualizeTriangles(svg, h, lo, hi, showDebugText = false) {
 			.enter()
 			.append('text')
 			.text(function(d,i) { return i; })	// display node index
-			.attr("transform", function (d,i) {
+			.attr("transform", function(d,i) {
 				var pt = h.mesh.triCentres[i] || [-9999,-9999];	// dirty hack
 				return "translate("+ 1000*pt[0]+","+ 1000*pt[1]+")";
 			})
@@ -1031,7 +1050,7 @@ function visualizeTriangles(svg, h, lo, hi, showDebugText = false) {
 	// Add click behaviour too
 	svg.selectAll('path.field')
 		.attr('d', makeD3Path)
-		.style('fill', function (d, i) {
+		.style('fill', function(d, i) {
 			var colorScale = d3.scaleLinear()
 				.domain([1, 0.5, 0.49, 0.47, 0.1, 0])	// max, pivot, min
 				.range(["sienna", "lemonchiffon", "white", "dodgerblue", "dodgerblue", "steelblue"]);
@@ -1072,7 +1091,7 @@ function visualizeSlopes(svg, render) {
 	var strokes = [];
 	var r = 0.25 / Math.sqrt(h.length);
 	for (var i = 0; i < h.length; i++) {
-		if (h[i] <= 0 || isnearedge(h.mesh, i)) continue;
+		if (h[i] <= seaLevel || isnearedge(h.mesh, i)) continue;
 		var nbs = neighbours(h.mesh, i);
 		nbs.push(i);
 		var s = 0;
@@ -1112,10 +1131,10 @@ function visualizeSlopes(svg, render) {
 	lines.exit()
 	.remove();
 	outerG.selectAll('line.slope')
-	.attr('x1', function (d) {return 1000*d[0][0];})
-	.attr('y1', function (d) {return 1000*d[0][1];})
-	.attr('x2', function (d) {return 1000*d[1][0];})
-	.attr('y2', function (d) {return 1000*d[1][1];});
+	.attr('x1', function(d) { return 1000*d[0][0]; })
+	.attr('y1', function(d) { return 1000*d[0][1]; })
+	.attr('x2', function(d) { return 1000*d[1][0]; })
+	.attr('y2', function(d) { return 1000*d[1][1]; });
 }
 
 // Draw the coastline on paths with height 0:
@@ -1139,8 +1158,8 @@ function cityScores(h, cities) {
 	cities = cities.map(c => c.ptIndex);
 	// TODO: simply place cities on coasts
 	for (var i = 0; i < h.length; i++) {
-		// No cities near edges:
-		if (h[i] <= 0 || isnearedge(h.mesh, i)) {
+		// No cities in water or near map edges:
+		if (h[i] <= seaLevel || isnearedge(h.mesh, i)) {
 			scores[i] = -999999;
 			continue;
 		}
@@ -1161,16 +1180,54 @@ function cityScores(h, cities) {
 // Pass in Town object so as to attach name to be rendered
 function placeCity(render, t) {
 	render.cities = render.cities || [];
+	var mesh = render.h.mesh;
 	// Recalculate city scores:
 	var scores = cityScores(render.h, render.cities);
 	// Get highest score:
-	var newcityIndex = d3.scan(scores, d3.descending);
-	console.log('topCity', newcityIndex);
+	var cityIndex = d3.scan(scores, d3.descending);	// NOT the triangle index!
+	console.log('cityIndex', cityIndex);
 
+	var portTri = downToTheSea(cityIndex, render);
+
+	var cityCoords = mesh.vxs[cityIndex];
+	console.log('cC', cityCoords);
+
+	/*
+	// Get nearest triangle index:
+	var tris = mesh.tris
+		.map(function(tri, i) {
+			// Keep its index with it despite filtering:
+			return {
+				index: i,
+				vertices: tri
+			};
+		});
+	console.log('tris', tris);	// 130
+
+	tris = tris.filter(function(tri) {
+		// Keep triangles which touch the city:
+		return tri.vertices.length === 3 && tri.vertices.map(v => v.index).includes(cityIndex);
+	});	// should return 3-6 triangles
+	console.log('tris', tris);	// BUG EMPTY!
+
+	tris = tris.map(function(tri) {
+		// Get lowest remaining tri:
+		return {
+			index: tri.index,
+			height: render.h[tri.index]
+		};
+	})
+	.sort((a,b) => b.height - a.height);
+	console.log('final tris', tris);	//
+	*/
 	render.cities.push({
-		ptIndex: newcityIndex,
-		name: t.name
+		coords: cityCoords,
+		ptIndex: cityIndex,
+		name: t.name,
+		//tri: tris[0] ? tris[0].index : null,
+		nearSea: portTri
 	});
+	console.log(render.cities);
 }
 
 // Find locations for all desired cities:
@@ -1200,14 +1257,15 @@ function visualizeCities(svg, render) {
 	circs.exit()
 		.remove();
 	svg.selectAll('circle.city')
-		.attr('cx', function (d) {return 1000*h.mesh.vxs[d.ptIndex][0];})
-		.attr('cy', function (d) {return 1000*h.mesh.vxs[d.ptIndex][1];})
-		.attr('r', function (d, i) {return i >= n ? 5 : 8;})	// allow n capitals and then minor towns
-		.attr('data-name', function (d) {return d.name;})
-		.style('fill', 'red')
-		.style('stroke-width', 5)
+		.attr('cx', function(d) { return 1000 * d.coords[0]; })
+		.attr('cy', function(d) { return 1000 * d.coords[1]; })
+		.attr('r', function(d, i) { return i >= n ? 4 : 8; })	// allow n capitals and then minor towns
+		.style('stroke-width', function(d, i) { return i >= n ? 2 : 4; })
 		.style('stroke-linecap', 'round')
 		.style('stroke', 'black')
+		.style('fill', 'red')
+		.attr('data-name', function(d) { return d.name; })
+		.attr('data-nearsea', function(d) { return d.nearSea; })
 		.raise()
 		.on('click', function(d) {
 			console.log(d.ptIndex, d.name);	// city clicked, logs html / id
@@ -1383,7 +1441,7 @@ function drawLabels(svg, render) {
 				}
 			];
 			// Select optimal label site:
-			var topSiteId = d3.scan(possLabels, function (a, b) {
+			var topSiteId = d3.scan(possLabels, function(a, b) {
 				return penalty(a) - penalty(b);
 			});
 			var label = possLabels[topSiteId];
@@ -1398,11 +1456,11 @@ function drawLabels(svg, render) {
 		texts.exit()
 		.remove();
 		svg.selectAll('text.city')
-		.attr('x', function (d) {return 1000*d.x;})
-		.attr('y', function (d) {return 1000*d.y;})
-		.style('font-size', function (d) {return d.size;})
-		.style('text-anchor', function (d) {return d.align;})
-		.text(function (d) {return d.text;})
+		.attr('x', function(d) { return 1000*d.x; })
+		.attr('y', function(d) { return 1000*d.y; })
+		.style('font-size', function(d) { return d.size; })
+		.style('text-anchor', function(d) { return d.align; })
+		.text(function(d) { return d.text; })
 		.raise();
 	}
 
@@ -1470,11 +1528,11 @@ function drawLabels(svg, render) {
 		texts.exit()
 		.remove();
 		svg.selectAll('text.region')
-		.attr('x', function (d) {return 1000*d.x;})
-		.attr('y', function (d) {return 1000*d.y;})
-		.style('font-size', function (d) {return 1000*d.size;})
+		.attr('x', function(d) { return 1000*d.x; })
+		.attr('y', function(d) { return 1000*d.y; })
+		.style('font-size', function(d) { return 1000*d.size; })
 		.style('text-anchor', 'middle')
-		.text(function (d) {return d.text;})
+		.text(function(d) { return d.text; })
 		.raise();
 	}
 
@@ -1514,7 +1572,7 @@ var defaultParams = {
 	extent: defaultExtent,
 	generator: generateCoast,
 	npts: 16384,
-	ncities: 15,
+	ncities: 25,
 	nterrs: 5,
 	fontsizes: {
 		region: 40,
@@ -1523,16 +1581,3 @@ var defaultParams = {
 	},
 	colours: []	// specify my own here?
 };
-
-// Average 3 point co-ordinates to get co-ords of centroid:
-function addCentresToTriangles(h) {
-	h.mesh.triCentres = h.mesh.tris.map(function(tri) {
-		if (tri.length === 3) {
-			var sumX = tri[0][0] + tri[1][0] + tri[2][0];
-			var sumY = tri[0][1] + tri[1][1] + tri[2][1];
-			return [sumX/3, sumY/3];
-		}
-		else return null;
-	});
-	return h;
-}

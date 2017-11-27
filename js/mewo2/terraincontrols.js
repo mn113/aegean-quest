@@ -355,7 +355,7 @@ var view = citySVG.append('g').attr('id', 'view');
 // Just wraps the heightmap in preparation for cities data:
 function newStage5Render(type, h) {
 	type = type || 1;
-	h = h || generateBaseMap(type, {npts:1024, extent: defaultExtent});
+	h = h || generateBaseMap(type, {npts:2048, extent: defaultExtent});
 	addCentresToTriangles(h);
 	var render = {
 		params: defaultParams,
@@ -373,7 +373,7 @@ var coast;
 function Stage5Draw() {
 	$("#game-loader").addClass("active dimmer");
 	var scores = cityScores(Stage5Render.h, Stage5Render.cities);
-	visualizeTriangles(view, Stage5Render.h, undefined, undefined, true);//, d3.max(scores) - seaLevel);//0.5);
+	visualizeTriangles(view, Stage5Render.h, undefined, undefined, false);//, d3.max(scores) - seaLevel);//0.5);
 	//visualizeCentroids(view, Stage5Render.h);
 	//visualizePoints(view, Stage5Render.h.mesh.pts, true);
 	//colorizePoints(view, Stage5Render.h);
@@ -385,7 +385,6 @@ function Stage5Draw() {
 
 	// Try to make a town on the coast:
 	coast = coastPoints(Stage5Render.h, 0.5);
-	console.log('coast', coast);
 }
 
 function generateBaseMap(type, params) {
@@ -536,8 +535,13 @@ citySVG.call(zoom);
 	postCityDiv.append("button")
 	.text("Add new city")
 	.on("click", function () {
-		placeCity(Stage5Render);
+		var t = new Town();
+		towns.push(t);
+		placeCity(Stage5Render, t);
+		console.log('Stage5Render', Stage5Render);
 		visualizeCities(view, Stage5Render);
+		drawLabels(view, Stage5Render);
+		linkCities(view);
 	});
 
 	postCityDiv.append("button")
@@ -551,6 +555,7 @@ citySVG.call(zoom);
 		console.log('Stage5Render', Stage5Render);
 		visualizeCities(view, Stage5Render);
 		drawLabels(view, Stage5Render);
+		linkCities(view);
 	});
 
 	postCityDiv.append("button")

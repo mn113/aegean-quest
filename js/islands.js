@@ -125,3 +125,27 @@ function moveShip(destNode, callback) {
 		if (callback !== undefined) callback();
 	}, duration);
 }
+
+function linkCities(svg) {
+	// Link cities in to nav network:
+	svg.selectAll("circle.city")	// only 10 => not ok
+	.on('click', function() {
+		console.log(this);
+		// Pass click through, get underlying tri:
+		var cityNode = $(this).data("triangle");
+		var seaNode = $(this).data("nearsea");
+		routeShip(seaNode);
+		return;
+	});
+}
+
+function downToTheSea(tri, render) {
+	console.log('dtts', tri);
+	while (render.h[tri] >= seaLevel) {
+		// Move to downhill neighbour if possible:
+		if (render.h.downhill[tri] === -1) break;
+		tri = render.h.downhill[tri];
+		console.log('dtts ->', tri);
+	}
+	return tri;
+}
