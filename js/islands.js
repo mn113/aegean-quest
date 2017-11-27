@@ -1,15 +1,15 @@
 /* global d3, $, Snap, view, generateGoodPoints, makeMesh, pointDistance, ShortestPathCalculator, visualizePoints, svgShip, seaLevel */
 
-var sPath, naviPoints, naviMesh;
+var sPath, shipNode, path, nodes;
 
 // Prepare nav nodes for Dijkstra pathfinding:
 function prepareNavNodes(h) {
 	return h.mesh.triCentres.map(function(value, index) {
-		if (value === null) return null;
+		//if (value === null) return null;
 		return {
 			index: index,
-			value: value,	// coords, ignored
-			r: h[index]		// size, ignored
+			value: value,			// coords, ignored
+			r: h[index] || null		// size, ignored
 		};
 	}).filter(t => t);	// no nulls por favor
 }
@@ -32,13 +32,13 @@ function prepareNavPaths(h) {
 			paths.push(c+"_"+d);
 		}
 	}
-	console.log('temp', paths);
+	//console.log('temp', paths);
 	// Format as object and append distances:
 	return paths.map(function(str) {
 		var arr = str.split("_");
-		console.log(arr);
+		//console.log(arr);
 		arr = arr.map(x => parseInt(x,10));
-		console.log(arr);
+		//console.log(arr);
 		return {
 			source: arr[0],
 			target: arr[1],
@@ -47,16 +47,16 @@ function prepareNavPaths(h) {
 	});
 }
 
-
+// Make navigation structures and wire up the map:
 function addNaviLayer(target, render) {
 	// Build navigation system from triangle centres:
-	var nodes = prepareNavNodes(render.h);
-	var paths = prepareNavPaths(render.h);
+	nodes = prepareNavNodes(render.h);
+	paths = prepareNavPaths(render.h);
 	console.log('nodes', nodes);
 	console.log('paths', paths);
 	sPath = new ShortestPathCalculator(nodes, paths);
 
-	// Make triangles clickable:
+	// Make map triangles clickable:
 	view.selectAll('path.field').on("click", function(d, clickedIndex) {
 		console.log(shipNode, nodes[shipNode]);	// from
 		console.log(clickedIndex, d);					// to
@@ -66,28 +66,35 @@ function addNaviLayer(target, render) {
 	});
 }
 
-// Enable Snap movement:
-var s = Snap("#fifth svg");
-
+// Create ship element and place on map:
 function addShipSvg(target) {
+	// Choose initial placement for ship (sea middle?):
+	var initNode = nodes.filter(n => n.r && n.r < seaLevel).random().index;
+	var initCoords = nodes[initNode].value;
+	console.log('initNode', initNode, initCoords);
+
 	// Add centred SVG ship to main SVG:
 	var svgShip = target.append("svg:image")
 	.attr("id", "shipSVG")
-	.attr("xlink:href", "img/boatR.png")//"img/drakkar.svg")
+	.attr("xlink:href", "img/boatR.png")
 	.attr("width", 50)
-	.attr("x", 0)
-	.attr("y", 0)
+	.attr("x", 1000 * initCoords[0])
+	.attr("y", 1000 * initCoords[1])
 	.raise();
 
+	shipNode = initNode;
 	return svgShip;
 }
 
-var shipNode = 0;
+// Enable Snap movement:
+var s = Snap("#fifth svg");
+
 // Ship methods:
 function routeShip(dest) {
 	var route = sPath.findRoute(shipNode, dest);
 	var hopped = 0;
 	console.log('route', route);
+	if (!route.path) return;
 	// Infinite loop:
 	function doHop() {
 		var hop = route.path[hopped];
@@ -104,14 +111,15 @@ function routeShip(dest) {
 }
 function moveShip(destNode, callback) {
 	// Get Pythagorean distance and use with ship's speed for animation duration:
-	var distance = 25000 * pointDistance(naviMesh, shipNode, destNode),
+	var distance = 25000 * triCentreDistance(Stage5Render.h.mesh, shipNode, destNode),
 		duration = distance / ship1.speed;
-	console.log('distance', distance, 'duration', duration);
+	//console.log('distance', distance, 'duration', duration);
 
 	// TODO: Use native D3 animation - if practical?
+	var destCoords = Stage5Render.h.mesh.triCentres[destNode];
 	s.select("#shipSVG").animate({
-		x: naviPoints[destNode][0] * 1000 - 25,
-		y: naviPoints[destNode][1] * 1000 - 35
+		x: destCoords[0] * 1000 - 25,	// ship sprite offset
+		y: destCoords[1] * 1000 - 35
 	}, duration);
 	setTimeout(function() {
 		if (callback !== undefined) callback();

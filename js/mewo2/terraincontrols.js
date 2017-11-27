@@ -355,7 +355,7 @@ var view = citySVG.append('g').attr('id', 'view');
 // Just wraps the heightmap in preparation for cities data:
 function newStage5Render(type, h) {
 	type = type || 1;
-	h = h || generateBaseMap(type, {npts:16, extent: defaultExtent});
+	h = h || generateBaseMap(type, {npts:1024, extent: defaultExtent});
 	addCentresToTriangles(h);
 	var render = {
 		params: defaultParams,

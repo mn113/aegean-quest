@@ -13,7 +13,7 @@ var ShortestPathCalculator = function(nodes, paths) {
 	this.distances = []; // [ [ x, 100, 150 ], [ 100, x, 10] ]
 	this.graph = {};
 
-	var maxNodes = 2048;
+	var maxNodes = 17000;
 	var minNodes = 3;
 
 	if (!d3) throw new ShortestPathCalculator.SpcError(10, 'D3 library not found');
@@ -298,7 +298,7 @@ ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 
 		}
 
-		console.log('SP', shortestPath);
+		//console.log('SP', shortestPath);
 		var totalDistance = shortestPath[end];
 
 		return {mesg:'OK', path: newPath, source: start, target: end, distance:totalDistance};
