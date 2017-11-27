@@ -1,4 +1,4 @@
-/* global d3, makeRandomLanguage, makeName, PriorityQueue */
+/* global d3, makeRandomLanguage, makeName, PriorityQueue, seaLevel */
 
 "use strict";
 
@@ -272,6 +272,16 @@ function pointDistance(mesh, i, j) {
 	return dist;
 }
 
+// Get Pythagorean distance between points:
+function triCentreDistance(mesh, i, j) {
+	var p = mesh.triCentres[i];
+	var q = mesh.triCentres[j];
+	var dx = p[0] - q[0];
+	var dy = p[1] - q[1];
+	var dist = Math.sqrt(dx*dx + dy*dy);
+	return dist;
+}
+
 // Make some sort of quantile scale of sorted heights?
 function quantile(h, q) {
 	var sortedh = [];
@@ -306,8 +316,8 @@ var meshTransforms = {
 		return mesh.map(function (pt) {
 			switch(side) {
 				// dealing with an [x,y] point in a [-0.5,0.5] extent for each axis
-				case 'left':   return pt[0] < (0.1 * Math.random() - 0.25);
-				case 'right':  return pt[0] > (0.1 * Math.random() + 0.25);
+				case 'left':   return pt[0] < (0.1 * Math.random() - 0.35);
+				case 'right':  return pt[0] > (0.1 * Math.random() + 0.35);
 				case 'top':    return pt[1] < (0.1 * Math.random() - 0.25);
 				case 'bottom': return pt[1] > (0.1 * Math.random() + 0.25);
 			}
@@ -556,7 +566,7 @@ function doErosion(h, amount, n) {
 // Set the map's sea level to a specific quantile:
 function setSeaLevel(h, q) {
 	var newh = zero(h.mesh);
-	var delta = quantile(h, q);
+	var delta = quantile(h, q);	// setting seaLevel to 50% quantile does NOT mean that 0.5 is the median
 	for (var i = 0; i < h.length; i++) {
 		newh[i] = h[i] - delta;
 	}
@@ -634,20 +644,29 @@ function trislope(h, i) {
 // Get all coastal edges:
 function coastEdges(h, seaLevel) {
 	seaLevel = seaLevel || 0;
+
+	var hi = d3.max(h) + 1e-9;
+	var lo = d3.min(h) - 1e-9;
+
+	var mappedvals = h.map(function (x) {
+		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
+	});
+
 	var edges = [];
 	for (var i = 0; i < h.mesh.edges.length; i++) {
 		var e = h.mesh.edges[i];
 		if (e[3] === undefined) continue;
 		//if (isnearedge(h.mesh, e[0]) || isnearedge(h.mesh, e[1])) continue;
 		// Check seaLevel crossings:
-		var p1Above = h[e[0]] > seaLevel,
-			p2Below = h[e[1]] <= seaLevel,
-			p2Above = h[e[1]] > seaLevel,
-			p1Below = h[e[0]] <= seaLevel;
-		if ((p1Above && p2Below) || (p1Below && p2Above)) {
+		var p0Above = mappedvals[e[0]] > seaLevel,
+			p1Below = mappedvals[e[1]] <= seaLevel,
+			p1Above = mappedvals[e[1]] > seaLevel,
+			p0Below = mappedvals[e[0]] <= seaLevel;
+		if ((p0Above && p1Below) || (p0Below && p1Above)) {
 			edges.push([e[2], e[3]]);
 		}
 	}
+	console.log('coastEdges for SL', seaLevel, edges);
 	return edges;
 }
 
@@ -874,50 +893,86 @@ function colorizePoints(svg, h) {
 	});
 }
 
-// Add classes to svg nodes: sea, coast or land:
-function classifyPoints(svg, h) {
-	svg.selectAll("circle")
-		.classed('land', function(d,i) {
-			return h[i];// difficult to do...
-		});
-}
-
+// Plot a circle at the centroid of each Voronoi cell / vertices of the Delaunay triangles
 function visualizeCentroids(svg, h, lo, hi) {
 	if (hi === undefined) hi = d3.max(h) + 1e-9;
 	if (lo === undefined) lo = d3.min(h) - 1e-9;
 
+	// Normalize:
 	var mappedvals = h.map(function (x) {
 		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
 	});
+	// var mappedvals = normalize(h);
+
+	var ptRadius = 100 / Math.sqrt(h.mesh.tris.length);
 
 	// Remove group if present:
 	svg.select("g#visualizedCentroids").remove();
 	var outerG = svg.append('g').attr('id', "visualizedCentroids");
 	// Bind pts data:
-	var bound = outerG.selectAll('circle').data(h.mesh.vor.cells);
+	var circles = outerG.selectAll('circle').data(h.mesh.pts);
 
-	var ptRadius = 100 / Math.sqrt(h.mesh.vor.cells.length);
 	// For each data point make a group containing circle and (optionally) text
-	var groups = bound.enter();
-	groups.append('circle')
-		.attr("transform", function (d) {return "translate("+ 1000*d.site[0]+","+ 1000*d.site[1]+")"; })
+	circles.enter()
+		.append('circle')
+		.attr("transform", function (d) {
+			return "translate("+ 1000*d[0]+","+ 1000*d[1]+")";
+		})
 		.attr('r', ptRadius)
 		.attr('id', function(d,i) { return 'cent_'+i; })
+		.classed('centroid', true)
 		.classed('clickable', true)
 		// A Voronoi polygon can only be land or sea. Points can also be coast or city.
 		.classed('land', function(d,i) {
-			return (mappedvals[i] > 0.5);
+			return (mappedvals[i] > seaLevel);
 		})
 		.classed('sea', function(d,i) {
-			return (mappedvals[i] < 0.5);
+			return (mappedvals[i] < seaLevel);
 		})
-		.style('fill', 'lawngreen')
+		.style('fill', function(d,i) {
+			//return d3.interpolateViridis(mappedvals[i]);
+			var colorScale = d3.scaleLinear()
+				.domain([1, 0.5, 0.49, 0.47, 0.1, 0])	// max, pivot, min
+				.range(["sienna", "lemonchiffon", "white", "dodgerblue", "dodgerblue", "steelblue"]);
+
+			return colorScale(mappedvals[i]);	// defines colour scale of entire map
+		})
 		.on('click', function(d,i) {
 			console.log('index', i, 'height', mappedvals[i]);	// not the right data!
 		})
+		//.on("click", function() {
+			// Try to pass centroid click through to triangle below...
+			/*
+			console.log(this, this.parentNode);
+			var coords = d3.mouse(this.parentNode);
+			console.log(coords);
+			var belowEl = getLowerElement(coords.x, coords.y);
+			console.log(belowEl);
+			belowEl.click(); // simulate click on the underlying element
+			*/
+		//})
 		;
 	// Cleanup:
-	groups.exit().remove();
+	circles.exit().remove();
+
+	console.log('vC', d3.max(mappedvals), d3.min(mappedvals), mappedvals.length);
+}
+
+// Pass click through SVG, only if it lands on a circle:
+function getLowerElement(x,y) {
+	var resulting_element;
+	var first_element = document.elementFromPoint(x,y);
+	//check if first_element is a svg
+	if (first_element.nodeName === "circle") {
+		var _display = first_element.style.display;    //save display of svg
+		first_element.style.display = "none";      // make svg invisible
+		resulting_element = document.elementFromPoint(x,y);
+		first_element.style.display = _display;    // reset display
+	}
+	else {
+		resulting_element = first_element;
+	}
+	return resulting_element;
 }
 
 // Convert a path (array of points) to svg string format:
@@ -931,56 +986,66 @@ function makeD3Path(path) {
 }
 
 // Add triangles to the SVG representing Voronoi cells:
-function visualizeVoronoi(svg, field, lo, hi) {
-	if (hi === undefined) hi = d3.max(field) + 1e-9;
-	if (lo === undefined) lo = d3.min(field) - 1e-9;
+function visualizeTriangles(svg, h, lo, hi, showDebugText = false) {
+	if (hi === undefined) hi = d3.max(h) + 1e-9;
+	if (lo === undefined) lo = d3.min(h) - 1e-9;
 
-	var mappedvals = field.map(function (x) {
+	var mappedvals = h.map(function (x) {
 		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
 	});
+	console.log('vT', h.length, h.mesh);
 
 	// Remove group if present:
-	svg.select("g#visualizedVoronoi").remove();
-	var g = svg.append('g').attr('id', "visualizedVoronoi");
-	var tris = g.selectAll('path.field')
-		.data(field.mesh.tris);
-
-	tris.enter()
+	svg.select("g#triangles").remove();
+	var outerG = svg.append('g').attr('id', "triangles");
+	// Bind pts data:
+	var triangles = outerG.selectAll('path.field')
+		.data(h.mesh.tris)
+		.enter()
 		.append('path')
 		.classed('field', true)
-		// A Voronoi polygon can only be land or sea. Points can also be coast or city.
-		.classed('land', function(d,i) {
-			return (mappedvals[i] > 0.5);
-		})
-		.classed('sea', function(d,i) {
-			return (mappedvals[i] < 0.5);
-		});
+		// A triangle can only be land or sea. Points can also be coast or city.
+		.classed('land', function(d,i) { return (mappedvals[i] > seaLevel); })
+		.classed('sea', function(d,i) { return (mappedvals[i] < seaLevel); });
+	// When data exits, remove elements:
+	triangles.exit().remove();
 
-	tris.exit()
-		.remove();
+	if (showDebugText) {
+		var numbers = outerG.selectAll('text')
+			.data(h.mesh.triCentres)
+			.enter()
+			.append('text')
+			.text(function(d,i) { return i; })	// display node index
+			.attr("transform", function (d,i) {
+				var pt = h.mesh.triCentres[i] || [-9999,-9999];	// dirty hack
+				return "translate("+ 1000*pt[0]+","+ 1000*pt[1]+")";
+			})
+			.style('color', 'black')
+			.style('stroke', 'white')
+			.style('pointerEvents', 'none');
+		// When data exits, remove elements:
+		numbers.exit().remove();
+	}
 
-	console.log(d3.max(mappedvals), d3.min(mappedvals), mappedvals.length);
-
+	// Attach path strings to the svg path elements & colour them:
+	// Add click behaviour too
 	svg.selectAll('path.field')
 		.attr('d', makeD3Path)
 		.style('fill', function (d, i) {
-			//return d3.interpolateViridis(mappedvals[i]);
 			var colorScale = d3.scaleLinear()
-				.domain([1, 0.5, 0])	// max, pivot, min
-				.range(["goldenrod", "lemonchiffon", "dodgerblue"]);
-
-			var colorScale2 = d3.scaleLinear()
-				.domain([0,1])
-				.interpolate(d3.interpolateHcl)
-				.range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]);
+				.domain([1, 0.5, 0.49, 0.47, 0.1, 0])	// max, pivot, min
+				.range(["sienna", "lemonchiffon", "white", "dodgerblue", "dodgerblue", "steelblue"]);
 
 			return colorScale(mappedvals[i]);	// defines colour scale of entire map
 		})
 		.on('click', function(d, i) {
 			console.log('index', i, 'height', mappedvals[i]);
 		});
+
+	console.log('vT', d3.max(mappedvals), d3.min(mappedvals), mappedvals.length);
 }
 
+// Draw rivers:
 function visualizeDownhill(h) {
 	var links = getRivers(h, 0.01);
 	drawPaths('river', links);
@@ -1421,11 +1486,8 @@ function drawLabels(svg, render) {
 function drawMap(svg, render) {
 	render.rivers = getRivers(render.h, 0.01);
 	render.coasts = contour(render.h, 0);
-	//render.terr = getTerritories(render);
-	//render.borders = getBorders(render);
 	drawPaths(svg, 'river', render.rivers);
 	drawPaths(svg, 'coast', render.coasts);
-	//drawPaths(svg, 'border', render.borders);
 	visualizeSlopes(svg, render);
 	visualizeCities(svg, render);
 	drawLabels(svg, render);
@@ -1461,3 +1523,16 @@ var defaultParams = {
 	},
 	colours: []	// specify my own here?
 };
+
+// Average 3 point co-ordinates to get co-ords of centroid:
+function addCentresToTriangles(h) {
+	h.mesh.triCentres = h.mesh.tris.map(function(tri) {
+		if (tri.length === 3) {
+			var sumX = tri[0][0] + tri[1][0] + tri[2][0];
+			var sumY = tri[0][1] + tri[1][1] + tri[2][1];
+			return [sumX/3, sumY/3];
+		}
+		else return null;
+	});
+	return h;
+}

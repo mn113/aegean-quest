@@ -12,8 +12,6 @@ Array.prototype.shuffle = function() {
 	return this;
 };
 
-console.log([1,2,3,4,5,6].shuffle());
-
 class Ship {
 	constructor() {
 		this.name = "My Ship";

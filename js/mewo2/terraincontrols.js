@@ -1,4 +1,4 @@
-/* global $, d3, meshTransforms, makeMesh, visualizePoints, generatePoints, improvePoints, zero, generateGoodMesh, visualizeVoronoi, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, randomFrom, fillSinks, erosionRate, doErosion, cleanCoast, getRivers, visualizeSlopes, generateCoast, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, coastPoints, colorizePoints, visualizeCentroids, addNaviLayer, addShipSvg, landSeaRatio, drawLabels, Town */
+/* global $, d3, meshTransforms, makeMesh, visualizePoints, generatePoints, improvePoints, zero, generateGoodMesh, visualizeTriangles, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, randomFrom, fillSinks, erosionRate, doErosion, cleanCoast, getRivers, visualizeSlopes, generateCoast, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, coastPoints, colorizePoints, visualizeCentroids, addNaviLayer, addShipSvg, landSeaRatio, drawLabels, Town */
 
 function addSVG(div) {
 	return div.insert("svg", ":first-child")
@@ -67,10 +67,10 @@ var primSVG = addSVG(primDiv);
 var primH = zero(generateGoodMesh(4096));
 
 function primDraw() {
-	visualizeVoronoi(primSVG, primH, -1, 1);
+	visualizeTriangles(primSVG, primH, -1, 1);
 	drawPaths(primSVG, 'coast', contour(primH, 0));
 }
-primDraw();
+//primDraw();
 
 (function() {
 	primDiv.append("br");
@@ -206,9 +206,9 @@ var erodeViewErosion = false;
 
 function erodeDraw() {
 	if (erodeViewErosion) {
-		visualizeVoronoi(erodeSVG, erosionRate(erodeH));
+		visualizeTriangles(erodeSVG, erosionRate(erodeH));
 	} else {
-		visualizeVoronoi(erodeSVG, erodeH, 0, 1);
+		visualizeTriangles(erodeSVG, erodeH, 0, 1);
 	}
 	drawPaths(erodeSVG, "coast", contour(erodeH, 0));
 }
@@ -271,7 +271,7 @@ var physViewHeight = true;
 /*
 function physDraw() {
 	if (physViewHeight) {
-		visualizeVoronoi(physSVG, physH, 0);
+		visualizeTriangles(physSVG, physH, 0);
 	} else {
 		physSVG.selectAll("path.field").remove();
 	}
@@ -355,7 +355,8 @@ var view = citySVG.append('g').attr('id', 'view');
 // Just wraps the heightmap in preparation for cities data:
 function newStage5Render(type, h) {
 	type = type || 1;
-	h = h || generateBaseMap(type, {npts:4096, extent: defaultExtent});
+	h = h || generateBaseMap(type, {npts:16, extent: defaultExtent});
+	addCentresToTriangles(h);
 	var render = {
 		params: defaultParams,
 		h: h,
@@ -365,18 +366,19 @@ function newStage5Render(type, h) {
 	render.coasts = contour(h, 0);
 	return render;
 }
-var Stage5Render = newStage5Render();
+var Stage5Render = newStage5Render();	// runs on load
 var coast;
 
+// Triggered by buttons:
 function Stage5Draw() {
 	$("#game-loader").addClass("active dimmer");
 	var scores = cityScores(Stage5Render.h, Stage5Render.cities);
-	visualizeVoronoi(view, scores, d3.max(scores) - 0.5);
+	visualizeTriangles(view, Stage5Render.h, undefined, undefined, true);//, d3.max(scores) - seaLevel);//0.5);
 	//visualizeCentroids(view, Stage5Render.h);
-	//visualizePoints(view, Stage5Render.h.mesh.pts, false);
+	//visualizePoints(view, Stage5Render.h.mesh.pts, true);
 	//colorizePoints(view, Stage5Render.h);
 
-	drawPaths(view, 'coast', contour(Stage5Render.h, 0));
+	drawPaths(view, 'coast', contour(Stage5Render.h, 0.5));
 	drawPaths(view, 'river', getRivers(Stage5Render.h, 0.01));
 	visualizeSlopes(view, Stage5Render);
 	$("#game-loader").removeClass("active dimmer");
@@ -384,11 +386,6 @@ function Stage5Draw() {
 	// Try to make a town on the coast:
 	coast = coastPoints(Stage5Render.h, 0.5);
 	console.log('coast', coast);
-}
-
-function addNavAndShip() {
-	addNaviLayer(view);
-	svgShip = addShipSvg(view);
 }
 
 function generateBaseMap(type, params) {
@@ -427,6 +424,15 @@ function generateBaseMap(type, params) {
 			mountains(mesh, 10, 0.08)
 		);
 	}
+	else if (type === 5) {	// 3 corners + 40
+		h = add(
+			//meshTransforms.cornerLand(mesh, 'topRight'),
+			mountains(mesh, 3, 0.06),
+			mountains(mesh, 3, 0.05),
+			mountains(mesh, 3, 0.04),
+			mountains(mesh, 3, 0.03)
+		);
+	}
 	else {
 		h = add(
 			slope(mesh, randomVector(4)),
@@ -440,27 +446,33 @@ function generateBaseMap(type, params) {
 	}
 	h = peaky(h);
 	// Erode terrain:
-	h = doErosion(h, randomFrom(0, 0.1), 2);	//5
-	seaLevel = randomFrom(0.2, 0.6);
+	//h = doErosion(h, randomFrom(0, 0.1), 2);	// 5 times
+	h = fillSinks(h);
+	h = normalize(h);
+
+	seaLevel = 0.5;//randomFrom(0.2, 0.6);		// why random?
 	h = setSeaLevel(h, seaLevel);
-
-	//h = fillSinks(h);
-	//h = normalize(h);
-	// Smooth coast:
-	h = cleanCoast(h, 3);
-
 	console.log('land:sea', landSeaRatio(h, seaLevel));
-	return h;
+
+	// Smooth coast:
+	h = cleanCoast(h, 6);
+
+	return normalize(h);
+}
+
+function addNavAndShip() {
+	addNaviLayer(view, Stage5Render);
+	svgShip = addShipSvg(view);
 }
 
 // Pan & zoom:
 var zoom = d3.zoom()
-	.scaleExtent([0.5, 1.75])
+	.scaleExtent([0.25, 1.5])
 	//.translateExtent([[25,25],[775,575]])	// trap to bounds?
 	.on("zoom", function() {
 		view.attr("transform", d3.event.transform);	// includes translate & scale
 	});
-view.call(zoom);
+citySVG.call(zoom);
 
 (function(){
 	postCityDiv.append("br");
@@ -502,6 +514,14 @@ view.call(zoom);
 	.on("click", function () {
 		Stage5Render = newStage5Render(4);
 		console.log('cityRender_type4', Stage5Render);
+		Stage5Draw();
+	});
+
+	postCityDiv.append("button")
+	.text("Generate Type 5")
+	.on("click", function () {
+		Stage5Render = newStage5Render(5);
+		console.log('cityRender_type5', Stage5Render);
 		Stage5Draw();
 	});
 
@@ -572,21 +592,3 @@ view.call(zoom);
 	});
 	*/
 }());
-
-
-// FINAL
-/*
-var finalDiv = d3.select("div#final");
-var finalSVG = addSVG(finalDiv);
-finalDiv.append("button")
-.text("Copy map from above")
-.on("click", function () {
-	drawMap(finalSVG, cityRender);
-});
-
-finalDiv.append("button")
-.text("Generate high resolution map")
-.on("click", function () {
-	doMap(finalSVG, defaultParams);
-});
-*/

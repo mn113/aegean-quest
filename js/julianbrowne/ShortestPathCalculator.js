@@ -13,14 +13,17 @@ var ShortestPathCalculator = function(nodes, paths) {
 	this.distances = []; // [ [ x, 100, 150 ], [ 100, x, 10] ]
 	this.graph = {};
 
-	var maxNodes = 256;
+	var maxNodes = 2048;
 	var minNodes = 3;
 
 	if (!d3) throw new ShortestPathCalculator.SpcError(10, 'D3 library not found');
 
-	if (!nodes.length || nodes.length > maxNodes || nodes.length < minNodes)
-		throw new ShortestPathCalculator.SpcError(11, 'Nodes format invalid => ' + JSON.stringify(nodes) );
-
+	if (!nodes.length || nodes.length < minNodes) {
+		throw new ShortestPathCalculator.SpcError(11, 'Insufficient nodes => ' + JSON.stringify(nodes) );
+	}
+	else if (nodes.length > maxNodes) {
+		throw new ShortestPathCalculator.SpcError(11, 'Too many nodes => ' + JSON.stringify(nodes) );
+	}
 };
 
 ShortestPathCalculator.isInteger = function(i) {

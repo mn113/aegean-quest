@@ -1,73 +1,66 @@
-/* global d3, $, Snap, view, generateGoodPoints, makeMesh, normalize, relax, cone, pointDistance, ShortestPathCalculator, visualizePoints, colorizePoints, svgShip */
+/* global d3, $, Snap, view, generateGoodPoints, makeMesh, pointDistance, ShortestPathCalculator, visualizePoints, svgShip, seaLevel */
 
 var sPath, naviPoints, naviMesh;
 
-function addNaviLayer(target) {
-	var naviGroup = target.append("svg:g").attr("id", "naviGroup");
-
-	// NAVIGATION GRID:
-	naviPoints = generateGoodPoints(256);
-	// TODO: Find nearest map point to each naviPoint. Is it on land or sea?
-	// Delete any naviPoint over land
-	// TODO: remove navi points which are above land, using x & y:
-	naviPoints.forEach(function(p) {
-		var x = 1000 * p[0], y = 1000 * p[1];
-		// Pseudo click:
-		var e2 = view.select("#visualizedVoronoi").createEvent('MouseEvent');
-		e2.initMouseEvent(e.type, e.bubbles, e.cancelable, e.view,  e.detail, e.screenX, e.screenY, e.clientX, e.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, e.button, e.relatedTarget);
-		el.dispatchEvent(e2);
-		// NOW WHAT?
-		//var el = document.elementFromPoint(x,y);
-		/*var rect = citySVG.append("rect")
-			.attr("x", x)
-			.attr("y", y)
-			.attr("width", 1)
-			.attr("height", 1);*/
-		//console.log('p', [p], 'iL', citySVG.getIntersectionList(rect, view.select("#visualizedVoronoi")));
-		//rect.remove();
-	});
-
-	naviMesh = makeMesh(naviPoints);
-	//naviMesh = normalize(relax(cone(naviMesh, -0.75)));
-	console.log('naviMesh', naviMesh);
-	console.log('maxH', d3.max(naviMesh), 'minH', d3.min(naviMesh));
-
-
-	// Build data structures for Dijkstra's algorithm:
-	var nodes = naviPoints.map(function(p,i) {
+// Prepare nav nodes for Dijkstra pathfinding:
+function prepareNavNodes(h) {
+	return h.mesh.triCentres.map(function(value, index) {
+		if (value === null) return null;
 		return {
-			index: i,
-			value: 'sea',
-			r: 10
+			index: index,
+			value: value,	// coords, ignored
+			r: h[index]		// size, ignored
+		};
+	}).filter(t => t);	// no nulls por favor
+}
+
+// Prepare nav paths for Dijkstra pathfinding:
+function prepareNavPaths(h) {
+	var paths = [];
+	// Transform the adj data into another format:
+	for (var a = 0; a < h.mesh.adj.length; a++) {
+		for (var b of h.mesh.adj[a]) {
+			// Don't add landy paths or null points:
+			if (h[a] > seaLevel || h[b] > seaLevel
+			|| !h.mesh.triCentres[a] || !h.mesh.triCentres[b])
+				continue;
+
+			var c = Math.min(a,b),	// always add lo->hi
+				d = Math.max(a,b);
+			// Avoid dupes:
+			if (paths.includes(c+"_"+d)) continue;
+			paths.push(c+"_"+d);
+		}
+	}
+	console.log('temp', paths);
+	// Format as object and append distances:
+	return paths.map(function(str) {
+		var arr = str.split("_");
+		console.log(arr);
+		arr = arr.map(x => parseInt(x,10));
+		console.log(arr);
+		return {
+			source: arr[0],
+			target: arr[1],
+			distance: 1000 * triCentreDistance(h.mesh, arr[0], arr[1])	// penalizes longer routes
 		};
 	});
-	var paths = naviMesh.edges.map(function(edge) {
-		if (edge[3] === undefined) return null;
-		// Use strings to avoid key problems: //FIXME
-		var a = ""+edge[2].index,
-			b = ""+edge[3].index;
-		return {
-			source: a,
-			target: b,
-			distance: 1000 * pointDistance(naviMesh, a, b)
-		};
-	}).filter(p => p);	// no nulls por favor
+}
+
+
+function addNaviLayer(target, render) {
+	// Build navigation system from triangle centres:
+	var nodes = prepareNavNodes(render.h);
+	var paths = prepareNavPaths(render.h);
 	console.log('nodes', nodes);
 	console.log('paths', paths);
-
 	sPath = new ShortestPathCalculator(nodes, paths);
 
-	visualizePoints(naviGroup, naviPoints, true);
-	colorizePoints(naviGroup, naviMesh);
-
-	// Make circles clickable:
-	view.selectAll('circle').on("click", function(d, clickedIndex) {
-		var coords = d3.mouse(this);
-		//svgShip.attr("x", coords[0]).attr("y", coords[1]);
-		// TODO: pass click through nav layer and return polygon height -> land or sea?
-		console.log(shipNode, naviPoints[shipNode]);	// from
+	// Make triangles clickable:
+	view.selectAll('path.field').on("click", function(d, clickedIndex) {
+		console.log(shipNode, nodes[shipNode]);	// from
 		console.log(clickedIndex, d);					// to
-		console.log(naviMesh[clickedIndex]);
+		console.log(nodes[clickedIndex]);
 		svgShip.raise();
 		routeShip(clickedIndex);
 	});
@@ -111,7 +104,7 @@ function routeShip(dest) {
 }
 function moveShip(destNode, callback) {
 	// Get Pythagorean distance and use with ship's speed for animation duration:
-	var distance = 2500 * pointDistance(naviMesh, shipNode, destNode),
+	var distance = 25000 * pointDistance(naviMesh, shipNode, destNode),
 		duration = distance / ship1.speed;
 	console.log('distance', distance, 'duration', duration);
 
@@ -123,26 +116,4 @@ function moveShip(destNode, callback) {
 	setTimeout(function() {
 		if (callback !== undefined) callback();
 	}, duration);
-}
-
-// Use class 'passThru' to allow clicks to pass to layer below
-function passThruEvents(g) {
-	g.on('mousedown.passThru', passThru);
-	//.on('mousemove.passThru', passThru)
-
-	function passThru(d) {
-		var e = d3.event;
-
-		var prev = this.style.pointerEvents;
-		this.style.pointerEvents = 'none';
-
-		var el = document.elementFromPoint(d3.event.x, d3.event.y);
-
-		var e2 = document.createEvent('MouseEvent');
-		e2.initMouseEvent(e.type,e.bubbles,e.cancelable,e.view, e.detail,e.screenX,e.screenY,e.clientX,e.clientY,e.ctrlKey,e.altKey,e.shiftKey,e.metaKey,e.button,e.relatedTarget);
-
-		el.dispatchEvent(e2);
-
-		this.style.pointerEvents = prev;
-	}
 }

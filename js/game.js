@@ -30,9 +30,9 @@ var ui = {
 	shipDiv: $("#ship-ui"),
 
 	renderShipInfo: function(sid) {
-		console.log(s);
 		var s = player.ships[sid];
 		var l = player.ships.length;
+		console.log(s);
 		var prev = player.ships[sid-1] % l;
 		var next = player.ships[sid+1] % l;
 		var html = `
