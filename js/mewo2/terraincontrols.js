@@ -408,8 +408,9 @@ function generateBaseMap(type, params) {
 	}
 	else if (type === 3) {	// Right-left + 25
 		h = add(
-			meshTransforms.edgeLand(mesh, 'right'),
 			meshTransforms.edgeLand(mesh, 'left'),
+			meshTransforms.cornerLand(mesh, 'topRight'),
+			meshTransforms.cornerLand(mesh, 'bottomRight'),
 			mountains(mesh, 10, 0.04),
 			mountains(mesh, 15, 0.06)
 		);
@@ -445,7 +446,7 @@ function generateBaseMap(type, params) {
 	}
 	h = peaky(h);
 	// Erode terrain:
-	//h = doErosion(h, randomFrom(0, 0.1), 2);	// 5 times
+	h = doErosion(h, randomFrom(0, 0.1), 2);	// 5 times
 	h = fillSinks(h);
 	h = normalize(h);
 
@@ -454,7 +455,7 @@ function generateBaseMap(type, params) {
 	console.log('land:sea', landSeaRatio(h, seaLevel));
 
 	// Smooth coast:
-	h = cleanCoast(h, 6);
+	h = cleanCoast(h, 6);	// FIXME smoother!
 
 	return normalize(h);
 }
@@ -466,12 +467,17 @@ function addNavAndShip() {
 
 // Pan & zoom:
 var zoom = d3.zoom()
-	.scaleExtent([0.25, 1.5])
-	//.translateExtent([[25,25],[775,575]])	// trap to bounds?
+	.scaleExtent([.75, 3])
+	.translateExtent([[0,0],[800,600]])	// trap to bounds (x=20, y=50)
 	.on("zoom", function() {
-		view.attr("transform", d3.event.transform);	// includes translate & scale
+		console.log(d3.event.transform);
+		var t = d3.event.transform,
+			x = t.x + 400 * t.k,
+			y = t.y + 300 * t.k;
+		view.attr("transform", "translate(" + x + "," + y + ") scale(" + t.k + ")");
 	});
 citySVG.call(zoom);
+zoom.scaleTo(citySVG, .75);
 
 (function(){
 	postCityDiv.append("br");
