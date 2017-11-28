@@ -1,4 +1,4 @@
-/* global d3, makeRandomLanguage, makeName, PriorityQueue, seaLevel */
+/* global d3, makeName, PriorityQueue, seaLevel */
 
 "use strict";
 
@@ -1349,9 +1349,6 @@ function drawLabels(svg, render) {
 	var cities = render.cities;
 	var nterrs = render.params.nterrs;
 	var avoids = [render.rivers, render.coasts];//, render.borders];
-
-	var lang = makeRandomLanguage();	// TODO: replace with static list
-	console.log('lang', lang);
 	var citylabels = [];
 
 	// Penalise non-optimal label placements:
@@ -1397,7 +1394,6 @@ function drawLabels(svg, render) {
 			var cityIndex = cities[i].ptIndex;
 			var x = h.mesh.vxs[cityIndex][0];
 			var y = h.mesh.vxs[cityIndex][1];
-			//var text = makeName(lang, 'city');	// TODO: replace with city name
 			var text = cities[i].name;
 			var size = i < nterrs ? params.fontsizes.city : params.fontsizes.town;
 			var sx = 0.65 * (size/1000) * text.length;

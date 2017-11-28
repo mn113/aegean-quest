@@ -1,4 +1,4 @@
-/* global d3, SpUtils */
+/* global d3, SpUtils, PriorityQueue */
 /*
 *
 * Dijkstra Short Path Calculator and Graph Plotter
@@ -6,9 +6,12 @@
 *
 */
 
+const infinity = 999999;  // larger than largest distance in distances array
+
+
 var ShortestPathCalculator = function(nodes, paths) {
 
-	this.nodes = nodes; // nodes => [ { index: 0, value: 'a', r: 20 }, ... ]
+	this.nodes = nodes; // nodes => [ { index: 0, value: 'a', r: 20, coords: [0,0] }, ... ]
 	this.paths = paths; // paths => [ { source: 0, target: 1, distance: 150 }, ... ]
 	this.distances = []; // [ [ x, 100, 150 ], [ 100, x, 10] ]
 	this.graph = {};
@@ -36,22 +39,41 @@ ShortestPathCalculator.SpcError = function(code, message) {
 	return { code: code, message: message };
 };
 
-ShortestPathCalculator.prototype.findRoute = function(source, target) {
+ShortestPathCalculator.prototype.init = function() {
+	this.makeDistanceArrayFromNodes();
+	this.populateDistances();
+	this.linkedNodes = this.buildLinksGraph();	// slooow
+	return this;
+};
 
+ShortestPathCalculator.prototype.findRoute = function(source, target) {
+	// Is input valid?
 	if (!ShortestPathCalculator.isInteger(source) || !ShortestPathCalculator.isInteger(target))
 		throw new ShortestPathCalculator.SpcError(20, "Source and target must be ints");
 
 	if (source > this.nodes.length - 1|| target > this.nodes.length - 1)
 		throw new ShortestPathCalculator.SpcError(21, "Source or target put of range");
 
-	this.makeDistanceArrayFromNodes();
+	//this.result = this.dijkstra(source, target);
+	this.result = this.aStarPath(source, target);
 
-	this.populateDistances();
+	return this.formatPath(this.result);
+};
 
-	this.result = this.dijkstra(source, target);
+ShortestPathCalculator.prototype.formatPath = function(path) {
+	if (!path) return {mesg: "No path found"};
 
-	return this.result;
+	var totalDistance = 0,
+		newPath = [],
+		start = path[0],
+		end = path[path.length - 1];
 
+	// Convert node array (length N) to sub-path array (length N-1):
+	for (var i = path.length - 1; i > 0; i--) {
+		newPath.push({source: path[i], target: path[i-1]});
+		totalDistance += this.distances[i][i-1];
+	}
+	return {mesg:'OK', path: newPath, source: start, target: end, distance:totalDistance};
 };
 
 ShortestPathCalculator.prototype.makeDistanceArrayFromNodes = function() {
@@ -83,7 +105,27 @@ ShortestPathCalculator.prototype.populateDistances = function() {
 
 };
 
-ShortestPathCalculator.clearDiv = function(elementId) {
+ShortestPathCalculator.prototype.buildLinksGraph = function() {
+	var linkedNodes = {};
+	for (var node of this.nodes) {
+		if (node.coords === null) continue;
+		// Initialise empty arrays:
+		linkedNodes[node.index] = [];
+		// Append all linked nodes:
+		for (var path of this.paths) {
+			// Forward way:
+			if (path.source === node.index)
+				linkedNodes[node.index].push(path.target);
+			// Backward way:
+			if (path.target === node.index)
+				linkedNodes[node.index].push(path.source);
+		}
+	}
+	console.log('links', linkedNodes);
+	return linkedNodes;
+};
+
+ShortestPathCalculator.prototype.clearDiv = function(elementId) {
 	var target = document.getElementById(elementId);
 
 	if (!target) return -1;
@@ -213,27 +255,22 @@ ShortestPathCalculator.prototype.formatResult = function() {
 };
 
 /*
-*
 * Calculate shortest path between two nodes in a graph
 *
 * @param {Integer} start     index of node to start from
 * @param {Integer} end       index of node to end at
-*
 */
-
 ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 
 	var nodeCount = this.distances.length,
-		infinity = 99999,  // larger than largest distance in distances array
 		shortestPath = new Array(nodeCount),
 		nodeChecked  = new Array(nodeCount),
-		pred         = new Array(nodeCount);
+		cameFrom     = new Array(nodeCount);
 
 	// initialise data placeholders
-
 	for(var i=0; i<nodeCount; i++) {
 		shortestPath[i] = infinity;
-		pred[i]=null;
+		cameFrom[i]=null;
 		nodeChecked[i]=false;
 	}
 
@@ -244,8 +281,8 @@ ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 		var minDist = infinity;
 		var closestNode = null;
 
+		// Get shortest known path to every node:
 		for (var j=0; j<nodeCount; j++) {
-
 			if (!nodeChecked[j]) {
 				if (shortestPath[j] <= minDist) {
 					minDist = shortestPath[j];
@@ -254,8 +291,10 @@ ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 			}
 		}
 
+		// Visit closest node:
 		nodeChecked[closestNode] = true;
 
+		// Find next closest node:
 		for(var k=0; k<nodeCount; k++) {
 			if (!nodeChecked[k]){
 				var nextDistance = distanceBetween(closestNode, k, this.distances);
@@ -266,27 +305,23 @@ ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 
 					shortestPath[k] = soFar + extra;
 
-					pred[k] = closestNode;
+					cameFrom[k] = closestNode;
 				}
 			}
 		}
-
 	}
 
 	if (shortestPath[end] < infinity) {
-
 		var newPath = [];
 		var step    = { target: parseInt(end) };
 
 		var v = parseInt(end);
-
 		//console.log('v');
 		//console.log(v);
 
+		// Track back to build up path:
 		while (v>=0) {
-
-			v = pred[v];
-
+			v = cameFrom[v];
 			//console.log('v');
 			//console.log(v);
 
@@ -295,7 +330,6 @@ ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 				newPath.unshift(step);
 				step = {target: v};
 			}
-
 		}
 
 		//console.log('SP', shortestPath);
@@ -306,14 +340,83 @@ ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 	else {
 		return {mesg:'No path found', path: null, source: start, target: end, distance: 0 };
 	}
+};
 
-	function distanceBetween(fromNode, toNode, distances) {
+ShortestPathCalculator.prototype.distanceBetween = function(fromNode, toNode) {
+	var dist = this.distances[fromNode][toNode];
+	if (dist==='x') dist = infinity;
+	return dist;
+};
 
-		var dist = distances[fromNode][toNode];
+ShortestPathCalculator.prototype.manhattanHeuristic = function(fromNode, toNode) {
+	// Manhattan distance:
+	var dx = this.nodes[fromNode].coords[0] - this.nodes[toNode].coords[0],
+		dy = this.nodes[fromNode].coords[1] - this.nodes[toNode].coords[1];
+	return 1000 * (Math.abs(dx) + Math.abs(dy));
+};
 
-		if (dist==='x') dist = infinity;
+/*
+ * Returns a list representing the optimal path between startNode and endNode or null if such a path does not exist
+ * If the path exists, the order is such that elements can be popped off the path
+ */
+ShortestPathCalculator.prototype.aStarPath = function (startNode, goalNode) {
+	// Priority Queue (https://github.com/STRd6/PriorityQueue.js)
+	//var frontier = PriorityQueue({low: true});	//  what have we not explored?
+	// Priority Queue (https://github.com/adamhooper/js-priority-queue)
+	var frontier = new PriorityQueue({ comparator: function(a, b) { return a[1] - b[1]; }});
 
-		return dist;
+	var explored = new Set(); // Set (https://github.com/jau/SetJS), what have we explored?
+
+	var pathTo = {}; // A dictionary mapping from nodes to nodes, used to keep track of the path
+	var gCost = {}; // A dictionary mapping from nodes to floats, used to keep track of the "G cost" associated with traveling to each node from startNode
+
+	pathTo[startNode] = null;
+	gCost[startNode] = 0.0;
+
+	frontier.queue([startNode, 0.0]);
+
+	// While the frontier remains unexplored:
+	while (frontier.length > 0) {
+		// Visit cheapest frontier node:
+		var leafNode = frontier.dequeue()[0];
+		console.log('visiting', leafNode);	// RUNS MANY TIMES?
+		// Mark as seen:
+		explored.add(leafNode);
+
+		// Test for goal:
+		if (leafNode === goalNode) {
+			// We found the goal! Reconstruct the path:
+			console.log('goal found!');
+			var path = [];
+			var pointer = goalNode;
+
+			while (pointer !== null) {
+				path.push(pointer);
+				pointer = pathTo[pointer];
+			}
+			console.log(path);
+			return path;
+		}
+
+		// Check linked nodes and add them to frontier with sum of cost (past) + heuristic (future):
+		for (var nextNode of this.linkedNodes[leafNode]) {
+			//var connectedNode = this.linkedNodes[leafNode][i];
+			var newCost = gCost[leafNode] + this.distanceBetween(leafNode, nextNode);
+			// If the next node is not yet visited, or has been but at a greater travel cost, process it:
+			if (!explored.has(nextNode) || newCost < gCost[nextNode]) {
+				// Set the new or lowered cost:
+				gCost[nextNode] = newCost;
+
+				var costSoFar = gCost[nextNode],
+					heuristic = this.manhattanHeuristic(nextNode, goalNode);
+				console.log('cost', costSoFar, 'heur', heuristic);
+				// Store item as [node, cost] - will be automatically sorted by cost:
+				frontier.queue([nextNode, costSoFar + heuristic]);
+				// Store new preferred ancestor:
+				pathTo[nextNode] = leafNode;
+			}
+		}
 	}
 
+	return null; // No path could be found
 };

@@ -1,6 +1,6 @@
-/* global d3, $, Snap, view, generateGoodPoints, makeMesh, pointDistance, ShortestPathCalculator, visualizePoints, svgShip, seaLevel */
+/* global d3, $, Snap, view, ShortestPathCalculator, svgShip, seaLevel */
 
-var sPath, shipNode, path, nodes;
+var sPath, shipNode, paths, nodes;
 
 // Prepare nav nodes for Dijkstra pathfinding:
 function prepareNavNodes(h) {
@@ -8,7 +8,8 @@ function prepareNavNodes(h) {
 		//if (value === null) return null;
 		return {
 			index: index,
-			value: value,			// coords, ignored
+			coords: value,
+			value: null,			// name, ignored
 			r: h[index] || null		// size, ignored
 		};
 	}).filter(t => t);	// no nulls por favor
@@ -55,6 +56,7 @@ function addNaviLayer(target, render) {
 	console.log('nodes', nodes);
 	console.log('paths', paths);
 	sPath = new ShortestPathCalculator(nodes, paths);
+	sPath.init();
 
 	// Make map triangles clickable:
 	view.selectAll('path.field').on("click", function(d, clickedIndex) {
@@ -69,8 +71,8 @@ function addNaviLayer(target, render) {
 // Create ship element and place on map:
 function addShipSvg(target) {
 	// Choose initial placement for ship (sea middle?):
-	var initNode = nodes.filter(n => n.r && n.r < seaLevel).random().index;
-	var initCoords = nodes[initNode].value;
+	var initNode = nodes.filter(n => n.coords && n.r && n.r < seaLevel).random().index;
+	var initCoords = nodes[initNode].coords;
 	console.log('initNode', initNode, initCoords);
 
 	// Add centred SVG ship to main SVG:
