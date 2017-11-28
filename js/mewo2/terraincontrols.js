@@ -470,11 +470,13 @@ var zoom = d3.zoom()
 	.scaleExtent([.75, 3])
 	.translateExtent([[0,0],[800,600]])	// trap to bounds (x=20, y=50)
 	.on("zoom", function() {
-		console.log(d3.event.transform);
+		//console.log(d3.event.transform);
 		var t = d3.event.transform,
 			x = t.x + 400 * t.k,
 			y = t.y + 300 * t.k;
 		view.attr("transform", "translate(" + x + "," + y + ") scale(" + t.k + ")");
+		// Keep ship sprite constant size across zoom levels:
+		d3.select("#shipSVG image").attr("transform", "translate(-25,-40) scale("+ 1.2 / t.k +")");
 	});
 citySVG.call(zoom);
 zoom.scaleTo(citySVG, .75);

@@ -1159,7 +1159,7 @@ function cityScores(h, cities) {
 	// TODO: simply place cities on coasts
 	for (var i = 0; i < h.length; i++) {
 		// No cities in water or near map edges:
-		if (h[i] <= seaLevel || isnearedge(h.mesh, i)) {
+		if (h[i] <= seaLevel || h[i] > seaLevel + 0.1 || isnearedge(h.mesh, i)) {
 			scores[i] = -999999;
 			continue;
 		}
@@ -1184,7 +1184,7 @@ function placeCity(render, t) {
 	// Recalculate city scores:
 	var scores = cityScores(render.h, render.cities);
 	// Get highest score:
-	var cityIndex = d3.scan(scores, d3.descending);	// NOT the triangle index!
+	var cityIndex = d3.scan(scores, d3.descending);
 	console.log('cityIndex', cityIndex);
 
 	var portTri = downToTheSea(cityIndex, render);
@@ -1192,39 +1192,10 @@ function placeCity(render, t) {
 	var cityCoords = mesh.vxs[cityIndex];
 	console.log('cC', cityCoords);
 
-	/*
-	// Get nearest triangle index:
-	var tris = mesh.tris
-		.map(function(tri, i) {
-			// Keep its index with it despite filtering:
-			return {
-				index: i,
-				vertices: tri
-			};
-		});
-	console.log('tris', tris);	// 130
-
-	tris = tris.filter(function(tri) {
-		// Keep triangles which touch the city:
-		return tri.vertices.length === 3 && tri.vertices.map(v => v.index).includes(cityIndex);
-	});	// should return 3-6 triangles
-	console.log('tris', tris);	// BUG EMPTY!
-
-	tris = tris.map(function(tri) {
-		// Get lowest remaining tri:
-		return {
-			index: tri.index,
-			height: render.h[tri.index]
-		};
-	})
-	.sort((a,b) => b.height - a.height);
-	console.log('final tris', tris);	//
-	*/
 	render.cities.push({
 		coords: cityCoords,
 		ptIndex: cityIndex,
 		name: t.name,
-		//tri: tris[0] ? tris[0].index : null,
 		nearSea: portTri
 	});
 	console.log(render.cities);

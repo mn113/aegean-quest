@@ -73,7 +73,7 @@ function addShipSvg(target) {
 	// Choose initial placement for ship (sea middle?):
 	var initNode = nodes.filter(n => n.coords && n.r && n.r < seaLevel).random().index;
 	var initCoords = nodes[initNode].coords;
-	console.log('initNode', initNode, initCoords);
+	//console.log('initNode', initNode, initCoords);
 	var x = 1000 * initCoords[0],
 		y = 1000 * initCoords[1];
 
@@ -127,12 +127,12 @@ function moveShip(destNode, callback) {
 	// Get Pythagorean distance and use with ship's speed for animation duration:
 	var distance = 25000 * triCentreDistance(Stage5Render.h.mesh, shipNode, destNode),
 		duration = distance / ship1.speed;
-	console.log('distance', distance, 'duration', duration);
+	//console.log('distance', distance, 'duration', duration);
 
 	var destCoords = Stage5Render.h.mesh.triCentres[destNode];
 	var x = 1000 * destCoords[0],
 		y = 1000 * destCoords[1];
-	console.log(destNode, destCoords);
+	//console.log(destNode, destCoords);
 
 	// Animate ship:
 	d3.select("#shipSVG")
