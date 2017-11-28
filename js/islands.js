@@ -1,8 +1,8 @@
-/* global d3, $, Snap, view, ShortestPathCalculator, svgShip, seaLevel */
+/* global d3, $, Snap, view, ShortestPathCalculator, svgShip, seaLevel, simplify */
 
 var sPath, shipNode, paths, nodes;
 
-// Prepare nav nodes for Dijkstra pathfinding:
+// Prepare nav nodes for A* pathfinding:
 function prepareNavNodes(h) {
 	return h.mesh.triCentres.map(function(value, index) {
 		//if (value === null) return null;
@@ -15,7 +15,7 @@ function prepareNavNodes(h) {
 	}).filter(t => t);	// no nulls por favor
 }
 
-// Prepare nav paths for Dijkstra pathfinding:
+// Prepare nav paths for A* pathfinding:
 function prepareNavPaths(h) {
 	var paths = [];
 	// Transform the adj data into another format:
@@ -60,8 +60,8 @@ function addNaviLayer(target, render) {
 
 	// Make map triangles clickable:
 	view.selectAll('path.field').on("click", function(d, clickedIndex) {
-		console.log(shipNode, nodes[shipNode]);	// from
-		console.log(clickedIndex, d);					// to
+		console.log(shipNode, nodes[shipNode]);		// from
+		console.log(clickedIndex, d);				// to
 		console.log(nodes[clickedIndex]);
 		svgShip.raise();
 		routeShip(clickedIndex);
@@ -74,24 +74,25 @@ function addShipSvg(target) {
 	var initNode = nodes.filter(n => n.coords && n.r && n.r < seaLevel).random().index;
 	var initCoords = nodes[initNode].coords;
 	console.log('initNode', initNode, initCoords);
+	var x = 1000 * initCoords[0],
+		y = 1000 * initCoords[1];
 
-	// Add centred SVG ship to main SVG:
-	var svgShip = target.append("svg:image")
-	.attr("id", "shipSVG")
-	.attr("xlink:href", "img/boatR.png")
-	.attr("width", 50)
-	.attr("x", 1000 * initCoords[0])
-	.attr("y", 1000 * initCoords[1])
-	.raise();
+	// Add SVG ship to main SVG at initial node position:
+	var svgShip = target.append("g")
+		.attr("id", "shipSVG")
+		.attr("transform", "translate("+x+","+y+")")
+		.raise();
+	// Image inside g has the permanent sprite offset:
+	svgShip.append("svg:image")
+		.attr("xlink:href", "img/boatR.png")
+		.attr("transform", "translate(-25,-40)")
+		.attr("width", 50);
 
 	shipNode = initNode;
 	return svgShip;
 }
 
-// Enable Snap movement:
-var s = Snap("#fifth svg");
-
-// Ship methods:
+// Make route for ship and set it moving:
 function routeShip(dest) {
 	var route = sPath.findRoute(shipNode, dest);
 	var hopped = 0;
@@ -111,23 +112,41 @@ function routeShip(dest) {
 	// Init loop:
 	doHop();
 }
+
+// Use Simplify.js to smooth the path:
+function simplifyRoute(route) {
+	var points = route.map(p => {
+			return {x: nodes[p.target].coords[0], y: nodes[p.target].coords[1]};
+		}),
+		tolerance = 5;
+	return simplify(points);
+}
+
+// Animate ship to a new node:
 function moveShip(destNode, callback) {
 	// Get Pythagorean distance and use with ship's speed for animation duration:
 	var distance = 25000 * triCentreDistance(Stage5Render.h.mesh, shipNode, destNode),
 		duration = distance / ship1.speed;
-	//console.log('distance', distance, 'duration', duration);
+	console.log('distance', distance, 'duration', duration);
 
-	// TODO: Use native D3 animation - if practical?
 	var destCoords = Stage5Render.h.mesh.triCentres[destNode];
-	s.select("#shipSVG").animate({
-		x: destCoords[0] * 1000 - 25,	// ship sprite offset
-		y: destCoords[1] * 1000 - 35
-	}, duration);
+	var x = 1000 * destCoords[0],
+		y = 1000 * destCoords[1];
+	console.log(destNode, destCoords);
+
+	// Animate ship:
+	d3.select("#shipSVG")
+		.transition()
+		.duration(duration)
+		.attr("transform", "translate("+x+","+y+")");// scaleX(-1)");	// flippit
+
+	// Call callback when done animating:
 	setTimeout(function() {
 		if (callback !== undefined) callback();
 	}, duration);
 }
 
+// Wire up cities so clicking them brings the ship to their water:
 function linkCities(svg) {
 	// Link cities in to nav network:
 	svg.selectAll("circle.city")	// only 10 => not ok
@@ -141,6 +160,7 @@ function linkCities(svg) {
 	});
 }
 
+// Use downhill flow graph to find a sea triangle near a land city:
 function downToTheSea(tri, render) {
 	console.log('dtts', tri);
 	while (render.h[tri] >= seaLevel) {

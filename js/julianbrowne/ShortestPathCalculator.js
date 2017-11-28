@@ -379,14 +379,14 @@ ShortestPathCalculator.prototype.aStarPath = function (startNode, goalNode) {
 	while (frontier.length > 0) {
 		// Visit cheapest frontier node:
 		var leafNode = frontier.dequeue()[0];
-		console.log('visiting', leafNode);	// RUNS MANY TIMES?
+		//console.log('visiting', leafNode);	// RUNS MANY TIMES?
 		// Mark as seen:
 		explored.add(leafNode);
 
 		// Test for goal:
 		if (leafNode === goalNode) {
 			// We found the goal! Reconstruct the path:
-			console.log('goal found!');
+			//console.log('goal found!');
 			var path = [];
 			var pointer = goalNode;
 
@@ -394,7 +394,7 @@ ShortestPathCalculator.prototype.aStarPath = function (startNode, goalNode) {
 				path.push(pointer);
 				pointer = pathTo[pointer];
 			}
-			console.log(path);
+			//console.log(path);
 			return path;
 		}
 
@@ -409,7 +409,7 @@ ShortestPathCalculator.prototype.aStarPath = function (startNode, goalNode) {
 
 				var costSoFar = gCost[nextNode],
 					heuristic = this.manhattanHeuristic(nextNode, goalNode);
-				console.log('cost', costSoFar, 'heur', heuristic);
+				//console.log('cost', costSoFar, 'heur', heuristic);
 				// Store item as [node, cost] - will be automatically sorted by cost:
 				frontier.queue([nextNode, costSoFar + heuristic]);
 				// Store new preferred ancestor:

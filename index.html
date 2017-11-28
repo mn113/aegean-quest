@@ -19,41 +19,8 @@
 </head>
 <body>
 	<h1>Aegean Quest</h1>
-	<p>έχεις δει ποτέ σου μαύρος αετους που ορμουν<br>
-	ρώτας γιατί ο λύκος αλυχτά<br>
-	τραγούδας ποτέ του δάσους τα σημαδιά<br>
-	με τα χρώματα του ανέμου εσύ πέτας
-	</p>
 
-	<h4 class="ui horizontal divider header">
-  		<i class="tag icon"></i> Test Area
-	</h4>
-
-	<div id="mesh"></div>
-	<hr>
-
-	<div id="prim"></div>
-	<hr>
-
-	<div id="erode"></div>
-	<hr>
-
-	<div id="phys"></div>
-	<hr>
-
-	<!--div id="fifth">
-		<svg id="gamesvg" height="600" width="800" viewBox="-200 -200 400 400">
-			<defs>
-				<style type="text/css">
-				.clickable {
-					cursor: pointer;
-				}
-				</style>
-			</defs>
-		</svg>
-	</div-->
 	<div id="post-fifth"></div>
-	<hr>
 
 	<div id="gamearea">
 		<div id="not-ui">
@@ -88,14 +55,14 @@
 				<i class="black university icon"></i>
 			</button>
 
-			<div class="ui left demo vertical inverted sidebar labeled icon menu thin xvisible">
+			<div class="ui left demo vertical inverted sidebar labeled icon menu thin visible">
 				<a class="ui message close inverted">
 					<i class="close icon"></i>
 				</a>
-				<a class="item" id="ship-ui"><!-- ship renders here -->
+				<a class="item" id="ship-ui"><!-- ship stats render here -->
 				</a>
 			</div>
-			<div class="ui right demo vertical inverted sidebar labeled icon menu xvisible">
+			<div class="ui right demo vertical inverted sidebar labeled icon menu visible">
 				<a class="ui message close inverted">
 					<i class="close icon"></i>
 				</a>
@@ -188,16 +155,13 @@
 		</div>
 	</div>
 
-	<!--canvas id="canvas" width="800px" height="600px"></canvas-->
-
 	<!-- end of HTML content -->
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js"></script>
+	<script src="js/adamhooper/priority-queue.min.js"></script>
 	<script src="js/julianbrowne/ShortestPathCalculator.js"></script>
 	<script src="js/julianbrowne/ShortestPathUtils.js"></script>
-	<script src="js/adamhooper/priority-queue.min.js"></script>
-	<script src="js/mewo2/language.js"></script>
+	<script src="js/mourner/simplify.js"></script>
 	<script src="js/mewo2/terrain.js"></script>
 	<script src="js/mewo2/terraincontrols.js"></script>
 	<script src="js/islands.js"></script>
