@@ -7,6 +7,7 @@ console.log('salt', salt);
 var player = {
 	ships: [new Ship()],
 	gametime: 0,	// TODO: timer
+	year: makeYear(),
 	// 12 turns = 1 year
 	turns: 0,		// change game salt every 15 minutes or every 10 turns?
 	gold: 100,
@@ -32,9 +33,7 @@ console.log(man1);
 player.ships[0].addCrew([man1, man2, man3, man4, man5, man6]);
 
 var ui = {
-	shipDiv: $("#ship-ui"),
-
-	// Render ship's stats
+	// Render a ship's stats in left sidebar
 	renderShipInfo: function(sid) {
 		var s = player.ships[sid];
 		var l = player.ships.length;
@@ -43,34 +42,77 @@ var ui = {
 		var next = player.ships[sid+1] % l;
 		var html = `
 		<div class="ship_stats" id="ship${sid}">
-			<div>
+			<!--div>
 				<i class="angle double left icon" onclick="ui.renderShip(${prev})"></i>
 				<i class="angle double right icon" onclick="ui.renderShip(${next})"></i>
-			</div>
+			</div-->
 			<h2>${s.name}</h2>
-			<h3>${s.type}</h3>
+			<h3>${s.type} class</h3>
 			<p>Speed: ${s.speed}</p>
-			<dl>
-				<dt>Bread</dt><dd>${s.bread}</dd>
-				<dt>Wine</dt><dd>${s.wine}</dd>
-			</dl>
+			<div class="upgrades">
+				${ui._renderShipUpgrades(s.upgrades)}
+			</div>
+			<div class="supplies">
+				${ui._renderShipSupplies(s.supplies)}
+			</div>
 			<h4>Crew</h4>
 			<ul class="crew">
-				${ui.renderCrew(s.captain, s.crew)}
+				${ui._renderCrew(s.captain, s.crew)}
 			</ul>
 		</div>`;
 		// Render
-		ui.shipDiv.html(html);
+		$("#ship-ui").html(html);
+	},
+
+	_renderShipUpgrades: function(upgrades) {
+		var html = "";
+		for (var u of upgrades) {
+			html += `<i class="gameitem ${u.className}"></i>`;	// TODO tooltip
+		}
+		return html;
+	},
+
+	_renderShipSupplies: function(supplies) {
+		return `
+			<p><i class="gameitem bread"></i>Bread: ${supplies.bread}</p>
+			<p><i class="gameitem wine"></i>Wine: ${supplies.wine}</p>
+			<p><i class="gameitem chicken"></i>Chickens: ${supplies.chicken}</p>
+			<p><i class="gameitem fish"></i>Fish: ${supplies.fish}</p>
+		`;
 	},
 
 	// Render a list of avatars
-	renderCrew: function(captain, sailors) {
+	_renderCrew: function(captain, sailors) {
 		var html = "<li class='avatar gold'>" + captain.renderAvatar() + "</li>";
 		sailors.filter(s => s !== captain)
 		.forEach(function(s) {
 			html += "<li class='avatar'>" + s.renderAvatar(); + "</li>";
 		});
 		return html;
+	},
+
+	renderYear: function() {
+		$("#year-ui").html(player.year + " BC");
+	},
+
+	// Render the player's gold amount in right sidebar
+	renderGold: function() {
+		var iconClass = (player.gold > 200) ? "gold-high" : (player.gold > 50) ? "gold-med" : "gold-low";
+		$("#gold-icon").removeClass("gold-high gold-med gold-low").addClass(iconClass);
+		$("#gold-ui").html(player.gold);
+	},
+
+	// Render the player's trophy icons in right sidebar
+	renderTrophies: function() {
+		var trophies = "";
+		for (var t of player.trophies) {	// TODO: grid layout here
+			trophies += `<a class="gameitem ${t.className}" onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
+		}
+		$("#trophies-ui").html(trophies);
+	},
+
+	renderGods: function() {
+
 	},
 
 	// The main 2-button modal card, used for most events
@@ -80,7 +122,7 @@ var ui = {
 		<div class="ui small modal">
 			<div class="header">${params.title}</div>
 			<div class="image content">
-				<img class="image" src="http://lorempixel.com/200/200/animals">
+				<img class="image" src="${params.img}">
 				<div class="description">
 					<p>${params.desc}</p>
 				</div>
@@ -90,17 +132,21 @@ var ui = {
 				<div>${params.extra}</div>
 			</div>
 			<div class="actions">
-				<div class="large buttons">
-					<div class="ui approve button">${params.buttons.yes}</div>
-					<div class="or"></div>
-					<div class="ui cancel button">${params.buttons.no}</div>
-				</div>
+				${ui.renderButtons(params.buttons)}
 			</div>
 		</div>
 		`;
 		$(".modal").remove();
-		$(".pushable").append(cardHtml);
+		$("#game-centre").append(cardHtml);
 		$(".small.modal").modal('show');
+	},
+
+	renderButtons: function(buttons) {
+		var html = `<div class="large buttons">`;
+		if (buttons.yes) html += `<div class="ui approve button">${buttons.yes}</div>`;
+		if (buttons.no) html += `<div class="ui cancel button">${buttons.no}</div>`;
+		html += "</div>";
+		return html;
 	},
 
 	// A generic smaller modal with text and 1 dismissal button
@@ -112,13 +158,12 @@ var ui = {
 				<p>${params.content}</p>
 			</div>
 			<div class="actions">
-				<div class="ui cancel button">${params.buttons.no}</div>
+				${ui.renderButtons(params.buttons)}
 			</div>
 		</div>
 		`;
-		// TODO: allow different number of buttons
 		$(".modal").remove();
-		$(".pushable").append(cardHtml);
+		$("#game-center").append(cardHtml);
 		$(".tiny.modal").modal('show');
 	},
 
@@ -243,9 +288,9 @@ var ui = {
 		},
 
 		// Further info popup
-		trophyInfoCard: function(trophy) {
-			var params = gameText.trophies.filter(t => t.name === trophy)[0];
-			params.buttons = {yes: "OK", no: "OK"};
+		trophyInfoCard: function(trophyClassName) {
+			var params = gameText.trophies.filter(t => t.className === trophyClassName)[0];
+			params.buttons = {yes: "OK", no: "more..."};
 			ui.renderModalCard(params);
 		},
 
@@ -274,8 +319,8 @@ var ui = {
 		giftPopup: function(gift, quantity, from) {
 			ui.renderPopup({
 				title: "You received a gift from " + from,
-				content: `${from} gave you ${quantity} ${gift}!`,
-				buttons: {yes: "OK", no: "OK"}
+				content: `${from} gave you ${quantity} ${gift}!`,	// TODO language
+				buttons: {yes: "OK"}
 			});
 			// TODO: add gift to player
 		},
@@ -283,13 +328,14 @@ var ui = {
 		// Game over info, win/loss
 		gameOverPopup: function(type) {
 			var params = {
-				title: "The local market",
+				title: "Game Over!",
 				buttons: {
 					no: "No thanks"
 				}
 			};
 			if (type === 'win') params.content = "You won!";
 			else if (type === 'loss') params.content = "You lost.";
+			// TODO: rating widget? ajax message?
 
 			ui.renderPopup(params);
 		}
@@ -300,8 +346,6 @@ var ui = {
 	}
 
 };
-
-ui.renderShipInfo(0);	// ok
 
 function combat(sailors, enemy) {
 	var att1 = sailors.map(s => s.xp - s.age / 15).reduce((a,b) => a+b) / (sailors.length / 2);
@@ -349,15 +393,32 @@ function combat(sailors, enemy) {
 	// Both combatants cannot be dead
 }
 
-function endTurn() {
-	player.turns += 1;
-	if (player.turns % 12 === 0) {
-		ui.popups.salary();
-	}
-	ui.renderShip();
-}
-
 // Test combat:
 var mEvent = gameText.monsterEvents.random();
 var m = new Enemy(mEvent);
 var res = combat(player.ships[0].crew, m);	// ok
+
+function endTurn() {
+	player.turns += 1;
+	if (player.turns % 12 === 0) {
+		player.year--;
+		ui.popups.salary();
+	}
+	updateSidebars();
+}
+
+player.trophies = gameText.trophies;
+
+function updateSidebars() {
+	ui.renderShipInfo(0);
+	ui.renderYear();
+	ui.renderGold();
+	ui.renderTrophies();
+	//ui.renderGods();
+}
+updateSidebars();
+
+// Choose a year from 800-600 BC:
+function makeYear() {
+	return 700 + Math.floor(100 * Math.random());
+}

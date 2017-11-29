@@ -25,18 +25,20 @@ String.prototype.hashCode = function(){
 
 class Ship {
 	constructor() {
-		this.name = "My Ship";
-		this.type = "Trireme";
+		this.name = gameText.shipNames.random();
+		this.type = "Bireme";
 		this.speed = 10;	// kmh
 		this.defence = 10;
-		this.upgrades = [];	// TODO
+		this.upgrades = gameText.upgrades;
 		this.max_crew = 20;
 		this.max_food = 1000;
 		this.max_wine = 250;
-		this.bread = 65;
-		this.chicken = 35;
-		this.fish = 0;
-		this.wine = 25;
+		this.supplies = {
+			bread: 65,
+			wine: 25,
+			chicken: 35,
+			fish: 0
+		};
 		this.health = 100;
 		this.captain = null;
 		this.crew = [];

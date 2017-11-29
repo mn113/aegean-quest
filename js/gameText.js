@@ -7,9 +7,9 @@ var gameText = {
 
 	"mensNames": ["Kostas", "Odysseus", "Christos", "Giorgos", "Giannis", "Pavlos", "Petros", "Telemachus", "Achilles", "Heracles", "Panos", "Alexis", "Vasos", "Hector", "Archimedes", "Socrates", "Pelleas", "Jason", "Psyrias"],
 
-	"shipNames": {
-		"list": []
-	},
+	"shipTypes": ["Bireme", "Trireme", "Pentekontor", "Lembos", "Hemiolia"],
+
+	"shipNames": ["Argo", "Paralus", "Salaminia", "Delias", "Danais", "Syracusia", "Phaeaco", "Pandora", "Phosphoros", "Kytheria", "Seiren", "Triainia", "Nereis", "Tritogenes", "Pandia", "Melitta", "Delphis", "Panthera", "Lykaina", "Salpinx", "Sphendone", "Synoris", "Peristera", "Okeia"],
 
 	"peaceTimeEvents": [
 		{
@@ -351,98 +351,92 @@ var gameText = {
 	"trophies": [
 		{
 			"name": "Golden Fleece",
+			"className": "golden-fleece",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Ring of Gyges",
+			"className": "ring-of-gyges",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
-			"name": "Winged Sandals",
+			"name": "Wing of Icarus",
+			"className": "wing-of-icarus",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Dragon's Teeth",
+			"className": "dragons-teeth",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Rod of Asclepius",
+			"className": "asclepius-rod",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Philosopher's Stone",
+			"className": "philosophers-stone",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Winnowing Oar",
+			"className": "chicken",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Sword of Damocles",
+			"className": "damocles-sword",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Petasos",
+			"className": "petasos",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Shield of Achilles",
+			"className": "achilles-shield",
 			"img": "",
-			"icon": "",
-			"desc": ""
-		},
-		{
-			"name": "Xoanon",
-			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Gorgoneion",
+			"className": "gorgoneion",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Thyrsus",
+			"className": "thyrsus",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
-			"name": "Lotus tree",
+			"name": "Lotus Fruit",
+			"className": "lotus-fruit",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Baetylus",
+			"className": "baetylus",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		},
 		{
 			"name": "Harpe",
+			"className": "harpe",
 			"img": "",
-			"icon": "",
 			"desc": ""
 		}
 	],
@@ -511,5 +505,40 @@ var gameText = {
 			"unit": ["amphora","amphorae"],
 			"basePrice": 5
 		}
+	],
+
+	"upgrades": [
+		{
+			"name": "Salt Boxes",
+			"className": "salt-box"
+		},
+		{
+			"name": "Pro Steering",
+			"className": "ships-wheel"
+		},
+		{
+			"name": "Navigation",
+			"className": "compass"
+		},
+		{
+			"name": "Silk Sails",
+			"className": "silk-sails"
+		},
+		{
+			"name": "Cotton Sails",
+			"className": "cotton-sails"
+		},
+		{
+			"name": "Fishing Nets",
+			"className": "fishing-net"
+		},
+		{
+			"name": "Extra Oars",
+			"className": "oars"
+		},
+		{
+			"name": "Armour Plating",
+			"className": "ship-armour"
+		},
 	]
 };

@@ -13,12 +13,15 @@
 	<link rel="stylesheet" href="css/semantic/semantic.css">
 	<script src="css/semantic/semantic.js"></script>
 	<script src="js/gameText.js"></script>
-	<script type="text/javascript" src="http://canvg.github.io/canvg/rgbcolor.js"></script>
-	<script type="text/javascript" src="http://canvg.github.io/canvg/StackBlur.js"></script>
-	<script type="text/javascript" src="http://canvg.github.io/canvg/canvg.js"></script>
 </head>
 <body>
 	<h1>Aegean Quest</h1>
+
+	<p style="font-family:Flamenco">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.</p>
+
+	<p style="font-family:Lancelot">Lexercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+
+	<p style="font-family:'GFS Neohellenic'">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
 	<div id="post-fifth"></div>
 
@@ -60,11 +63,12 @@
 					<i class="close icon"></i>
 				</a>
 				<a class="item">
-					Time...
+					<p id="year-ui"></p>
 				</a>
 				<a class="item">
 					<div class="yellow inverted statistic">
-						<div class="value" id="gold-ui">100</div>
+						<i class="gameitem gold-low" id="gold-icon"></i>
+						<div class="value" id="gold-ui"></div>
 						<div class="label">Gold</div>
 					</div>
 				</a>
@@ -76,9 +80,9 @@
 				<a class="item">
 					Gods
 					<div id="gods-ui">
+						<img src="img/gods-dark.png" width="50">
 					</div>
 				</a>
-				<img src="img/compass.png" width="30">
 			</div>
 			<div id="game-centre" class="pusher">
 				<!--div class="ui segment" id="game-loader">

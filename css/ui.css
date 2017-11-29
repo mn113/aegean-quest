@@ -3,12 +3,8 @@
 }
 #ui_ships {
 	width: 200px;
-	height: 800px;
+	height: 600px;
 	padding: 4px 6px;
-}
-#ui_ships .ship_stats {
-	background: saddlebrown;
-	color: lemonchiffon;
 }
 #ui_ships > * {
 	border: 1px solid #421;
@@ -95,4 +91,55 @@ ul, ol {
 	position: absolute;
 	top: 40px;
 	right: 5px;
+}
+
+#trophies-ui {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+.gameitem {
+	background: url(../img/items.png) no-repeat;
+	display: block;
+	height: 32px;
+	width: 32px;
+}
+.ring-of-gyges	{ background-position: 0px 0px; }
+.philosophers-stone { background-position: -32px 0px; }
+.gorgoneion		{ background-position: -64px 0px; }
+.wing-of-icarus { background-position: -192px 0px; }
+.lotus-fruit	{ background-position: -224px 0px; }
+.golden-fleece	{ background-position: -288px 0px; }
+
+.achilles-shield{ background-position: 0px -32px; }
+.petasos		{ background-position: -32px -32px; }
+.damocles-sword	{ background-position: -64px -32px; }
+.harpe			{ background-position: -96px -32px; }
+.asclepius-rod	{ background-position: -160px -32px; }
+.thyrsus		{ background-position: -192px -32px; }
+.dragons-teeth	{ background-position: -256px -32px; }
+.baetylus		{ background-position: -288px -32px; }
+
+.gold-low	{ background-position: 0px -64px; }
+.gold-med	{ background-position: -32px -64px; }
+.gold-high	{ background-position: -64px -64px; }
+.wine		{ background-position: -96px -64px; }
+.bread		{ background-position: -128px -64px; }
+.chicken	{ background-position: -256px -64px; }
+.fish		{ background-position: -288px -64px; }
+
+.compass	{ background-position: 0px -96px; }
+.salt-box	{ background-position: -32px -96px; }
+.ships-wheel{ background-position: -64px -96px; }
+.cotton-sails	{ background-position: 0px -96px; }
+.silk-sails	{ background-position: 0px -96px; }
+.fishing-net{ background-position: 0px -96px; }
+.ship-oars	{ background-position: 0px -96px; }
+.ship-armour{ background-position: 0px -96px; }
+
+.upgrades {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr
+}
+.supplies i {
+	float: left;
 }
