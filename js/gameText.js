@@ -488,5 +488,28 @@ var gameText = {
 
 	"benefactors": [
 		"Passing traders", "A nobleman", "Hades", "Phoenicians", "The great hero Achilles", "The great hero Odysseus", "A kindly philospher", "A local farmer"
+	],
+
+	"produce": [
+		{
+			"name": "bread",
+			"unit": ["loaf","loaves"],
+			"basePrice": 1
+		},
+		{
+			"name": "fish",
+			"unit": ["crate","crates"],
+			"basePrice": 2
+		},
+		{
+			"name": "chickens",
+			"unit": ["box","boxes"],
+			"basePrice": 3
+		},
+		{
+			"name": "wine",
+			"unit": ["amphora","amphorae"],
+			"basePrice": 5
+		}
 	]
 };

@@ -1199,6 +1199,8 @@ function placeCity(render, t) {
 		nearSea: portTri
 	});
 	console.log(render.cities);
+
+	return cityIndex;
 }
 
 // Find locations for all desired cities:
@@ -1236,6 +1238,7 @@ function visualizeCities(svg, render) {
 		.style('stroke', 'black')
 		.style('fill', 'red')
 		.attr('data-name', function(d) { return d.name; })
+		.attr('data-ptIndex', function(d) { return d.ptIndex; })
 		.attr('data-nearsea', function(d) { return d.nearSea; })
 		.raise()
 		.on('click', function(d) {

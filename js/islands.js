@@ -93,7 +93,7 @@ function addShipSvg(target) {
 }
 
 // Make route for ship and set it moving:
-function routeShip(dest) {
+function routeShip(dest, callback) {
 	var route = sPath.findRoute(shipNode, dest);
 	var hopped = 0;
 	console.log('route', route);
@@ -107,6 +107,9 @@ function routeShip(dest) {
 			hopped++;
 			// Continue infinite loop:
 			if (hopped < route.path.length) doHop();
+			else if (shipNode === dest) {
+				callback();
+			}
 		});
 	}
 	// Init loop:
@@ -126,7 +129,7 @@ function simplifyRoute(route) {
 function moveShip(destNode, callback) {
 	// Get Pythagorean distance and use with ship's speed for animation duration:
 	var distance = 25000 * triCentreDistance(Stage5Render.h.mesh, shipNode, destNode),
-		duration = distance / ship1.speed;
+		duration = distance / player.ships[0].speed;
 	//console.log('distance', distance, 'duration', duration);
 
 	var destCoords = Stage5Render.h.mesh.triCentres[destNode];
@@ -149,13 +152,21 @@ function moveShip(destNode, callback) {
 // Wire up cities so clicking them brings the ship to their water:
 function linkCities(svg) {
 	// Link cities in to nav network:
-	svg.selectAll("circle.city")	// only 10 => not ok
+	svg.selectAll("circle.city")
 	.on('click', function() {
 		console.log(this);
 		// Pass click through, get underlying tri:
 		var cityNode = $(this).data("triangle");
 		var seaNode = $(this).data("nearsea");
-		routeShip(seaNode);
+		var ptIndex = $(this).data("ptIndex");
+		var name = $(this).data("name");
+		// Set sail, and visit city on arrival:
+		routeShip(seaNode, function() {
+			// Retrieve city from registry:
+			var city = towns.filter(t => t.name === name)[0];	// BUG cannot find it
+			console.log(city);
+			city.visit();
+		});
 		return;
 	});
 }

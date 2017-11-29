@@ -545,7 +545,7 @@ zoom.scaleTo(citySVG, .75);
 	.on("click", function () {
 		var t = new Town();
 		towns.push(t);
-		placeCity(Stage5Render, t);
+		t.ptIndex = placeCity(Stage5Render, t);
 		console.log('Stage5Render', Stage5Render);
 		visualizeCities(view, Stage5Render);
 		drawLabels(view, Stage5Render);
@@ -558,7 +558,7 @@ zoom.scaleTo(citySVG, .75);
 		for (var c = 10; c > 0; c--) {
 			var t = new Town();
 			towns.push(t);
-			placeCity(Stage5Render, t);
+			t.ptIndex = placeCity(Stage5Render, t);
 		}
 		console.log('Stage5Render', Stage5Render);
 		visualizeCities(view, Stage5Render);

@@ -1,4 +1,4 @@
-/*global ui, gameText */
+/*global ui, gameText, salt */
 
 Array.prototype.random = function() {
 	return this[Math.floor(Math.random() * this.length)];
@@ -10,6 +10,17 @@ Array.prototype.shuffle = function() {
 		[this[i], this[j]] = [this[j], this[i]];
 	}
 	return this;
+};
+
+String.prototype.hashCode = function(){
+	var hash = 0;
+	if (this.length === 0) return hash;
+	for (var i = 0; i < this.length; i++) {
+		var char = this.charCodeAt(i);
+		hash = ((hash<<5)-hash)+char;
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	return hash;
 };
 
 class Ship {
@@ -53,6 +64,9 @@ class Ship {
 
 	getDefence() {
 		// Test for Upgrades & Crew skills
+		var s = this.speed;
+		if (this.upgrades.includes("fastness")) s += 2;
+		return s;
 	}
 
 	getFood() {
@@ -60,7 +74,7 @@ class Ship {
 	}
 
 	sail(distance) {
-
+		// Reduce food & morale
 	}
 
 	fish() {
@@ -70,7 +84,7 @@ class Ship {
 	}
 
 	buy(product, amount, cost) {
-
+		this.sell(product, -amount, -cost);	// FIXME
 	}
 
 	sell(product, amount, cost) {
@@ -132,9 +146,9 @@ class Sailor {
 		</dl>`;
 	}
 
-	renderAvatar() {
+	renderAvatar(className = "") {
 		// Includes tooltip text
-		return `<img class="ui avatar image"
+		return `<img class="ui avatar image ${className}"
 		data-title="${this.name} of ${this.origin}"
 		data-content="${this.skills.join(", ")}"
 		src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/50.png">`;
@@ -142,68 +156,108 @@ class Sailor {
 }
 
 class Town {
-	constructor(x,y) {
-		this.name = this.pickName();
-		this.location = {x: x, y: y};
-		this.sailors = 2;
+	constructor(ptIndex, x,y) {
+		this.name = gameText.places.random();
+		this.ptIndex = ptIndex;
+		this.location = {x: x, y: y};	// TODO lookup x & y
+		this.size = 5;
+		this.sailors = 2;	// available on demand or quota'd?
 		this.buying = [];
 		this.selling = [];
-		this.status = "free";
-		this.size = 5;
+		this.status = "atWar";
+		this.peaceEvent = null;
+		this.warEvent = null;
 		this.visited = false;
 		return this;
 	}
 
-	pickName() {
-		return gameText.places.random();
+	peaceTimeEvent() {
+		if (!this.peaceEvent) {
+			// Choose an event based on city name + salt:
+			var seed = (this.name + salt) & gameText.peaceTimeEvents.length;
+			var event = gameText.peaceTimeEvents[seed];
+			event.title = "You have been invited to a "+event.title;
+			event.buttons = {
+				yes: "Accept",
+				no: "Decline"
+			};
+		}
+		else {
+			event = this.peaceEvent;
+		}
+		ui.renderModalCard(event);
+	}
+
+	underAttack() {
+		if (!this.warEvent) {
+			// Choose an event based on city name + salt:
+			var seed = (this.name + salt) & gameText.monsterEvents.length;
+			var event = gameText.monsterEvents[seed];
+			console.log(event);
+			event.title = this.name+" is under attack by a/an/the "+event.title;
+			event.buttons = {
+				yes: "Fight",
+				no: "Flee"
+			};
+		}
+		else {
+			event = this.warEvent;
+		}
+		ui.renderModalCard(event);
 	}
 
 	inventTrades() {
 		// Buying?
-		var items = ["bread", "fish", "chicken", "wine"];
-		//items.shuffle();
 		var b = [0,1,2].random();
+		var items = gameText.produce.shuffle();
 		while (b > 0) {
+			var item = items.pop();
 			this.buying.push({
-				"item": items.pop(),
+				"name": item.name,
+				"unit": item.unit,
 				"quantity": 5 * Math.ceil(10 * Math.random()),	// 5-50
-				"price": 1 // TODO
+				"price": item.basePrice
 			});
 		}
 		// Selling?
-		items = ["bread", "fish", "chicken", "wine"];
-		//items.shuffle();
 		b = [0,1,2].random();
+		items = gameText.produce.shuffle();
 		while (b > 0) {
+			item = items.pop();
 			this.selling.push({
-				"item": items.pop(),
+				"name": item.name,
+				"unit": item.unit,
 				"quantity": 5 * Math.ceil(10 * Math.random()),	// 5-50
-				"price": 1 // TODO
+				"price": item.basePrice
 			});
 		}
+		return;
 	}
 
-	peaceTimeEvent() {
-		var params = gameText.peaceTimeEvents.random();
-		params.title = "You have been invited to a "+params.title;
-		params.buttons = {
-			yes: "Accept",
-			no: "Decline"
-		};
-		ui.renderModalCard(params);
-		return this;
+	tradeWith() {
+		this.inventTrades();	// populates this.buying, this.selling
+		// Pop up trading interface:
+		ui.modals.traderCard(this.buying, this.selling);
 	}
 
-	underAttack() {
-		var params = gameText.peaceTimeEvents.random();
-		console.log(params);
-		params.title = this.name+" is under attack by a/an/the "+params.title;
-		params.buttons = {
-			yes: "Fight",
-			no: "Flee"
-		};
-		ui.renderModalCard(params);
-		return this;
+	offerRecruits(num) {
+		var recruits = [];
+		while (num > 0) {
+			recruits.push(new Sailor());
+		}
+		// Pop up recruitment interface:
+		ui.modals.recruitmentCard(recruits);
+	}
+
+	visit() {
+		this.visited = true;
+		if (this.status === 'atWar') this.underAttack();
+		else if (this.status === 'atPeace') this.peaceTimeEvent();
+		else if (player.ships[0].crew.length < 5) this.offerRecruits(3);
+		else if (Math.random() > 0.5) this.tradeWith();
+		else {
+			// Do nothing
+		}
 	}
 }
 
@@ -228,47 +282,4 @@ class Enemy {
 	die() {
 
 	}
-}
-
-function combat(sailors, enemy) {
-	var att1 = sailors.map(s => s.xp - s.age / 15).reduce((a,b) => a+b) / (sailors.length / 2);
-	var def1 = sailors.map(s => s.morale + s.age / 12).reduce((a,b) => a+b) / (sailors.length / 2);
-	var att2 = enemy.attack;
-	var def2 = enemy.health;
-	var brav2 = enemy.bravery;
-	console.log('Combat stats:', 'att1', att1, 'def1', def1, 'att2', att2, 'def2', def2, 'brav2', brav2);
-
-	// TODO: account for weapon skills & weaknesses
-
-	while (def1 > 0 && def2 > 0) {
-		// We attack:
-		var a = (att1 / 3) * (4 * Math.random() + 4) / 8;
-		console.log('a', a);
-		def2 -= a;
-		brav2 -= a / 3;
-		// He ded?
-		if (def2 <= 0) return {
-			status: "Victory!",
-			desc: "The enemy was vanquished!"
-		};
-		// He chicken out?
-		if (brav2 < a) return {
-			status: "Victory!",
-			desc: "The enemy ran away."
-		};
-		// Enemy attacks:
-		def1 -= att2 / 3 * (4 * Math.random() + 4) / 8;
-		// We ded?
-		if (def1 <= 0) {
-			var lossQuota = Math.floor(Math.sqrt(sailors.length * Math.random()));
-			var lost = sailors.shuffle().slice(0,lossQuota);
-			return {
-				status: "Defeat.",
-				desc: "The enemy was too strong.",
-				losses: lost
-			};
-		}
-		// Repeat
-	}
-	// Both combatants cannot be dead
 }
