@@ -118,7 +118,7 @@ class Sailor {
 		this.age = 18 + Math.floor(30 * Math.random());
 		this.xp = Math.floor(this.age / 10) + Math.floor(5 * Math.random());
 		this.morale = Math.ceil(7 + 3 * Math.random());
-		this.salary = this.xp;
+		this.salary = Math.floor((this.age + this.xp + this.skills.length) / 3);
 		return this;
 	}
 
@@ -128,7 +128,7 @@ class Sailor {
 	}
 
 	pickSkills() {
-		const skillList = "Combat, Navigation, Seafaring, Fishing, Cartography, Carpentry, Weaponry, Rowing, Music".split(", ");
+		const skillList = "Combat, Navigation, Seafaring, Fishing, Cartography, Carpentry, Weaponry, Rowing, Music, Philosophy".split(", ");
 		// Give the sailor 1 or 2 skills:
 		var skills = [skillList.random()];
 		if (Math.random() > 0.5) {
@@ -139,12 +139,14 @@ class Sailor {
 	}
 
 	showStats() {
-		return this.renderAvatar() + `<h3>${this.name}</h3>
+		return this.renderAvatar() + `
+		<h3>${this.name}</h3>
 		<span>of ${this.origin}</span>
 		<dl>
 			<dt>Age</dt><dd>${this.age}</dd>
-			<dt>Skills</dt><dd>${this.skills.join(", ")}</dd>
+			<dt>XP</dt><dd>${this.xp}</dd>
 			<dt>Salary</dt><dd>${this.salary}gpy</dd>
+			<dt>Skills</dt><dd>${this.skills.join(", ")}</dd>
 		</dl>`;
 	}
 

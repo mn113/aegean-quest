@@ -46,7 +46,7 @@ var ui = {
 				<i class="angle double left icon" onclick="ui.renderShip(${prev})"></i>
 				<i class="angle double right icon" onclick="ui.renderShip(${next})"></i>
 			</div-->
-			<h2>${s.name}</h2>
+			<h2>“${s.name}”</h2>
 			<h3>${s.type} class</h3>
 			<p>Speed: ${s.speed}</p>
 			<div class="upgrades">
@@ -67,7 +67,10 @@ var ui = {
 	_renderShipUpgrades: function(upgrades) {
 		var html = "";
 		for (var u of upgrades) {
-			html += `<i class="gameitem ${u.className}"></i>`;	// TODO tooltip
+			html += `<i class="gameitem ${u.className}"
+					data-title="${u.name}"
+					data-content="${u.desc}"
+					></i>`;
 		}
 		return html;
 	},
@@ -105,8 +108,11 @@ var ui = {
 	// Render the player's trophy icons in right sidebar
 	renderTrophies: function() {
 		var trophies = "";
-		for (var t of player.trophies) {	// TODO: grid layout here
-			trophies += `<a class="gameitem ${t.className}" onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
+		for (var t of player.trophies) {
+			trophies += `<a class="gameitem ${t.className}"
+		 					data-title="${t.name}"
+							data-content="${t.desc}"
+							onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
 		}
 		$("#trophies-ui").html(trophies);
 	},

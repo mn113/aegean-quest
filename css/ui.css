@@ -35,13 +35,13 @@ ul, ol {
 	padding-left: 0 !important;
 }
 .crew {
-	display: flex;
-	flex-wrap: wrap;
-	/* could use grid? */
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 }
 .crew li {
 	background: #876;
 	width: 50px;
+	height: 50px;
 }
 .avatar.gold {
 	border: 2px solid gold;
@@ -80,7 +80,15 @@ ul, ol {
 	pointer-events: all;
 }
 .avatar {
-
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.ui.avatar.image {
+    margin-right: 0.25em;
+    display: inline-block;
+    width: 2.7em !important;
+    height: 2.7em !important;
 }
 #ui > .button.left {
 	position: absolute;
@@ -119,22 +127,22 @@ ul, ol {
 .dragons-teeth	{ background-position: -256px -32px; }
 .baetylus		{ background-position: -288px -32px; }
 
-.gold-low	{ background-position: 0px -64px; }
-.gold-med	{ background-position: -32px -64px; }
-.gold-high	{ background-position: -64px -64px; }
-.wine		{ background-position: -96px -64px; }
-.bread		{ background-position: -128px -64px; }
-.chicken	{ background-position: -256px -64px; }
-.fish		{ background-position: -288px -64px; }
+.gold-low		{ background-position: 0px -64px; }
+.gold-med		{ background-position: -32px -64px; }
+.gold-high		{ background-position: -64px -64px; }
+.wine			{ background-position: -96px -64px; }
+.bread			{ background-position: -128px -64px; }
+.chicken		{ background-position: -256px -64px; }
+.fish			{ background-position: -288px -64px; }
 
-.compass	{ background-position: 0px -96px; }
-.salt-box	{ background-position: -32px -96px; }
-.ships-wheel{ background-position: -64px -96px; }
-.cotton-sails	{ background-position: 0px -96px; }
-.silk-sails	{ background-position: 0px -96px; }
-.fishing-net{ background-position: 0px -96px; }
-.ship-oars	{ background-position: 0px -96px; }
-.ship-armour{ background-position: 0px -96px; }
+.compass		{ background-position: 0px -96px; }
+.salt-box		{ background-position: -32px -96px; }
+.ships-wheel	{ background-position: -64px -96px; }
+.ship-armour	{ background-position: -96px -96px; }
+.silk-sails		{ background-position: -128px -96px; }
+.cotton-sails	{ background-position: -160px -96px; }
+.fishing-net	{ background-position: -192px -96px; }
+.ship-oars		{ background-position: -224px -96px; }
 
 .upgrades {
 	display: grid;

@@ -106,8 +106,6 @@
 	<script src="js/game.js"></script>
 	<script type="text/javascript">
 
-		var towns = [];	// game global?
-
 		var FizzyText = function() {
 			this.shipName = player.ships[0].name;
 			this.poseidon = 0.8;
@@ -174,8 +172,7 @@
 		};
 
 		// Semantic UI setup:
-		$('.ui.sidebar')
-		.sidebar({
+		$('.ui.sidebar').sidebar({
 			context: $('#ui'),
 			dimPage: false,
 			transition: "overlay"
@@ -188,16 +185,10 @@
 		$right_sb.sidebar('attach events', '.right a.close', 'close');
 		$right_sb.sidebar('attach events', '#ui > .button.right', 'open');
 
-		// Crew tooltips:
+		// Enable tooltips:
 		$('#gamearea .ui .crew img').popup();
-
-		function svgToCanvas() {
-			// NOT IN USE
-			var svgString = $("#fifth").html();
-			console.log(svgString);
-			//load a svg snippet in the canvas with id = 'drawingArea'
-			canvg(document.querySelector('#canvas'), svgString, {});
-		}
+		$('.upgrades i').popup();
+		$('#trophies-ui a').popup();
 
 	</script>
 </body>
