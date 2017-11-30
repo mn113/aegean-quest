@@ -1,4 +1,4 @@
-/*global ui, gameText, salt */
+/*global ui, gameText, salt, player */
 
 Array.prototype.random = function() {
 	return this[Math.floor(Math.random() * this.length)];
@@ -77,6 +77,15 @@ class Ship {
 
 	sail(distance) {
 		// Reduce food & morale
+		var deductions = Math.floor(distance / 10);
+		console.log("Deducting", deductions);
+		while (deductions > 0) {
+			if (this.supplies.bread > 0)   { this.supplies.bread--; deductions--; }
+			if (this.supplies.chicken > 0) { this.supplies.chicken--; deductions--; }
+			if (this.supplies.fish > 0)    { this.supplies.fish--; deductions--; }
+			if (this.supplies.wine > 0)    { this.supplies.wine--; deductions--; }
+		}
+		ui.renderShipInfo();
 	}
 
 	fish() {
@@ -168,7 +177,7 @@ class Town {
 		this.sailors = 2;	// available on demand or quota'd?
 		this.buying = [];
 		this.selling = [];
-		this.status = "atWar";
+		this.status = "atPeace";	// must start atWar
 		this.peaceEvent = null;
 		this.warEvent = null;
 		this.visited = false;
@@ -180,10 +189,25 @@ class Town {
 			// Choose an event based on city name + salt:
 			var seed = (this.name + salt) & gameText.peaceTimeEvents.length;
 			var event = gameText.peaceTimeEvents[seed];
-			event.title = "You have been invited to a "+event.title;
+			event.heading = `The townsfolk of <span class="town">${this.name}</span>
+			invite you to a ${event.title}.`;
+			event.desc = "";
+			event.content = "";
+			event.extra = "";
 			event.buttons = {
 				yes: "Accept",
 				no: "Decline"
+			};
+			// Specify callbacks for event's action buttons:
+			event.callback1 = function() {
+				var gift = ["gold", "wine", "chicken", "fish"].random(),
+					quantity = 20 + Math.floor(30 * Math.random());
+				ui.popups.giftPopup(gift, quantity, "the townspeople");
+			};
+			event.callback2 = function() {
+				var god = gameText.gods.random(),
+					delta = -0.5;
+				ui.popups.godReactionPopup(god, delta);
 			};
 		}
 		else {
@@ -198,11 +222,30 @@ class Town {
 			var seed = (this.name + salt) & gameText.monsterEvents.length;
 			var event = gameText.monsterEvents[seed];
 			console.log(event);
-			event.title = this.name+" is under attack by a/an/the "+event.title;
+			event.heading = `<h2>Attention all heroes!</h2>
+			<span class="town">${this.name}</span> is being terrorised by
+			<span class="monster">${event.article} ${event.name}</span>!`;
+			event.link = `<a href="${event.url}" target="_blank">Learn more...</a>`;
+			event.desc = event.text + "<br><br>" + event.link;
+			event.content = `<h2>Will you fight <span class="monster">${event.article} ${event.name}</span>?</h2>`;
 			event.buttons = {
 				yes: "Fight",
 				no: "Flee"
 			};
+			// Specify callbacks for event's action buttons:
+			event.callback1 = function() {
+				ui.modals.preCombatCard(event);
+			};
+			event.callback2 = function() {
+				var god = gameText.gods.random(),
+					delta = -0.5;
+				ui.popups.godReactionPopup(god, delta);
+				ui.renderPopup({
+					heading: "Your men fled back to the ship.",
+					content: `${event.name} continues to harrass ${this.name}.`,
+					buttons: {yes: "OK"}
+				});
+			}.bind(this);
 		}
 		else {
 			event = this.warEvent;
@@ -255,8 +298,9 @@ class Town {
 
 	visit() {
 		this.visited = true;
+		// When you visit, things can happen conditionally in this order:
 		if (this.status === 'atWar') this.underAttack();
-		else if (this.status === 'atPeace') this.peaceTimeEvent();
+		else if (this.status === 'atPeace') this.peaceTimeEvent();	// TODO: define another state?
 		else if (player.ships[0].crew.length < 5) this.offerRecruits(3);
 		else if (Math.random() > 0.5) this.tradeWith();
 		else {
@@ -265,7 +309,7 @@ class Town {
 	}
 }
 
-class Enemy {
+class Enemy {	// FIXME: not used, just getting static object from gameText
 	constructor(params) {
 		this.name = params.name;
 		this.desc = params.desc;
@@ -287,3 +331,6 @@ class Enemy {
 
 	}
 }
+
+// Suppress linter errors:
+console.log(Ship, Town, Enemy);

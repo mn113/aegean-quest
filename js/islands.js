@@ -1,4 +1,4 @@
-/* global d3, $, Snap, view, ShortestPathCalculator, svgShip, seaLevel, simplify */
+/* global d3, $, view, ShortestPathCalculator, svgShip, seaLevel, simplify, triCentreDistance, Stage5Render, player, towns */
 
 var sPath, shipNode, paths, nodes;
 
@@ -119,10 +119,10 @@ function routeShip(dest, callback) {
 // Use Simplify.js to smooth the path:
 function simplifyRoute(route) {
 	var points = route.map(p => {
-			return {x: nodes[p.target].coords[0], y: nodes[p.target].coords[1]};
-		}),
-		tolerance = 5;
-	return simplify(points);
+		return {x: nodes[p.target].coords[0], y: nodes[p.target].coords[1]};
+	});
+	//var tolerance = 5;
+	return simplify(points);	// TODO
 }
 
 // Animate ship to a new node:
@@ -156,9 +156,9 @@ function linkCities(svg) {
 	.on('click', function() {
 		console.log(this);
 		// Pass click through, get underlying tri:
-		var cityNode = $(this).data("triangle");
+		//var cityNode = $(this).data("triangle");
 		var seaNode = $(this).data("nearsea");
-		var ptIndex = $(this).data("ptIndex");
+		//var ptIndex = $(this).data("ptIndex");
 		var name = $(this).data("name");
 		// Set sail, and visit city on arrival:
 		routeShip(seaNode, function() {

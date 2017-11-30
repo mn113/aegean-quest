@@ -1,4 +1,4 @@
-/* global $, gameText, Ship, Sailor */
+/* global gameText, Ship, Sailor, ui */
 
 // Seeding
 var salt = new Date().getHours() % 4;	// changes every 15 minutes
@@ -13,12 +13,12 @@ var player = {
 	gold: 100,
 	trophies: [],
 	godFavours: {
-		"Poseidon": 0,
-		"Uranus": 0,
-		"Demeter": 0,
-		"Hephaestus": 0,
-		"Artemis": 0,
-		"Ares": 0
+		poseidon: -4,
+		uranus: -3,
+		demeter: -2,
+		hephaestus: -1,
+		artemis: 1,
+		ares: 2
 	}
 };
 
@@ -31,327 +31,6 @@ var man6 = new Sailor();
 console.log(man1);
 
 player.ships[0].addCrew([man1, man2, man3, man4, man5, man6]);
-
-var ui = {
-	// Render a ship's stats in left sidebar
-	renderShipInfo: function(sid) {
-		var s = player.ships[sid];
-		var l = player.ships.length;
-		console.log(s);
-		var prev = player.ships[sid-1] % l;
-		var next = player.ships[sid+1] % l;
-		var html = `
-		<div class="ship_stats" id="ship${sid}">
-			<!--div>
-				<i class="angle double left icon" onclick="ui.renderShip(${prev})"></i>
-				<i class="angle double right icon" onclick="ui.renderShip(${next})"></i>
-			</div-->
-			<h2>“${s.name}”</h2>
-			<h3>${s.type} class</h3>
-			<p>Speed: ${s.speed}</p>
-			<div class="upgrades">
-				${ui._renderShipUpgrades(s.upgrades)}
-			</div>
-			<div class="supplies">
-				${ui._renderShipSupplies(s.supplies)}
-			</div>
-			<h4>Crew</h4>
-			<ul class="crew">
-				${ui._renderCrew(s.captain, s.crew)}
-			</ul>
-		</div>`;
-		// Render
-		$("#ship-ui").html(html);
-	},
-
-	_renderShipUpgrades: function(upgrades) {
-		var html = "";
-		for (var u of upgrades) {
-			html += `<i class="gameitem ${u.className}"
-					data-title="${u.name}"
-					data-content="${u.desc}"
-					></i>`;
-		}
-		return html;
-	},
-
-	_renderShipSupplies: function(supplies) {
-		return `
-			<p><i class="gameitem bread"></i>Bread: ${supplies.bread}</p>
-			<p><i class="gameitem wine"></i>Wine: ${supplies.wine}</p>
-			<p><i class="gameitem chicken"></i>Chickens: ${supplies.chicken}</p>
-			<p><i class="gameitem fish"></i>Fish: ${supplies.fish}</p>
-		`;
-	},
-
-	// Render a list of avatars
-	_renderCrew: function(captain, sailors) {
-		var html = "<li class='avatar gold'>" + captain.renderAvatar() + "</li>";
-		sailors.filter(s => s !== captain)
-		.forEach(function(s) {
-			html += "<li class='avatar'>" + s.renderAvatar(); + "</li>";
-		});
-		return html;
-	},
-
-	renderYear: function() {
-		$("#year-ui").html(player.year + " BC");
-	},
-
-	// Render the player's gold amount in right sidebar
-	renderGold: function() {
-		var iconClass = (player.gold > 200) ? "gold-high" : (player.gold > 50) ? "gold-med" : "gold-low";
-		$("#gold-icon").removeClass("gold-high gold-med gold-low").addClass(iconClass);
-		$("#gold-ui").html(player.gold);
-	},
-
-	// Render the player's trophy icons in right sidebar
-	renderTrophies: function() {
-		var trophies = "";
-		for (var t of player.trophies) {
-			trophies += `<a class="gameitem ${t.className}"
-		 					data-title="${t.name}"
-							data-content="${t.desc}"
-							onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
-		}
-		$("#trophies-ui").html(trophies);
-	},
-
-	renderGods: function() {
-
-	},
-
-	// The main 2-button modal card, used for most events
-	renderModalCard: function(params) {
-		params.extra = params.extra || "";
-		var cardHtml = `
-		<div class="ui small modal">
-			<div class="header">${params.title}</div>
-			<div class="image content">
-				<img class="image" src="${params.img}">
-				<div class="description">
-					<p>${params.desc}</p>
-				</div>
-			</div>
-			<div class="content">
-				<p>${params.content}</p>
-				<div>${params.extra}</div>
-			</div>
-			<div class="actions">
-				${ui.renderButtons(params.buttons)}
-			</div>
-		</div>
-		`;
-		$(".modal").remove();
-		$("#game-centre").append(cardHtml);
-		$(".small.modal").modal('show');
-	},
-
-	renderButtons: function(buttons) {
-		var html = `<div class="large buttons">`;
-		if (buttons.yes) html += `<div class="ui approve button">${buttons.yes}</div>`;
-		if (buttons.no) html += `<div class="ui cancel button">${buttons.no}</div>`;
-		html += "</div>";
-		return html;
-	},
-
-	// A generic smaller modal with text and 1 dismissal button
-	renderPopup: function(params) {
-		var cardHtml = `
-		<div class="ui tiny modal">
-			<div class="header">${params.title}</div>
-			<div class="content">
-				<p>${params.content}</p>
-			</div>
-			<div class="actions">
-				${ui.renderButtons(params.buttons)}
-			</div>
-		</div>
-		`;
-		$(".modal").remove();
-		$("#game-center").append(cardHtml);
-		$(".tiny.modal").modal('show');
-	},
-
-	clearModals: function() {
-		$(".modal").remove();
-	},
-
-	modals: {
-		// Modal container for choosing combatants
-		preCombatCard: function(monster) {
-			var ship = player.ships[0];
-			var sailors = ship.crew.filter(s => s !== ship.captain);
-			var sailorInputs = sailors.map(s => {
-				return `<span><input type="checkbox" value="" checked>${s.renderAvatar()}</span>`;
-			});
-			var params = {
-				title: "How many will fight?",
-				content: "Choose the men you will send into combat. The more warriors, the better their chances of victory - but the higher the risk.",
-				extras: sailorInputs.join("") + "<p><span>0</span> men selected</p>",
-				buttons: {yes: "Fight!"}
-			};
-			ui.renderModalCard(params);
-		},
-
-		// Results of combat info
-		postCombatCard: function(monster, result) {
-			var params = {};
-			if (result.code === 2) {
-				params.title = "Victory!";
-				params.content = `Your men proved valiant enough to slay the ${monster.name}.`;		// FIXME plurals
-			}
-			else if (result.code === 1) {
-				params.title = "Victory!";
-				params.content = `The ${monster.name} ran away when the going got tough.`;
-			}
-			else if (result.code === 0) {
-				params.title = "Defeated.";
-				params.content = `The ${monster.name} was too strong. Your men were unable to hold it off.`;
-				params.extras = `
-					<h4>The following men were lost in the battle:</h4>
-					${result.losses.map(s => s.renderAvatar('dead')).join("")}
-				`;	// FIXME
-			}
-
-			params.buttons = {no: "Continue"};
-			ui.renderModalCard(params);
-		},
-
-		// Modal for viewing Sailor's stats, promotion or dismissal
-		sailorInfoCard: function(sailor) {
-			var card = $("<div>")
-				.addClass("sailor modal")
-				.append(sailor.showStats());
-			$("#ui").append(card);
-		},
-
-		// Modal container for the buy/sell interface
-		traderCard: function(buying, selling) {
-			var params = {
-				title: "The local market",
-				buttons: {
-					yes: "Done trading",
-					no: "No thanks"
-				}
-			};
-			params.extras = ui.renderTradeMenu('buy', buying) + ui.renderTradeMenu('sell', selling);
-
-			ui.renderModalCard(params);
-		},
-
-		// Renders a button with a multi-level dropdown inside it
-		renderTradeMenu(type, data) {
-			// Wire up player's trading functions to buttons:
-			var doTrade = {
-				buy: player.buy,
-				sell: player.sell
-			}[type];
-			var buttonLabel = type.toUpperCase();
-
-			var items = data.map(i => {
-				return `
-				<div class="ui pointing item">
-					<i class="${i.name} icon"></i>
-					${i.name} @ ${i.price}/${i.unit}
-					<div class="menu">
-						<div class="item">Buy 1</div>
-						<div class="item">Buy 5</div>
-						<div class="item">Buy 10</div>
-					</div>
-				</div>
-				`;
-			});
-
-			var html = `
-			<div class="ui floating labeled pointing icon dropdown button">
-				<span class="text">${buttonLabel}...</span>
-				<div class="menu">
-					<div class="header">
-						<i class="tags icon"></i>
-						${buttonLabel}
-					</div>
-					<div class="divider"></div>
-					${items.join("")}
-				</div>
-			</div>`;
-
-			return html;
-		},
-
-		// Modal container for the recruitment interface
-		recruitmentCard: function(sailors) {
-			var params = {
-				title: "Some local talent is available for hire:",
-				buttons: {
-					yes: "Hire selected",
-					no: "No thanks"
-				}
-			};
-			params.extras = ui.sailorPicker(sailors);	// TODO
-
-			ui.renderModalCard(params);
-		},
-
-		// Further info popup
-		trophyInfoCard: function(trophyClassName) {
-			var params = gameText.trophies.filter(t => t.className === trophyClassName)[0];
-			params.buttons = {yes: "OK", no: "more..."};
-			ui.renderModalCard(params);
-		},
-
-		// Further info popup
-		godInfoCard: function(god) {
-			var params = gameText.gods.filter(g => g.name === god)[0];
-			params.buttons = {yes: "OK", no: "OK"};
-			ui.renderModalCard(params);
-		},
-
-	},
-
-	popups: {
-		// Brief message popup, 2 buttons
-		godReactionPopup: function(god, delta) {
-			// TODO: random gods
-			ui.renderPopup({
-				title: "The Oracle says...",
-				content: (delta > 0) ? god + " liked this! 👌" : god + " didn't like that! 😡",
-				buttons: {yes: "OK", no: "more..."}
-			});
-			// TODO: add delta to God's counter
-		},
-
-		// Received gift popup, 1 button
-		giftPopup: function(gift, quantity, from) {
-			ui.renderPopup({
-				title: "You received a gift from " + from,
-				content: `${from} gave you ${quantity} ${gift}!`,	// TODO language
-				buttons: {yes: "OK"}
-			});
-			// TODO: add gift to player
-		},
-
-		// Game over info, win/loss
-		gameOverPopup: function(type) {
-			var params = {
-				title: "Game Over!",
-				buttons: {
-					no: "No thanks"
-				}
-			};
-			if (type === 'win') params.content = "You won!";
-			else if (type === 'loss') params.content = "You lost.";
-			// TODO: rating widget? ajax message?
-
-			ui.renderPopup(params);
-		}
-	},
-
-	sailorPicker: function() {
-
-	}
-
-};
 
 function combat(sailors, enemy) {
 	var att1 = sailors.map(s => s.xp - s.age / 15).reduce((a,b) => a+b) / (sailors.length / 2);
@@ -400,9 +79,9 @@ function combat(sailors, enemy) {
 }
 
 // Test combat:
-var mEvent = gameText.monsterEvents.random();
-var m = new Enemy(mEvent);
-var res = combat(player.ships[0].crew, m);	// ok
+//var mEvent = gameText.monsterEvents.random();
+//var m = new Enemy(mEvent);
+//var res = combat(player.ships[0].crew, m);	// ok
 
 function endTurn() {
 	player.turns += 1;
@@ -420,7 +99,7 @@ function updateSidebars() {
 	ui.renderYear();
 	ui.renderGold();
 	ui.renderTrophies();
-	//ui.renderGods();
+	ui.renderGods();
 }
 updateSidebars();
 

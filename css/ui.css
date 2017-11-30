@@ -64,6 +64,7 @@ ul, ol {
 }
 .modal {
 	top: 40px !important;
+	margin-top: 20px !important;
 }
 .ui.modal > .header,
 .ui.modal > .actions {
@@ -78,6 +79,11 @@ ul, ol {
 }
 .ui {
 	pointer-events: all;
+}
+
+.or {
+	margin-top: 0.5em !important;
+	z-index: 20 !important;
 }
 .avatar {
 	display: flex;
@@ -101,7 +107,7 @@ ul, ol {
 	right: 5px;
 }
 
-#trophies-ui {
+#trophies-ui, #gods-ui {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 }
@@ -151,3 +157,44 @@ ul, ol {
 .supplies i {
 	float: left;
 }
+
+.town, .monster {
+	color: red;
+}
+
+/*************/
+/* GOD FACES */
+/*************/
+.god {
+	width: 50px;
+	height: 50px;
+}
+.modal .god {
+	background: white url(../img/gods-white-60px-2by3.png) no-repeat;
+}
+.sidebar .god {
+	background: black url(../img/gods-black-yellow-50px-2by3.png) no-repeat;
+}
+.god.poseidon	{ background-position: 0 0; }
+.god.artemis	{ background-position: -50px 0; }
+.god.ares		{ background-position: 0 -50px; }
+.god.uranus		{ background-position: -50px -50px; }
+.god.demeter	{ background-position: 0 -100px; }
+.god.hephaestus	{ background-position: -50px -100px; }
+
+.sidebar .godafter {
+    position: absolute; /* Positions psuedo element relative to .icon */
+	content: ""; /* Allows psuedo element to show */
+    width: 50px; /* Same dimensions as .icon */
+    height: 50px;
+    background: #EC008C; /* The color you want the icon to change to */
+    mix-blend-mode: multiply; /* Only apply color on top of white, use screen if icon is black */
+}
+.sidebar .god.score3 { filter: hue-rotate(60deg) saturate(3); }
+.sidebar .god.score2 { filter: hue-rotate(40deg) saturate(3); }
+.sidebar .god.score1 { filter: hue-rotate(20deg) saturate(3); }
+.sidebar .god.score0 { filter: grayscale(); }
+.sidebar .god.score-1 { filter: hue-rotate(-15deg) saturate(3); }
+.sidebar .god.score-2 { filter: hue-rotate(-30deg) saturate(3); }
+.sidebar .god.score-3 { filter: hue-rotate(-45deg) saturate(3); }
+.sidebar .god.score-4 { filter: hue-rotate(-60deg) saturate(3); }

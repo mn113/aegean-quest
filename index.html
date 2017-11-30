@@ -6,8 +6,8 @@
 	<link href="https://fonts.googleapis.com/css?family=Flamenco|GFS+Neohellenic|Lancelot" rel="stylesheet">
 	<link rel="stylesheet" href="css/map.css">
 	<link rel="stylesheet" href="css/ui.css">
-	<link rel="stylesheet" href="js/dataarts/dat.gui.css">
-	<script src="js/dataarts/dat.gui.js"></script>
+	<!--link rel="stylesheet" href="js/dataarts/dat.gui.css">
+	<script src="js/dataarts/dat.gui.js"></script-->
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="css/semantic/semantic.css">
@@ -53,14 +53,14 @@
 
 			<div class="ui left demo vertical inverted sidebar labeled icon menu thin visible">
 				<a class="ui message close inverted">
-					<i class="close icon"></i>
+					<i class="close icon yellow"></i>
 				</a>
 				<a class="item" id="ship-ui"><!-- ship stats render here -->
 				</a>
 			</div>
 			<div class="ui right demo vertical inverted sidebar labeled icon menu visible">
-				<a class="ui message close inverted">
-					<i class="close icon"></i>
+				<a class="ui message close inverted right">
+					<i class="close icon yellow"></i>
 				</a>
 				<a class="item">
 					<p id="year-ui"></p>
@@ -80,7 +80,6 @@
 				<a class="item">
 					Gods
 					<div id="gods-ui">
-						<img src="img/gods-dark.png" width="50">
 					</div>
 				</a>
 			</div>
@@ -91,6 +90,8 @@
 			</div>
 		</div>
 	</div>
+
+	<div id="modal" class="ui dimmer modals page transition"></div>
 
 	<!-- end of HTML content -->
 
@@ -103,9 +104,10 @@
 	<script src="js/mewo2/terraincontrols.js"></script>
 	<script src="js/islands.js"></script>
 	<script src="js/classes.js"></script>
+	<script src="js/ui.js"></script>
 	<script src="js/game.js"></script>
 	<script type="text/javascript">
-
+/*
 		var FizzyText = function() {
 			this.shipName = player.ships[0].name;
 			this.poseidon = 0.8;
@@ -170,14 +172,15 @@
 			f3.add(text, 'toggleSidebar');	// button
 			gui.close();
 		};
-
-		// Semantic UI setup:
+*/
+		// Semantic UI:
+		// Sidebars:
 		$('.ui.sidebar').sidebar({
 			context: $('#ui'),
 			dimPage: false,
 			transition: "overlay"
 		});
-		// Open & close buttons:
+		// Sidebar activation buttons:
 		var $left_sb = $('.left.sidebar');
 		var $right_sb = $('.right.sidebar');
 		$left_sb.sidebar('attach events', '.left a.close', 'close');
@@ -189,6 +192,7 @@
 		$('#gamearea .ui .crew img').popup();
 		$('.upgrades i').popup();
 		$('#trophies-ui a').popup();
+		$('#gods-ui div').popup();
 
 	</script>
 </body>

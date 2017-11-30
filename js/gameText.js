@@ -86,9 +86,11 @@ var gameText = {
 
 	"monsterEvents": [
 		{
-			"name": "Kerberos",
-			"desc": "In Greek mythology, Cerberus (Greek: Κέρβερος, Kerberos), often called the 'hound of Hades', is the monstrous multi-headed dog that guards the gates of the Underworld to prevent the dead from leaving. Cerberus was the offspring of the monsters Echidna and Typhon, and usually is described as having three heads, a serpent for a tail, and snakes protruding from parts of his body.",
-			"img": "",
+			"article": "",
+			"name": "Cerberus",
+			"text": "In Greek mythology, Cerberus (Greek: Κέρβερος, Kerberos), often called the 'hound of Hades', is the monstrous multi-headed dog that guards the gates of the Underworld to prevent the dead from leaving. Cerberus was the offspring of the monsters Echidna and Typhon, and usually is described as having three heads, a serpent for a tail, and snakes protruding from parts of his body.",
+			"img": "img/monsters-250px/cerberus.jpg",
+			"url": "",
 			"attack": 7,
 			"health": 6,
 			"bravery": 6,
@@ -96,9 +98,11 @@ var gameText = {
 			"weakness": "Slithery tail"
 		},
 		{
+			"article": "some",
 			"name": "Harpies",
-			"desc": "In Greek mythology and Roman mythology, harpies (Greek: ἅρπυια, harpyia) were half-human and half-bird personifications of storm winds. Their name means 'snatchers' or 'swift robbers' and they steal food from their victims while they are eating and carry evildoers (especially those who have killed their family) to the Erinyes.",
-			"img": "",
+			"text": "In Greek mythology and Roman mythology, harpies (Greek: ἅρπυια, harpyia) were half-human and half-bird personifications of storm winds. Their name means 'snatchers' or 'swift robbers' and they steal food from their victims while they are eating and carry evildoers (especially those who have killed their family) to the Erinyes.",
+			"img": "img/monsters-250px/harpies.jpg",
+			"url": "",
 			"attack": 7,
 			"health": 5,
 			"bravery": 7,
@@ -106,9 +110,11 @@ var gameText = {
 			"weakness": "Few defensive manoeuvres"
 		},
 		{
+			"article": "",
 			"name": "Gorgons",
-			"desc": "A Gorgon (Ancient Greek: Γοργώ) is a female creature. The name derives from the ancient Greek word gorgós, which means 'dreadful'. The term refers to any of three sisters who had hair made of living, venomous snakes, as well as a horrifying visage that turned those who beheld her to stone. Traditionally, while two of the Gorgons were immortal, Stheno and Euryale, their sister Medusa was not.",
-			"img": "",
+			"text": "A Gorgon (Ancient Greek: Γοργώ) is a female creature. The name derives from the ancient Greek word gorgós, which means 'dreadful'. The term refers to any of three sisters who had hair made of living, venomous snakes, as well as a horrifying visage that turned those who beheld her to stone. Traditionally, while two of the Gorgons were immortal, Stheno and Euryale, their sister Medusa was not.",
+			"img": "img/monsters-250px/gorgons.jpg",
+			"url": "",
 			"attack": 10,
 			"health": 2,
 			"bravery": 6,
@@ -116,19 +122,23 @@ var gameText = {
 			"weakness": "Soft fleshy necks"
 		},
 		{
-			"name": "Spartae",
-			"desc": "",
-			"img": "",
-			"attack": 10,
-			"health": 10,
-			"bravery": 5,
-			"strength": "",
-			"weakness": ""
+			"article": "a tribe of",
+			"name": "Spartoi",
+			"text": "THE SPARTOI (Sparti) were a tribe of warlike, earth-born men which sprang fully grown and armed for battle from the sown teeth of a Drakon (Dragon) sacred to the war-god Ares.",
+			"img": "img/monsters-250px/spartoi.jpg",
+			"url": "",
+			"attack": 8,
+			"health": 3,
+			"bravery": 8,
+			"strength": "Always ready for battle",
+			"weakness": "Limited intelligence"
 		},
 		{
+			"article": "a",
 			"name": "Cyclops",
-			"desc": "A cyclops (Ancient Greek: Κύκλωψ, Kyklōps), in Greek mythology and later Roman mythology, is a member of a primordial race of giants, each with a single eye in the center of his forehead.",
-			"img": "",
+			"text": "A cyclops (Ancient Greek: Κύκλωψ, Kyklōps), in Greek mythology and later Roman mythology, is a member of a primordial race of giants, each with a single eye in the center of his forehead.",
+			"img": "img/monsters-250px/cyclops.jpg",
+			"url": "",
 			"attack": 10,
 			"health": 8,
 			"bravery": 4,
@@ -136,9 +146,11 @@ var gameText = {
 			"weakness": "Peripheral vision"
 		},
 		{
+			"article": "a",
 			"name": "Minotaur",
-			"desc": "The Minotaur (Ancient Greek: Μῑνώταυρος) is a mythical creature with the head of a bull and the body of a man. The Minotaur dwelt at the center of the Labyrinth, which was an elaborate maze-like construction designed by the architect Daedalus and his son Icarus, on the command of King Minos of Crete.",
-			"img": "",
+			"text": "The Minotaur (Ancient Greek: Μῑνώταυρος) is a mythical creature with the head of a bull and the body of a man. The Minotaur dwelt at the center of the Labyrinth, which was an elaborate maze-like construction designed by the architect Daedalus and his son Icarus, on the command of King Minos of Crete.",
+			"img": "img/monsters-250px/minotaur.jpg",
+			"url": "",
 			"attack": 12,
 			"health": 10,
 			"bravery": 5,
@@ -146,9 +158,11 @@ var gameText = {
 			"weakness": "Sense of direction"
 		},
 		{
+			"article": "several",
 			"name": "Centaurs",
-			"desc": "A centaur (Greek: Κένταυρος, Kéntauros), or occasionally hippocentaur, is a mythological creature with the upper body of a human and the lower body of a horse. The Centaurs are best known for their fight with the Lapiths. A Lapith hero, Caeneus, who was invulnerable to weapons, was beaten into the earth by Centaurs wielding rocks and the branches of trees.",
-			"img": "",
+			"text": "A centaur (Greek: Κένταυρος, Kéntauros), or occasionally hippocentaur, is a mythological creature with the upper body of a human and the lower body of a horse. The Centaurs are best known for their fight with the Lapiths. A Lapith hero, Caeneus, who was invulnerable to weapons, was beaten into the earth by Centaurs wielding rocks and the branches of trees.",
+			"img": "img/monsters-250px/centaurs.jpg",
+			"url": "",
 			"attack": 8,
 			"health": 11,
 			"bravery": 5,
@@ -156,9 +170,11 @@ var gameText = {
 			"weakness": "Compassion"
 		},
 		{
+			"article": "",
 			"name": "Circe",
-			"desc": "Circe (Greek: Κίρκη) is a goddess of magic or sometimes a nymph, witch, enchantress or sorceress. By most accounts, she was the daughter of the sun god Helios, and Perse, an Oceanid nymph. Circe was renowned for her vast knowledge of potions and herbs. Through the use of these and a magic wand or staff, she transformed her enemies, or those who offended her, into wild beasts.",
-			"img": "",
+			"text": "Circe (Greek: Κίρκη) is a goddess of magic or sometimes a nymph, witch, enchantress or sorceress. By most accounts, she was the daughter of the sun god Helios, and Perse, an Oceanid nymph. Circe was renowned for her vast knowledge of potions and herbs. Through the use of these and a magic wand or staff, she transformed her enemies, or those who offended her, into wild beasts.",
+			"img": "img/monsters-250px/circe.jpg",
+			"url": "",
 			"attack": 9,
 			"health": 8,
 			"bravery": 7,
@@ -166,9 +182,11 @@ var gameText = {
 			"weakness": "Unknown"
 		},
 		{
+			"article": "",
 			"name": "Arachne",
-			"desc": "In Greek (and later Roman) mythology, Arachne (Greek: ἀράχνη 'spider') was a talented mortal weaver who challenged Athena, goddess of wisdom and crafts, to a weaving contest; this hubris resulted in her being transformed into a spider.",
-			"img": "",
+			"text": "In Greek (and later Roman) mythology, Arachne (Greek: ἀράχνη 'spider') was a talented mortal weaver who challenged Athena, goddess of wisdom and crafts, to a weaving contest; this hubris resulted in her being transformed into a spider.",
+			"img": "img/monsters-250px/arachne.jpg",
+			"url": "",
 			"attack": 4,
 			"health": 7,
 			"bravery": 9,
@@ -176,9 +194,11 @@ var gameText = {
 			"weakness": "Overconfidence"
 		},
 		{
+			"article": "a",
 			"name": "Chimera",
-			"desc": "The Chimera (Greek: Χίμαιρα, Chímaira 'she-goat') was a monstrous fire-breathing hybrid creature of Lycia in Asia Minor, composed of the parts of more than one animal. It is usually a lion, with the head of a goat arising from its back, and a tail that ends with a snake's head. The seeing of a Chimera was an omen for disaster.",
-			"img": "",
+			"text": "The Chimera (Greek: Χίμαιρα, Chímaira 'she-goat') was a monstrous fire-breathing hybrid creature of Lycia in Asia Minor, composed of the parts of more than one animal. It is usually a lion, with the head of a goat arising from its back, and a tail that ends with a snake's head. The seeing of a Chimera was an omen for disaster.",
+			"img": "img/monsters-250px/chimera.jpg",
+			"url": "",
 			"attack": 6,
 			"health": 6,
 			"bravery": 6,
@@ -186,9 +206,11 @@ var gameText = {
 			"weakness": "Goaty intelligence"
 		},
 		{
+			"article": "a",
 			"name": "Crocotta",
-			"desc": "The crocotta is a mythical dog-wolf of India or Ethiopia, linked to the hyena and said to be a deadly enemy of men and dogs.",
-			"img": "",
+			"text": "The crocotta is a mythical dog-wolf of India or Ethiopia, linked to the hyena and said to be a deadly enemy of men and dogs.",
+			"img": "img/monsters-250px/crocotta.jpg",
+			"url": "",
 			"attack": 10,
 			"health": 5,
 			"bravery": 8,
@@ -196,9 +218,11 @@ var gameText = {
 			"weakness": "Stupidity"
 		},
 		{
+			"article": "",
 			"name": "Empusa",
-			"desc": "Empusa (Ancient Greek: Ἔμπουσα, Empousa) is a demigoddess of Greek mythology. In later incarnations, she appeared as a species of monsters commanded by Hecate. Empusa was the beautiful daughter of the goddess Hecate and the spirit Mormo. She feasted on blood by seducing young men as they slept, before drinking their blood and eating their flesh.",
-			"img": "",
+			"text": "Empusa (Ancient Greek: Ἔμπουσα, Empousa) is a demigoddess of Greek mythology. In later incarnations, she appeared as a species of monsters commanded by Hecate. Empusa was the beautiful daughter of the goddess Hecate and the spirit Mormo. She feasted on blood by seducing young men as they slept, before drinking their blood and eating their flesh.",
+			"img": "img/monsters-250px/empusa.jpg",
+			"url": "",
 			"attack": 9,
 			"health": 3,
 			"bravery": 4,
@@ -206,9 +230,11 @@ var gameText = {
 			"weakness": "Fighting"
 		},
 		{
+			"article": "the",
 			"name": "Furies",
-			"desc": "In Greek mythology the Erinyes (Greek: Ἐρῑνύες [ῠ], pl. of Ἐρῑνύς [ῡ], Erinys), also known as the Furies, were female chthonic deities of vengeance; they were sometimes referred to as 'infernal goddesses' (χθόνιαι θεαί). A formulaic oath in the Iliad invokes them as 'the Erinyes, that under earth take vengeance on men, whosoever hath sworn a false oath'.",
-			"img": "",
+			"text": "In Greek mythology the Erinyes (Greek: Ἐρῑνύες [ῠ], pl. of Ἐρῑνύς [ῡ], Erinys), also known as the Furies, were female chthonic deities of vengeance; they were sometimes referred to as 'infernal goddesses' (χθόνιαι θεαί). A formulaic oath in the Iliad invokes them as 'the Erinyes, that under earth take vengeance on men, whosoever hath sworn a false oath'.",
+			"img": "img/monsters-250px/furies.jpg",
+			"url": "",
 			"attack": 7,
 			"health": 4,
 			"bravery": 4,
@@ -216,9 +242,11 @@ var gameText = {
 			"weakness": "Stamina"
 		},
 		{
+			"article": "a",
 			"name": "Gegenees",
-			"desc": "The Gegenees (Gr. Γηγενεης Gêgeneês - meaning 'earth-born') were a race of six-armed giants who inhabited the same island as the Doliones in the ancient Greek epic Argonautica.",
-			"img": "",
+			"text": "The Gegenees (Gr. Γηγενεης Gêgeneês - meaning 'earth-born') were a race of six-armed giants who inhabited the same island as the Doliones in the ancient Greek epic Argonautica.",
+			"img": "img/monsters-250px/gegenees.jpg",
+			"url": "",
 			"attack": 10,
 			"health": 10,
 			"bravery": 5,
@@ -226,9 +254,11 @@ var gameText = {
 			"weakness": "Top-heavy"
 		},
 		{
+			"article": "a",
 			"name": "Gryphon",
-			"desc": "The gryphon (Greek: γρύφων, grýphōn) is a legendary creature with the body, tail, and back legs of a lion; the head and wings of an eagle; and an eagle's talons as its front feet. Because the lion was traditionally considered the king of the beasts and the eagle the king of birds, the griffin was thought to be an especially powerful and majestic creature. Griffins are known for guarding treasure and priceless possessions.",
-			"img": "",
+			"text": "The gryphon (Greek: γρύφων, grýphōn) is a legendary creature with the body, tail, and back legs of a lion; the head and wings of an eagle; and an eagle's talons as its front feet. Because the lion was traditionally considered the king of the beasts and the eagle the king of birds, the griffin was thought to be an especially powerful and majestic creature. Griffins are known for guarding treasure and priceless possessions.",
+			"img": "img/monsters-250px/gryphon.jpg",
+			"url": "",
 			"attack": 8,
 			"health": 7,
 			"bravery": 10,
@@ -236,9 +266,11 @@ var gameText = {
 			"weakness": "Lack of coordination"
 		},
 		{
+			"article": "the",
 			"name": "Hydra",
-			"desc": "The Lernaean Hydra (Greek: Λερναῖα Ὕδρα) was a serpentine water monster. Its lair was the lake of Lerna in the Argolid, which reputed to be an entrance to the Underworld. The Hydra was the offspring of Typhon and Echidna. It possessed many heads, for every head chopped off, the Hydra would regrow a couple of heads. The Hydra had poisonous breath and blood so virulent that even its scent was deadly.",
-			"img": "",
+			"text": "The Lernaean Hydra (Greek: Λερναῖα Ὕδρα) was a serpentine water monster. Its lair was the lake of Lerna in the Argolid, which reputed to be an entrance to the Underworld. The Hydra was the offspring of Typhon and Echidna. It possessed many heads, for every head chopped off, the Hydra would regrow a couple of heads. The Hydra had poisonous breath and blood so virulent that even its scent was deadly.",
+			"img": "img/monsters-250px/hydra.jpg",
+			"url": "",
 			"attack": 10,
 			"health": 10,
 			"bravery": 5,
@@ -246,9 +278,11 @@ var gameText = {
 			"weakness": "Easily chopped"
 		},
 		{
+			"article": "a",
 			"name": "Manticore",
-			"desc": "The manticore is a Persian legendary creature similar to the Egyptian sphinx. It has the head of a human, body of a lion and a tail of poisonous spines similar to porcupine quills. There are some accounts that the spines can be shot like arrows, thus making the manticore a lethal predator. It eats its victims whole, using its triple rows of teeth, and leaves no bones behind.",
-			"img": "",
+			"text": "The manticore is a Persian legendary creature similar to the Egyptian sphinx. It has the head of a human, body of a lion and a tail of poisonous spines similar to porcupine quills. There are some accounts that the spines can be shot like arrows, thus making the manticore a lethal predator. It eats its victims whole, using its triple rows of teeth, and leaves no bones behind.",
+			"img": "img/monsters-250px/manticore.jpg",
+			"url": "",
 			"attack": 11,
 			"health": 8,
 			"bravery": 3,
@@ -257,8 +291,9 @@ var gameText = {
 		},
 		{
 			"name": "Lamia",
-			"desc": "In ancient Greek mythology, Lamia (Greek: Λάμια) was a beautiful queen of Libya who became a child-eating daemon. The myth has Hera stealing all of Lamia's children and Lamia, who loses her mind from grief and despair, starts stealing and devouring others' children out of envy, the repeated monstrosity of which transforms her into a monster. Some accounts say she has a serpent's tail below the waist. ",
-			"img": "",
+			"text": "In ancient Greek mythology, Lamia (Greek: Λάμια) was a beautiful queen of Libya who became a child-eating daemon. The myth has Hera stealing all of Lamia's children and Lamia, who loses her mind from grief and despair, starts stealing and devouring others' children out of envy, the repeated monstrosity of which transforms her into a monster. Some accounts say she has a serpent's tail below the waist. ",
+			"img": "img/monsters-250px/lamia.jpg",
+			"url": "",
 			"attack": 7,
 			"health": 7,
 			"bravery": 2,
@@ -266,9 +301,11 @@ var gameText = {
 			"weakness": "Internal conflict; cowardice"
 		},
 		{
+			"article": "a",
 			"name": "Phoenix",
-			"desc": "In Greek mythology, a phoenix (Ancient Greek: φοῖνιξ phoînix) is a long-lived bird that is cyclically regenerated or born again. Associated with the Sun, a phoenix obtains new life by arising from the ashes of its predecessor. According to some sources, the phoenix dies in a show of flames and combustion.",
-			"img": "",
+			"text": "In Greek mythology, a phoenix (Ancient Greek: φοῖνιξ phoînix) is a long-lived bird that is cyclically regenerated or born again. Associated with the Sun, a phoenix obtains new life by arising from the ashes of its predecessor. According to some sources, the phoenix dies in a show of flames and combustion.",
+			"img": "img/monsters-250px/phoenix.jpg",
+			"url": "",
 			"attack": 4,
 			"health": 4,
 			"bravery": 8,
@@ -276,9 +313,11 @@ var gameText = {
 			"weakness": "Water baths"
 		},
 		{
+			"article": "",
 			"name": "Stymphalian Birds",
-			"desc": "The Stymphalian birds (Greek: Στυμφαλίδες ὄρνιθες, Stymphalídes órnithes) are a group of voracious, man-eating birds with beaks of bronze, sharp metallic feathers they could launch at their victims, and poisonous dung. These birds were pets of Artemis, the goddess of the hunt or have been brought up by Ares. They migrated to a marsh in Arcadia to escape a pack of wolves. There they bred quickly and swarmed over the countryside, destroying crops, fruit trees, and townspeople.",
-			"img": "",
+			"text": "The Stymphalian birds (Greek: Στυμφαλίδες ὄρνιθες, Stymphalídes órnithes) are a group of voracious, man-eating birds with beaks of bronze, sharp metallic feathers they could launch at their victims, and poisonous dung. These birds were pets of Artemis, the goddess of the hunt or have been brought up by Ares. They migrated to a marsh in Arcadia to escape a pack of wolves. There they bred quickly and swarmed over the countryside, destroying crops, fruit trees, and townspeople.",
+			"img": "img/monsters-250px/stymphalian-birds.jpg",
+			"url": "",
 			"attack": 10,
 			"health": 7,
 			"bravery": 4,
@@ -286,9 +325,11 @@ var gameText = {
 			"weakness": "Counter-projectiles"
 		},
 		{
+			"article": "some",
 			"name": "Lycanthropes",
-			"desc": "A lycanthrope (Greek: λυκάνθρωπος lukánthrōpos, 'wolf-person') is a mythological or folkloric human with the ability to shapeshift into a wolf, either purposely or after being placed under a curse or affliction (often a bite or scratch from another werewolf).",
-			"img": "",
+			"text": "A lycanthrope (Greek: λυκάνθρωπος lukánthrōpos, 'wolf-person') is a mythological or folkloric human with the ability to shapeshift into a wolf, either purposely or after being placed under a curse or affliction (often a bite or scratch from another werewolf).",
+			"img": "img/monsters-250px/lycanthropes.jpg",
+			"url": "",
 			"attack": 10,
 			"health": 8,
 			"bravery": 6,
@@ -296,9 +337,10 @@ var gameText = {
 			"weakness": "Daylight"
 		},
 		{
+			"article": "an",
 			"name": "Automaton",
-			"desc": "THE AUTOMATONES were animate, metal statues of animal, men and monsters crafted by the divine smith Hephaestus and the Athenian craftsman Daedalus. The best of them could think and feel like men.",
-			"img": "",
+			"text": "THE AUTOMATONES were animate, metal statues of animal, men and monsters crafted by the divine smith Hephaestus and the Athenian craftsman Daedalus. The best of them could think and feel like men.",
+			"img": "img/monsters-250px/automaton.jpg",
 			"url": "",
 			"attack": 8,
 			"health": 10,
@@ -307,9 +349,10 @@ var gameText = {
 			"weakness": "Technical malfunctions"
 		},
 		{
+			"article": "the",
 			"name": "Calydonian Boar",
-			"desc": "THE HUS KALYDONIOS (Calydonian Boar) was a gigantic boar sent by Artemis to ravage the countryside of Kalydon (Calydon) to punish King Oineus (Oeneus) for neglecting her in the offerings of the first fruits to the gods.",
-			"img": "",
+			"text": "THE HUS KALYDONIOS (Calydonian Boar) was a gigantic boar sent by Artemis to ravage the countryside of Kalydon (Calydon) to punish King Oineus (Oeneus) for neglecting her in the offerings of the first fruits to the gods.",
+			"img": "img/monsters-250px/calydonian-boar.jpg",
 			"url": "",
 			"attack": 8,
 			"health": 6,
@@ -318,9 +361,10 @@ var gameText = {
 			"weakness": "Low intelligence"
 		},
 		{
+			"article": "the",
 			"name": "Echidna",
-			"desc": "EKHIDNA (Echidna) was a monstrous she-dragon (drakaina) with the head and breast of a woman and the tail of a coiling serpent. She probably represented the corruptions of the earth--rot, slime, fetid waters, illness and disease.",
-			"img": "",
+			"text": "EKHIDNA (Echidna) was a monstrous she-dragon (drakaina) with the head and breast of a woman and the tail of a coiling serpent. She probably represented the corruptions of the earth--rot, slime, fetid waters, illness and disease.",
+			"img": "img/monsters-250px/echidna.jpg",
 			"url": "",
 			"attack": 6,
 			"health": 5,
