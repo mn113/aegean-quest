@@ -1,8 +1,10 @@
 /* global gameText, Ship, Sailor, ui */
 
 // Seeding
-var salt = new Date().getHours() % 4;	// changes every 15 minutes
-console.log('salt', salt);
+function reSalt() {
+	return new Date().getHours() % 4;
+}
+var salt = reSalt();	// changes every 15 minutes provided reSalt called regularly
 
 var player = {
 	ships: [new Ship()],
@@ -13,12 +15,12 @@ var player = {
 	gold: 100,
 	trophies: gameText.trophies,
 	godFavours: {
-		poseidon: -4,
-		uranus: -3,
-		demeter: -2,
-		hephaestus: -1,
-		artemis: 1,
-		ares: 2
+		poseidon: 0,
+		uranus: 0,
+		demeter: 0,
+		hephaestus: 0,
+		artemis: 0,
+		ares: 0
 	}
 };
 

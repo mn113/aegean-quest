@@ -4,6 +4,8 @@ function capitalise(word) {
 	return word[0].toUpperCase() + word.substr(1);
 }
 
+var recruits = [];
+
 var ui = {
 	// Full re-render of all sidebar panels
 	updateSidebars: function() {
@@ -15,7 +17,7 @@ var ui = {
 	},
 
 	// Render a ship's stats in left sidebar
-	renderShipInfo: function(sid) {
+	renderShipInfo: function(sid = 0) {
 		var s = player.ships[sid];
 		var l = player.ships.length;
 		console.log(s);
@@ -179,7 +181,7 @@ var ui = {
 		//$("#modal .tiny.modal").modal('show');
 		$('#modal .tiny.modal')
 		.modal({
-			closable: false,
+			closable: true,
 			// Wiring up of buttons to passed callback functions:
 			onApprove : function() {
 				params.callback1();
@@ -238,7 +240,7 @@ var ui = {
 		},
 
 		// Modal for viewing Sailor's stats, promotion or dismissal
-		sailorInfoCard: function(sailor) {
+		sailorInfoCard: function(sailor) {		// TODO
 			var card = $("<div>")
 				.addClass("sailor modal")
 				.append(sailor.showStats());
@@ -301,13 +303,14 @@ var ui = {
 		// Modal container for the recruitment interface
 		recruitmentCard: function(sailors) {
 			var params = {
-				title: "Some local talent is available for hire:",
+				heading: "Recruitment",
+				desc: "Some local talent is available for hire.",
 				buttons: {
-					yes: "Hire selected",
-					no: "No thanks"
+					no: "Done"
 				}
 			};
-			params.extras = ui.sailorPicker(sailors);	// TODO
+			params.content = ui.sailorPicker(sailors);
+			params.callback2 = () => false;		// Dismiss card
 
 			ui.renderModalCard(params);
 		},
@@ -333,23 +336,28 @@ var ui = {
 		godReactionPopup: function(god, delta) {
 			ui.renderPopup({
 				heading: "The Oracle says...",
-				content: (delta > 0) ? god + " liked this! 👌" : god + " didn't like that! 😡",
-				buttons: {yes: "OK", no: "more..."}
+				content: (delta > 0) ? capitalise(god) + " liked this! 👌"
+									: capitalise(god) + " didn't like that! 😡",
+				buttons: {yes: "OK"},
+				callback1: () => false	// Simply dismiss
 			});
 			// Also update data:
-			player.godFavours[god.name] += delta;
+			player.godFavours[god] += delta;
+			ui.renderGods();
 		},
 
 		// Received gift popup, 1 button
 		giftPopup: function(gift, quantity, from) {
 			ui.renderPopup({
 				heading: "You received a gift from " + from,
-				content: `${from} gave you ${quantity} ${gift}!`,	// TODO plurals
-				buttons: {yes: "OK"}
+				content: `${from} gave you ${quantity} ${gift}! <i class="gameitem ${gift}"></i>`,	// TODO plurals
+				buttons: {yes: "OK"},
+				callback1: () => false	// Simply dismiss
 			});
 			// Also update data:
 			if (gift === "gold") player.gold += quantity;
 			else player.supplies[gift] += quantity;
+			ui.renderShipInfo();
 		},
 
 		// Game over info, win/loss
@@ -357,17 +365,51 @@ var ui = {
 			var params = {
 				heading: "Game Over!",
 				content: "You won!",
-				buttons: {yes: "Play again"}
+				buttons: {yes: "Play again"},
+				callback1: () => { window.location.reload(); }
 			};
 			if (type === 'loss') params.content = "You lost.";
 			// TODO: rating widget? ajax metrics message?
-
 			ui.renderPopup(params);
 		}
 	},
 
-	sailorPicker: function() {
-
+	// Sailor recruitment interface
+	sailorPicker: function(sailors) {
+		// Store them outside, so buttons can see who to hire:
+		recruits = sailors;
+		// Present grid of 2-4 sailor info cards:
+		var html = `<div class="ui two cards">`;
+		for (var i = 0; i < recruits.length; i++) {
+			var s = recruits[i];
+			//html += s.showStats();
+			html += `
+				<div class="card" data-rid=${i}>
+			    	<div class="content">
+			      		<div class="header">
+							${s.renderAvatar()}
+							${s.name} of ${s.origin}
+						</div>
+			      		<div class="description">
+							<p><b>Age:</b> ${s.age} | <b>XP:</b> ${s.xp}</p>
+							<p><b>Skills:</b> ${s.skills.join(", ")}</p>
+			      		</div>
+			    	</div>
+			    	<div class="ui bottom attached button" onclick="hire(${i})">
+			      		<i class="add icon"></i>
+			      		Hire (${s.salary} gold)
+			    	</div>
+			  	</div>`;
+		}
+		html += `</div>`;
+		return html;
 	}
 
 };
+
+function hire(i) {
+	player.ships[0].addCrew(recruits[i]);
+	ui.renderShipInfo();
+	// Remove card:
+	$(`.modal .card[data-rid="${i}"]`).remove();
+}

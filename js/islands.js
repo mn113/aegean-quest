@@ -1,6 +1,6 @@
 /* global meshTransforms, generateGoodMesh, visualizeTriangles, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, randomFrom, fillSinks, doErosion, cleanCoast, getRivers, visualizeSlopes, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, landSeaRatio, drawLabels, addCentresToTriangles, triCentreDistance */
 /* global $, d3, ShortestPathCalculator, simplify */
-/* global Town, player, svgShip,  */
+/* global Town, player, svgShip */
 
 // A few globals
 var seaLevel = 0.5;
@@ -93,7 +93,7 @@ function addShipSvg(target) {
 		.raise();
 	// Image inside g has the permanent sprite offset:
 	svgShip.append("svg:image")
-		.attr("xlink:href", "img/boatR.png")
+		.attr("xlink:href", "img/trireme-blue-r.png")
 		.attr("transform", "translate(-25,-40)")
 		.attr("width", 50);
 

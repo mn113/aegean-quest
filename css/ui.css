@@ -1,6 +1,45 @@
-.ship_stats {
+/**********/
+/* BASICS */
+/**********/
+ul, ol {
+	list-style: none;
+	padding-left: 0 !important;
+}
+.greek_banner {
+	background-color: #000000;
+	background-image: url("data:image/svg+xml,%3Csvg width='32' height='64' viewBox='0 0 32 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 28h20V16h-4v8H4V4h28v28h-4V8H8v12h4v-8h12v20H0v-4zm12 8h20v4H16v24H0v-4h12V36zm16 12h-4v12h8v4H20V44h12v12h-4v-8zM0 36h8v20H0v-4h4V40H0v-4z' fill='%23f98400' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E");
+	position: absolute;
+	height: 36px;
+	width: 100%;
+}
+.greek_banner.top { top: 0;	}
+.greek_banner.bottom { bottom: 0; }
+
+#ui > .button.left {
+	position: absolute;
+	top: 40px;
+	left: 5px;
+}
+#ui > .button.right {
+	position: absolute;
+	top: 40px;
+	right: 5px;
+}
+.ui.sidebar, #ui {
+	position: absolute !important;
 	overflow: hidden;
 }
+#ui {
+	pointer-events: none;
+}
+.ui {
+	pointer-events: all;
+}
+
+
+/************/
+/* SIDEBARS */
+/************/
 #ui_ships {
 	width: 200px;
 	height: 600px;
@@ -16,23 +55,12 @@
 #ui_ships h3 {
 	text-align: center;
 }
-dt {}
-dd {}
-#ship-ui {
-	xpadding-left: 0 !important;
-	xpadding-right: 0 !important;
+.ship_stats {
+	overflow: hidden;
 }
-
-.avatar {
-	width: 72px;
-	height: 72px;
-	border-radius: 3px;
-	border: 1px solid black;
-}
-
-ul, ol {
-	list-style: none;
-	padding-left: 0 !important;
+.upgrades {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr
 }
 .crew {
 	display: grid;
@@ -43,52 +71,14 @@ ul, ol {
 	width: 50px;
 	height: 50px;
 }
-.avatar.gold {
-	border: 2px solid gold;
-}
-
-.greek_banner {
-	background-color: #000000;
-	background-image: url("data:image/svg+xml,%3Csvg width='32' height='64' viewBox='0 0 32 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 28h20V16h-4v8H4V4h28v28h-4V8H8v12h4v-8h12v20H0v-4zm12 8h20v4H16v24H0v-4h12V36zm16 12h-4v12h8v4H20V44h12v12h-4v-8zM0 36h8v20H0v-4h4V40H0v-4z' fill='%23f98400' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E");
-	position: absolute;
-	height: 36px;
-	width: 100%;
-}
-.greek_banner.top { top: 0;	}
-.greek_banner.bottom { bottom: 0; }
-
-/* Semantic UI overrides */
-.ui.sidebar, #ui {
-	position: absolute !important;
-	overflow: hidden;
-}
-.modal {
-	top: 40px !important;
-	margin-top: 20px !important;
-}
-.ui.modal > .header,
-.ui.modal > .actions {
-	text-align: center !important;
-}
-.modal img {
-	max-width: 200px;
-	max-height: 200px;
-}
-#ui {
-	pointer-events: none;
-}
-.ui {
-	pointer-events: all;
-}
-
-.or {
-	margin-top: 0.5em !important;
-	z-index: 20 !important;
-}
 .avatar {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	xwidth: 72px;
+	xheight: 72px;
+	xborder-radius: 3px;
+	border: 1px solid black;
 }
 .ui.avatar.image {
     margin-right: 0.25em;
@@ -96,26 +86,26 @@ ul, ol {
     width: 2.7em !important;
     height: 2.7em !important;
 }
-#ui > .button.left {
-	position: absolute;
-	top: 40px;
-	left: 5px;
+.avatar.gold {
+	border: 2px solid gold;
 }
-#ui > .button.right {
-	position: absolute;
-	top: 40px;
-	right: 5px;
-}
-
 #trophies-ui, #gods-ui {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 }
+
+
+/*********/
+/* ITEMS */
+/*********/
 .gameitem {
 	background: url(../img/items.png) no-repeat;
 	display: block;
 	height: 32px;
 	width: 32px;
+}
+.supplies i {
+	float: left;
 }
 .ring-of-gyges	{ background-position: 0px 0px; }
 .philosophers-stone { background-position: -32px 0px; }
@@ -150,17 +140,33 @@ ul, ol {
 .fishing-net	{ background-position: -192px -96px; }
 .ship-oars		{ background-position: -224px -96px; }
 
-.upgrades {
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr
-}
-.supplies i {
-	float: left;
-}
 
+/**********/
+/* MODALS */
+/**********/
+.modal {
+	top: 40px !important;
+	margin-top: 20px !important;
+}
+.ui.modal > .header,
+.ui.modal > .actions {
+	text-align: center !important;
+}
+.modal img {
+	max-width: 200px;
+	max-height: 200px;
+}
 .town, .monster {
 	color: red;
 }
+.modal .content {
+	font-size: 1.5rem !important;
+}
+.or {
+	margin-top: 0.5em !important;
+	z-index: 20 !important;
+}
+
 
 /*************/
 /* GOD FACES */

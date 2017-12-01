@@ -177,7 +177,7 @@ class Town {	// eslint-disable-line
 		this.sailors = 2;	// available on demand or quota'd?
 		this.buying = [];
 		this.selling = [];
-		this.status = "atPeace";	// must start atWar
+		this.status = "";	// must start atWar
 		this.peaceEvent = null;
 		this.warEvent = null;
 		this.visited = false;
@@ -281,7 +281,7 @@ class Town {	// eslint-disable-line
 		return;
 	}
 
-	tradeWith() {
+	offerTrade() {
 		this.inventTrades();	// populates this.buying, this.selling
 		// Pop up trading interface:
 		ui.modals.traderCard(this.buying, this.selling);
@@ -291,6 +291,7 @@ class Town {	// eslint-disable-line
 		var recruits = [];
 		while (num > 0) {
 			recruits.push(new Sailor());
+			num--;
 		}
 		// Pop up recruitment interface:
 		ui.modals.recruitmentCard(recruits);
@@ -300,35 +301,11 @@ class Town {	// eslint-disable-line
 		this.visited = true;
 		// When you visit, things can happen conditionally in this order:
 		if (this.status === 'atWar') this.underAttack();
-		else if (this.status === 'atPeace') this.peaceTimeEvent();	// TODO: define another state?
-		else if (player.ships[0].crew.length < 5) this.offerRecruits(3);
-		else if (Math.random() > 0.5) this.tradeWith();
+		else if (this.status === 'atPeace') this.peaceTimeEvent();
+		else if (player.ships[0].crew.length < 8) this.offerRecruits(2 + Math.floor(3 * Math.random()));
+		else if (Math.random() > 0.5) this.offerTrade();
 		else {
 			// Do nothing
 		}
-	}
-}
-
-// FIXME: not used, just getting static object from gameText
-class Enemy {	// eslint-disable-line
-	constructor(params) {
-		this.name = params.name;
-		this.desc = params.desc;
-		this.img = params.img;
-		this.attack = params.attack;
-		this.health = params.health;
-		this.bravery = params.bravery;
-		this.strength = params.strength;
-		this.weakness = params.weakness;
-		console.log(this);
-		return this;
-	}
-
-	renderCard() {
-
-	}
-
-	die() {
-
 	}
 }
