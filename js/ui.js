@@ -3,9 +3,17 @@
 function capitalise(word) {
 	return word[0].toUpperCase() + word.substr(1);
 }
-console.log(capitalise('bloo'));
 
 var ui = {
+	// Full re-render of all sidebar panels
+	updateSidebars: function() {
+		ui.renderShipInfo(0);
+		ui.renderYear();
+		ui.renderGold();
+		ui.renderTrophies();
+		ui.renderGods();
+	},
+
 	// Render a ship's stats in left sidebar
 	renderShipInfo: function(sid) {
 		var s = player.ships[sid];

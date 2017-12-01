@@ -1,4 +1,4 @@
-/* global d3, makeName, PriorityQueue, seaLevel */
+/* global d3, makeName, seaLevel */
 
 "use strict";
 
@@ -41,6 +41,7 @@ var defaultExtent = {
 	height: 0.75
 };
 
+// Future TODO?
 class Points {
 	constructor(extent) {
 		this.points = [];
@@ -245,8 +246,8 @@ function isnearedge(mesh, i) {
 function neighbours(mesh, i) {
 	var onbs = mesh.adj[i];		// ?
 	var nbs = [];				// neighbours
-	for (var i = 0; i < onbs.length; i++) {
-		nbs.push(onbs[i]);
+	for (var j = 0; j < onbs.length; j++) {
+		nbs.push(onbs[j]);
 	}
 	return nbs;	// why not just return onbs?
 }
@@ -396,7 +397,7 @@ function add() {
 function mountains(mesh, n, rad) {
 	rad = rad || 0.05;
 	var mountains = [];
-	for (var i = 0; i < n; i++) {
+	for (var q = 0; q < n; q++) {
 		mountains.push([mesh.extent.width * (Math.random() - 0.5), mesh.extent.height * (Math.random() - 0.5)]);
 	}
 	var newvals = zero(mesh);
@@ -684,7 +685,7 @@ function coastEdges(h, seaLevel) {
 			edges.push([e[2], e[3]]);
 		}
 	}
-	console.log('coastEdges for SL', seaLevel, edges);
+	//console.log('coastEdges for SL', seaLevel, edges);
 	return edges;
 }
 
@@ -903,15 +904,6 @@ function visualizePoints(svg, points, showDebugText = false) {
 	groups.exit().remove();
 }
 
-// Colour the svg circles according to height:
-function colorizePoints(svg, h) {
-	svg.selectAll('circle')
-	.data(h)
-	.style('fill', function(d) {
-		return d3.interpolateViridis(d);
-	});
-}
-
 // Plot a circle at the centroid of each Voronoi cell / vertices of the Delaunay triangles
 function visualizeCentroids(svg, h, lo, hi) {
 	if (hi === undefined) hi = d3.max(h) + 1e-9;
@@ -1012,7 +1004,7 @@ function visualizeTriangles(svg, h, lo, hi, showDebugText = false) {
 	var mappedvals = h.map(function(x) {
 		return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo);
 	});
-	console.log('vT', h.length, h.mesh);
+	//console.log('vT', h.length, h.mesh);
 
 	// Remove group if present:
 	svg.select("g#triangles").remove();
@@ -1061,7 +1053,7 @@ function visualizeTriangles(svg, h, lo, hi, showDebugText = false) {
 			console.log('index', i, 'height', mappedvals[i]);
 		});
 
-	console.log('vT', d3.max(mappedvals), d3.min(mappedvals), mappedvals.length);
+	//console.log('vT', d3.max(mappedvals), d3.min(mappedvals), mappedvals.length);
 }
 
 // Draw rivers:
@@ -1151,6 +1143,18 @@ function visualizeBorders(h, cities, n) {
 }
 */
 
+// Use downhill flow graph to find a sea triangle near a land city:
+function downToTheSea(tri, render) {
+	//console.log('dtts', tri);
+	while (render.h[tri] >= seaLevel) {
+		// Move to downhill neighbour if possible:
+		if (render.h.downhill[tri] === -1) break;
+		tri = render.h.downhill[tri];
+		//console.log('dtts ->', tri);
+	}
+	return tri;
+}
+
 // Calculate city viability score for each point in the mesh:
 function cityScores(h, cities) {
 	var scores = map(getFlux(h), Math.sqrt);
@@ -1178,19 +1182,19 @@ function cityScores(h, cities) {
 
 // Find the best location for the next city to be added:
 // Pass in Town object so as to attach name to be rendered
-function placeCity(render, t) {
+function placeCity(render, t, debug) {
 	render.cities = render.cities || [];
 	var mesh = render.h.mesh;
 	// Recalculate city scores:
 	var scores = cityScores(render.h, render.cities);
 	// Get highest score:
 	var cityIndex = d3.scan(scores, d3.descending);
-	console.log('cityIndex', cityIndex);
+	//console.log('cityIndex', cityIndex);
 
 	var portTri = downToTheSea(cityIndex, render);
 
 	var cityCoords = mesh.vxs[cityIndex];
-	console.log('cC', cityCoords);
+	//console.log('cC', cityCoords);
 
 	render.cities.push({
 		coords: cityCoords,
@@ -1198,7 +1202,7 @@ function placeCity(render, t) {
 		name: t.name,
 		nearSea: portTri
 	});
-	console.log(render.cities);
+	if (debug) console.log(render.cities);
 
 	return cityIndex;
 }
@@ -1510,8 +1514,8 @@ function drawLabels(svg, render) {
 	//drawRegionLabels();
 }
 
-// Render the map:
-function drawMap(svg, render) {
+// Render the map: //NOTE I have another drawMap function in islands.js -> renamed
+function _drawMap(svg, render) {
 	render.rivers = getRivers(render.h, 0.01);
 	render.coasts = contour(render.h, 0);
 	drawPaths(svg, 'river', render.rivers);
@@ -1535,7 +1539,7 @@ function doMap(svg, params) {
 	svg.selectAll().remove();
 	render.h = params.generator(params);
 	placeCities(render);
-	drawMap(svg, render);
+	_drawMap(svg, render);
 }
 
 var defaultParams = {
@@ -1548,6 +1552,5 @@ var defaultParams = {
 		region: 40,
 		city: 25,
 		town: 20
-	},
-	colours: []	// specify my own here?
+	}
 };

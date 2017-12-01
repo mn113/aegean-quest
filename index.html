@@ -98,81 +98,13 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js"></script>
 	<script src="js/adamhooper/priority-queue.min.js"></script>
 	<script src="js/julianbrowne/ShortestPathCalculator.js"></script>
-	<script src="js/julianbrowne/ShortestPathUtils.js"></script>
 	<script src="js/mourner/simplify.js"></script>
 	<script src="js/mewo2/terrain.js"></script>
-	<script src="js/mewo2/terraincontrols.js"></script>
-	<script src="js/islands.js"></script>
 	<script src="js/classes.js"></script>
+	<script src="js/islands.js"></script>
 	<script src="js/ui.js"></script>
 	<script src="js/game.js"></script>
 	<script type="text/javascript">
-/*
-		var FizzyText = function() {
-			this.shipName = player.ships[0].name;
-			this.poseidon = 0.8;
-			this.uranus = -1.5;
-			this.demeter = 0;
-			this.newTown = function() {		// ok
-				var t = new Town();
-				towns.push(t);
-				console.log(t);
-			};
-			this.newShip = function() {
-				players.ships.push(new Ship());
-				// re-render sidebar
-			};
-			this.newSailor = function() {
-				var currentShip = player.ships[0];
-				currentShip.addCrew(new Sailor());
-				ui.renderShip(currentShip);
-			};
-			this.showHidePoints = function() {
-				$("#visualizedPoints").toggle();	// ok
-			};
-			this.toggleSidebar = function() {
-				$('.ui.labeled.icon.sidebar').sidebar('toggle');
-			};
-			this.visitTown = function() {
-				towns[0].peaceTimeEvent();
-			};
-			this.visitSea = function() {
-				ui.makeModal(seaEvent());
-			};
-			this.insufficient = function() {
-				ui.renderPopup({
-					title: "Sorry",
-					content: "You don't have sufficient men to sail. You should hire more men.",
-					buttons: {no: "OK"}
-				});
-			}
-			this.godlike = function() {
-				ui.godReaction("Uranus", 1);
-			};
-		};
-
-		window.onload = function() {
-			var text = new FizzyText();
-			var gui = new dat.GUI();
-			gui.add(text, 'shipName');
-			var f1 = gui.addFolder('Gods');
-			f1.add(text, 'poseidon', -5, 5);	// range
-			f1.add(text, 'uranus', -5, 5);		// range
-			f1.add(text, 'demeter', -5, 5);		// range
-			var f2 = gui.addFolder('Functions');
-			f2.add(text, 'newTown');	// button
-			f2.add(text, 'newShip');	// button
-			f2.add(text, 'newSailor');	// button
-			f2.add(text, 'visitTown');	// button
-			f2.add(text, 'visitSea');	// button
-			f2.add(text, 'insufficient'); // button
-			f2.add(text, 'godlike'); // button
-			var f3 = gui.addFolder('UI');
-			f3.add(text, 'showHidePoints');	// button
-			f3.add(text, 'toggleSidebar');	// button
-			gui.close();
-		};
-*/
 		// Semantic UI:
 		// Sidebars:
 		$('.ui.sidebar').sidebar({
@@ -193,7 +125,6 @@
 		$('.upgrades i').popup();
 		$('#trophies-ui a').popup();
 		$('#gods-ui div').popup();
-
 	</script>
 </body>
 <html>

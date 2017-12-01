@@ -208,7 +208,7 @@ ShortestPathCalculator.prototype.drawGraph = function(elementId, width, height) 
 	.attr("class", "node")
 	.attr("cx", function(d) { return d.x; })
 	.attr("cy", function(d) { return d.y; })
-	.attr("r",  function(d) { return 15; });
+	.attr("r",  function() { return 15; });
 
 	this.graph.svg.append("svg:g")
 	.selectAll("text")
@@ -268,10 +268,10 @@ ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 		cameFrom     = new Array(nodeCount);
 
 	// initialise data placeholders
-	for(var i=0; i<nodeCount; i++) {
-		shortestPath[i] = infinity;
-		cameFrom[i]=null;
-		nodeChecked[i]=false;
+	for(var h=0; h<nodeCount; h++) {
+		shortestPath[h] = infinity;
+		cameFrom[h]=null;
+		nodeChecked[h]=false;
 	}
 
 	shortestPath[start]=0;
@@ -297,7 +297,7 @@ ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 		// Find next closest node:
 		for(var k=0; k<nodeCount; k++) {
 			if (!nodeChecked[k]){
-				var nextDistance = distanceBetween(closestNode, k, this.distances);
+				var nextDistance = distanceBetween(closestNode, k, this.distances);	// eslint-disable-line no-undef
 
 				if ((parseInt(shortestPath[closestNode]) + parseInt(nextDistance)) < parseInt(shortestPath[k])){
 					var soFar = parseInt(shortestPath[closestNode]);

@@ -23,7 +23,7 @@ String.prototype.hashCode = function(){
 	return hash;
 };
 
-class Ship {
+class Ship {	// eslint-disable-line
 	constructor() {
 		this.name = gameText.shipNames.random();
 		this.type = "Bireme";
@@ -121,7 +121,7 @@ class Ship {
 class Sailor {
 	constructor() {
 		this.name = gameText.mensNames.random();
-		this.origin = gameText.placeNames.list.random();
+		this.origin = gameText.places.list.random();
 		this.avatarSeed = this.pickAvatarSeed();
 		this.skills = this.pickSkills();
 		this.age = 18 + Math.floor(30 * Math.random());
@@ -168,9 +168,9 @@ class Sailor {
 	}
 }
 
-class Town {
+class Town {	// eslint-disable-line
 	constructor(ptIndex, x,y) {
-		this.name = gameText.places.random();
+		this.name = gameText.places.list.random();
 		this.ptIndex = ptIndex;
 		this.location = {x: x, y: y};	// TODO lookup x & y
 		this.size = 5;
@@ -309,7 +309,8 @@ class Town {
 	}
 }
 
-class Enemy {	// FIXME: not used, just getting static object from gameText
+// FIXME: not used, just getting static object from gameText
+class Enemy {	// eslint-disable-line
 	constructor(params) {
 		this.name = params.name;
 		this.desc = params.desc;
@@ -331,6 +332,3 @@ class Enemy {	// FIXME: not used, just getting static object from gameText
 
 	}
 }
-
-// Suppress linter errors:
-console.log(Ship, Town, Enemy);

@@ -11,7 +11,7 @@ var player = {
 	// 12 turns = 1 year
 	turns: 0,		// change game salt every 15 minutes or every 10 turns?
 	gold: 100,
-	trophies: [],
+	trophies: gameText.trophies,
 	godFavours: {
 		poseidon: -4,
 		uranus: -3,
@@ -29,7 +29,6 @@ var man4 = new Sailor();
 var man5 = new Sailor();
 var man6 = new Sailor();
 console.log(man1);
-
 player.ships[0].addCrew([man1, man2, man3, man4, man5, man6]);
 
 function combat(sailors, enemy) {
@@ -78,32 +77,18 @@ function combat(sailors, enemy) {
 	// Both combatants cannot be dead
 }
 
-// Test combat:
-//var mEvent = gameText.monsterEvents.random();
-//var m = new Enemy(mEvent);
-//var res = combat(player.ships[0].crew, m);	// ok
-
 function endTurn() {
 	player.turns += 1;
 	if (player.turns % 12 === 0) {
 		player.year--;
 		ui.popups.salary();
 	}
-	updateSidebars();
+	ui.updateSidebars();
 }
 
-player.trophies = gameText.trophies;
-
-function updateSidebars() {
-	ui.renderShipInfo(0);
-	ui.renderYear();
-	ui.renderGold();
-	ui.renderTrophies();
-	ui.renderGods();
-}
-updateSidebars();
-
-// Choose a year from 800-600 BC:
 function makeYear() {
+	// Choose a year from 800-600 BC:
 	return 700 + Math.floor(100 * Math.random());
 }
+
+ui.updateSidebars();
