@@ -1,11 +1,5 @@
 /* global gameText, Ship, Sailor, ui */
 
-// Seeding
-function reSalt() {
-	return new Date().getHours() % 4;
-}
-var salt = reSalt();	// changes every 15 minutes provided reSalt called regularly
-
 var player = {
 	ships: [new Ship()],
 	gametime: 0,	// TODO: timer

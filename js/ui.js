@@ -103,11 +103,13 @@ var ui = {
 	// Render the gods faces display in right sidebar
 	renderGods: function() {
 		var godsHtml = "";
-		for (var godName of Object.keys(player.godFavours)) {
-			var score = player.godFavours[godName],
+		for (var god of gameText.gods) {
+			var score = player.godFavours[god.name.toLowerCase()],
 				scoreClass = "score"+Math.floor(score);
-			godsHtml += `<div class="god ${godName} ${scoreClass}"
-							data-title="${capitalise(godName)}"
+
+			godsHtml += `<div class="god ${god.name.toLowerCase()} ${scoreClass}"
+							data-title="${god.name}"
+							data-content="${god.desc}"
 							data-score="${score}">
 							</div>`;
 		}
@@ -218,13 +220,20 @@ var ui = {
 		// Results of combat info
 		postCombatCard: function(monster, result) {
 			var params = {};
-			if (result.code === 2) {
+
+			if (result.code > 0) {
 				params.title = "Victory!";
-				params.content = `Your men proved valiant enough to slay the ${monster.name}.`;		// FIXME plurals
-			}
-			else if (result.code === 1) {
-				params.title = "Victory!";
-				params.content = `The ${monster.name} ran away when the going got tough.`;
+				params.content = (result.code > 1) ?
+					`Your men proved valiant enough to slay the ${monster.name}.` :
+					`The ${monster.name} ran away when the going got tough.`;	// FIXME plurals
+				params.buttons = {yes: "Continue"};
+				// Wire up button:
+				params.callback1 = function() {
+					setTimeout(function() {
+						gainTrophy();
+					}, 750);
+					return false;
+				};
 			}
 			else if (result.code === 0) {
 				params.title = "Defeated.";
@@ -233,9 +242,10 @@ var ui = {
 					<h4>The following men were lost in the battle:</h4>
 					${result.losses.map(s => s.renderAvatar('dead')).join("")}
 				`;	// FIXME
+				params.buttons = {no: "Continue"};
+				params.callback2 = () => false; // Simply dismiss
 			}
 
-			params.buttons = {no: "Continue"};
 			ui.renderModalCard(params);
 		},
 
@@ -305,21 +315,27 @@ var ui = {
 			var params = {
 				heading: "Recruitment",
 				desc: "Some local talent is available for hire.",
-				buttons: {
-					no: "Done"
-				}
+				content: ui.sailorPicker(sailors),
+				buttons: {no: "Done"},
+				callback2: () => false	// Simply dismiss
 			};
-			params.content = ui.sailorPicker(sailors);
-			params.callback2 = () => false;		// Dismiss card
 
 			ui.renderModalCard(params);
 		},
 
 		// Further info popup
-		trophyInfoCard: function(trophyClassName) {
-			var params = gameText.trophies.filter(t => t.className === trophyClassName)[0];
-			params.buttons = {yes: "OK"};
+		trophyInfoCard: function(trophy) {
+			var link = `<a href="${trophy.url}" target="_blank">Learn more...</a>`;
+			var params = {
+				heading: "Trophy Achieved!",
+				img: trophy.img,
+				desc: `For your recent accomplishment, you were awarded the ${trophy.name}.`,
+				content: trophy.text + "<br><br>" + link,
+				buttons: {yes: "OK"},
+				callback1: () => false	// Simply dismiss
+			};
 			ui.renderModalCard(params);
+			ui.renderTrophies();
 		},
 
 		// Further info popup
@@ -332,7 +348,7 @@ var ui = {
 	},
 
 	popups: {
-		// Brief message popup, 2 buttons
+		// Brief message popup, 1 button
 		godReactionPopup: function(god, delta) {
 			ui.renderPopup({
 				heading: "The Oracle says...",
@@ -356,11 +372,24 @@ var ui = {
 			});
 			// Also update data:
 			if (gift === "gold") player.gold += quantity;
-			else player.supplies[gift] += quantity;
+			else player.ships[0].supplies[gift] += quantity;
 			ui.renderShipInfo();
 		},
 
-		// Game over info, win/loss
+		// Fishing haul popup, 1 button
+		fishPopup: function(quantity) {
+			ui.renderPopup({
+				heading: "A helping hand from Poseidon",
+				content: `You caught ${quantity} crates of fish <i class="gameitem fish"></i>`,
+				buttons: {yes: "OK"},
+				callback1: () => false	// Simply dismiss
+			});
+			// Also update data:
+			player.ships[0].supplies.fish += quantity;
+			ui.renderShipInfo();
+		},
+
+		// Game over info, win/loss, 1 button
 		gameOverPopup: function(type) {
 			var params = {
 				heading: "Game Over!",
@@ -412,4 +441,12 @@ function hire(i) {
 	ui.renderShipInfo();
 	// Remove card:
 	$(`.modal .card[data-rid="${i}"]`).remove();
+}
+
+function gainTrophy() {
+	// Select one randomly which we don't yet have:
+	var newTrophy = gameText.trophies.filter(t => !player.trophies.includes(t)).random();
+	console.log(newTrophy);
+	player.trophies.push(newTrophy);
+	ui.modals.trophyInfoCard(newTrophy);
 }

@@ -23,6 +23,12 @@ String.prototype.hashCode = function(){
 	return hash;
 };
 
+// Seeding
+function reSalt() {
+	return new Date().getHours() % 4;
+}
+var salt = reSalt();	// changes every 15 minutes provided reSalt called regularly
+
 class Ship {	// eslint-disable-line
 	constructor() {
 		this.name = gameText.shipNames.random();
@@ -177,7 +183,7 @@ class Town {	// eslint-disable-line
 		this.sailors = 2;	// available on demand or quota'd?
 		this.buying = [];
 		this.selling = [];
-		this.status = "";	// must start atWar
+		this.status = "atPeace";	// must start atWar
 		this.peaceEvent = null;
 		this.warEvent = null;
 		this.visited = false;
@@ -190,8 +196,9 @@ class Town {	// eslint-disable-line
 			var seed = (this.name + salt) & gameText.peaceTimeEvents.length;
 			var event = gameText.peaceTimeEvents[seed];
 			event.heading = `The townsfolk of <span class="town">${this.name}</span>
-			invite you to a ${event.title}.`;
-			event.desc = "";
+			invite you to ${event.article} ${event.title}.`;
+			event.link = `<a href="${event.url}" target="_blank">Learn more...</a>`;
+			event.desc = event.desc + "<br><br>" + event.link;
 			event.content = "";
 			event.extra = "";
 			event.buttons = {
@@ -199,18 +206,26 @@ class Town {	// eslint-disable-line
 				no: "Decline"
 			};
 			// Specify callbacks for event's action buttons:
+			// Accept: reward
 			event.callback1 = function() {
-				var gift = ["gold", "wine", "chicken", "fish"].random(),
-					quantity = 20 + Math.floor(30 * Math.random());
-				ui.popups.giftPopup(gift, quantity, "the townspeople");
-			};
+				var gift = event.reward.types.random(),
+					range = event.reward.max - event.reward.max,
+					quantity = event.reward.min + Math.floor(range * Math.random());
+				ui.popups.giftPopup(gift, quantity, `the townspeople of ${this.name}`);
+			}.bind(this);	// 2nd param becomes 1st when fn called
+
+			// Decline: godReaction
 			event.callback2 = function() {
 				var god = gameText.gods.random(),
 					delta = -0.5;
-				ui.popups.godReactionPopup(god, delta);
+				ui.popups.godReactionPopup(god.name, delta);
 			};
+
+			// Store event as property of city:
+			this.peaceEvent = event;
 		}
 		else {
+			// Fully-populated event already stored as property:
 			event = this.peaceEvent;
 		}
 		ui.renderModalCard(event);
@@ -233,21 +248,27 @@ class Town {	// eslint-disable-line
 				no: "Flee"
 			};
 			// Specify callbacks for event's action buttons:
+			// Fight: pre-combat
 			event.callback1 = function() {
 				ui.modals.preCombatCard(event);
 			};
+			// Flee: godReaction
 			event.callback2 = function() {
 				var god = gameText.gods.random(),
 					delta = -0.5;
-				ui.popups.godReactionPopup(god, delta);
+				ui.popups.godReactionPopup(god.name, delta);
 				ui.renderPopup({
 					heading: "Your men fled back to the ship.",
 					content: `${event.name} continues to harrass ${this.name}.`,
 					buttons: {yes: "OK"}
 				});
 			}.bind(this);
+
+			// Store event as property of city:
+			this.warEvent = event;
 		}
 		else {
+			// Fully-populated event already stored as property:
 			event = this.warEvent;
 		}
 		ui.renderModalCard(event);

@@ -13,9 +13,11 @@ var gameText = {
 
 	"peaceTimeEvents": [
 		{
-			"name": "Grape Harvest",
-			"img": "",
-			"desc": "",
+			"article": "the",
+			"title": "Grape Harvest",
+			"img": "img/events-250px/grapeharvest.jpg",
+			"desc": "The ancient Greeks pioneered new methods of viticulture and wine production that they shared with early winemaking communities through trade and colonization. When grapes were ready for crushing, wicker baskets filled with grapes were placed inside wooden or earthenware vats with a rope or plank above. Vineyard workers grasped the rope for balance to crush the grapes with their feet, occasionally to the accompaniment of a flute played in a festive manner. After crushing, the grapes were placed in large pithoi, jars where fermentation took place.",
+			"url": "https://en.wikipedia.org/wiki/Ancient_Greece_and_wine",
 			"reward": {
 				"types": ["wine"],
 				"min": 20,
@@ -23,19 +25,23 @@ var gameText = {
 			}
 		},
 		{
-			"name": "Party",
-			"img": "",
-			"desc": "",
+			"article": "a",
+			"title": "Festival",
+			"img": "img/events-250px/festival.jpg",
+			"desc": "Anthesteria (Greek: Ἀνθεστήρια) was one of the four Athenian festivals in honor of Dionysus. It was held each year from the 11th to the 13th of the month of Anthesterion. It celebrated the beginning of spring, particularly the maturing of the wine stored at the previous vintage. During the feast, social order was interrupted or inverted, the slaves being allowed to participate, uniting the household in ancient fashion.",
+			"url": "https://en.wikipedia.org/wiki/Anthesteria",
 			"reward": {
-				"types": ["bread", "chicken"],
+				"types": ["wine", "chicken"],
 				"min": 10,
 				"max": 25
 			}
 		},
 		{
-			"name": "Building Work",
-			"img": "",
-			"desc": "",
+			"article": "help with",
+			"title": "Building Work",
+			"img": "img/events-250px/architecture.jpg",
+			"desc": "The Ancient Greeks were excellent architects, draughtsmen and builders. Their most freely available building material was stone. There was an abundance of high quality white marble both on the mainland and islands, particularly Paros and Naxos. This finely grained material was a major contributing factor to precision of detail, both architectural and sculptural, that adorned ancient Greek architecture. A helping hand on the construction site is likely to be well-rewarded.",
+			"url": "https://en.wikipedia.org/wiki/Ancient_Greek_architecture",
 			"reward": {
 				"types": ["gold", "wine"],
 				"min": 40,
@@ -43,29 +49,34 @@ var gameText = {
 			}
 		},
 		{
-			"name": "Mining",
-			"img": "",
-			"desc": "",
+			"article": "help with",
+			"title": "Mining",
+			"img": "img/events-250px/mining.jpg",
+			"desc": "Mining in Europe has a very long history. Examples include the silver mines of Laurium, which helped support the Greek city state of Athens. At other mines, such as on the island of Thassos, marble was quarried by the Parians after they arrived in the 7th Century BC. The marble was shipped away and was later found by archaeologists to have been used in buildings including the tomb of Amphipolis. Gold mines in Thrace were later used for minting coinage, eventually producing 26 tons per year.",
+			"url": "https://en.wikipedia.org/wiki/Mining#Ancient_Greek_and_Roman_mining",
 			"reward": {
 				"types": ["gold"],
-				"min": 20,
+				"min": 25,
 				"max": 90
 			}
 		},
 		{
-			"name": "Fishing lesson",
-			"img": "",
-			"desc": "",
+			"article": "a",
+			"name": "Fishing Lesson",
+			"img": "img/events-250px/fishing.jpg",
+			"desc": "The locals here are renowned for their fishing skill and bountiful waters. They have offered to give you a guided tour of the bay. About 180 AD the Greek author Oppian wrote the Halieutica, a didactic poem about fishing. He described various means of fishing including the use of nets cast from boats, scoop nets held open by a hoop, and various traps 'which work while their masters sleep'.",
 			"reward": {
 				"types": ["fish"],
-				"min": 15,
-				"max": 35
+				"min": 30,
+				"max": 50
 			}
 		},
 		{
-			"name": "Religious festival",
-			"img": "",
-			"desc": "",
+			"article": "a",
+			"title": "Religious Festival",
+			"img": "img/events-250px/sacrifice.jpg",
+			"desc": "Religious festivals and ceremonies were commonplace in Ancient Greece and varied according to local tradition. Worship typically consisted of sacrificing domestic animals at the altar with hymn and prayer. Parts of the animal were then burned for the gods; the worshippers would eat the rest. The locals probably want to thank a god or gain favour from them.",
+			"url": "https://en.wikipedia.org/wiki/Religion_in_ancient_Greece",
 			"reward": {
 				"types": ["bread", "wine"],
 				"min": 20,
@@ -73,11 +84,13 @@ var gameText = {
 			}
 		},
 		{
-			"name": "Athletic Games",
-			"img": "",
-			"desc": "",
+			"article": "the",
+			"title": "Athletic Games",
+			"img": "img/events-250px/athletics.jpg",
+			"desc": "Athletic Games were an important event in Ancient Greek culture; a festival and celebration of and for the Gods, and a chance for all comers to prove their athletic prowess over their rivals in disciplines such as running, wresting, chariot racing and javelin throwing. To be invited to participate is a great honour.",
+			"url": "https://en.wikipedia.org/wiki/Panhellenic_Games",
 			"reward": {
-				"types": ["gold", "wine"],
+				"types": ["bread", "wine"],
 				"min": 10,
 				"max": 20
 			}
@@ -400,95 +413,110 @@ var gameText = {
 			"name": "Golden Fleece",
 			"className": "golden-fleece",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Ring of Gyges",
 			"className": "ring-of-gyges",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Wing of Icarus",
 			"className": "wing-of-icarus",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Dragon's Teeth",
 			"className": "dragons-teeth",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Rod of Asclepius",
 			"className": "asclepius-rod",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Philosopher's Stone",
 			"className": "philosophers-stone",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Winnowing Oar",
 			"className": "chicken",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Sword of Damocles",
 			"className": "damocles-sword",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Petasos",
 			"className": "petasos",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Shield of Achilles",
 			"className": "achilles-shield",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Gorgoneion",
 			"className": "gorgoneion",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Thyrsus",
 			"className": "thyrsus",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Lotus Fruit",
 			"className": "lotus-fruit",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Baetylus",
 			"className": "baetylus",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		},
 		{
 			"name": "Harpe",
 			"className": "harpe",
 			"img": "",
-			"desc": ""
+			"text": "",
+			"url": ""
 		}
 	],
 
-	"gods": [
+	"gods": [	// Used in godInfoPopup
 		{
 			"name": "Poseidon",
 			"desc": "God of the sea",
