@@ -45,6 +45,7 @@ var ui = {
 		</div>`;
 		// Render
 		$("#ship-ui").html(html);
+		ui.makePopups();
 	},
 
 	_renderShipUpgrades: function(upgrades) {
@@ -98,6 +99,7 @@ var ui = {
 							onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
 		}
 		$("#trophies-ui").html(trophies);
+		ui.makePopups();
 	},
 
 	// Render the gods faces display in right sidebar
@@ -114,6 +116,7 @@ var ui = {
 							</div>`;
 		}
 		$("#gods-ui").html(godsHtml);
+		ui.makePopups();
 	},
 
 	// The main 2-button modal card, used for most events
@@ -432,6 +435,15 @@ var ui = {
 		}
 		html += `</div>`;
 		return html;
+	},
+
+	// Enable Semantic UI tooltips:
+	makePopups: function() {
+		$('#gamearea .ui .crew img').popup({position: "top left"});
+		$('.upgrades i').popup({position: "top left"});
+		$('#trophies-ui a').popup({position: "top right"});
+		$('#gods-ui div').popup({position: "top right"});
+
 	}
 
 };

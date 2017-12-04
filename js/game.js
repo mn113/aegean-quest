@@ -7,7 +7,7 @@ var player = {
 	// 12 turns = 1 year
 	turns: 0,		// change game salt every 15 minutes or every 10 turns?
 	gold: 100,
-	trophies: gameText.trophies,
+	trophies: [],//gameText.trophies,
 	godFavours: {
 		poseidon: 0,
 		uranus: 0,

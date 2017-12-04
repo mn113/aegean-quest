@@ -412,107 +412,107 @@ var gameText = {
 		{
 			"name": "Golden Fleece",
 			"className": "golden-fleece",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/golden-fleece.jpg",
+			"text": "The Golden Fleece (Greek: χρυσόμαλλον δέρας, chrysómallon déras) is the fleece of the gold-haired winged ram, which was held in Colchis. The fleece is a symbol of authority and kingship. It figures in the tale of the hero Jason and his crew of Argonauts, who set out on a quest for the fleece by order of King Pelias, in order to place Jason rightfully on the throne of Iolcus in Thessaly.",
+			"url": "https://en.wikipedia.org/wiki/Golden_Fleece"
 		},
 		{
 			"name": "Ring of Gyges",
 			"className": "ring-of-gyges",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/ring-of-gyges.jpg",
+			"text": "The Ring of Gyges is a mythical magical artifact mentioned by the philosopher Plato in Book 2 of his Republic. After an earthquake, a cave was revealed in a mountainside where a shepherd was feeding his flock. Entering the cave, he discovered that it was in fact a tomb containing a corpse, larger than that of a man, who wore a golden ring, which he pocketed. He discovered that the ring gave him the power to become invisible by adjusting it.",
+			"url": "https://en.wikipedia.org/wiki/Ring_of_Gyges"
 		},
 		{
 			"name": "Wing of Icarus",
 			"className": "wing-of-icarus",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/wing-of-icarus.jpg",
+			"text": "Icarus (Ancient Greek: Ἴκαρος, Íkaros) was the son of the master craftsman Daedalus, the creator of the Labyrinth. Often depicted in art, Icarus attempted to escape from Crete by means of wings that his father constructed from feathers and wax.",
+			"url": "https://en.wikipedia.org/wiki/Icarus"
 		},
 		{
 			"name": "Dragon's Teeth",
 			"className": "dragons-teeth",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/dragons-teeth.jpg",
+			"text": "Cadmus, the bringer of literacy and civilization, killed the sacred dragon that guarded the spring of Ares. The goddess Athena told him to sow the dragon's teeth, from which sprang a group of ferocious warriors called the Spartoi. The five survivors joined with Cadmus to found the city of Thebes.",
+			"url": "https://en.wikipedia.org/wiki/Dragon%27s_teeth_(mythology)"
 		},
 		{
 			"name": "Rod of Asclepius",
 			"className": "asclepius-rod",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/rod-of-asclepius.jpg",
+			"text": "The Rod of Asclepius takes its name from the god Asclepius, a deity associated with healing and medicinal arts in Greek mythology. Asclepius' attributes, the snake and the staff, sometimes depicted separately in antiquity, are combined in this symbol. A famous healing temple (or asclepeion) was located on the island of Kos, where Hippocrates, the legendary 'father of medicine', may have begun his career.",
+			"url": "https://en.wikipedia.org/wiki/Rod_of_Asclepius"
 		},
 		{
 			"name": "Philosopher's Stone",
 			"className": "philosophers-stone",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/philosophers-stone.jpg",
+			"text": "The philosopher's stone is a legendary alchemical substance capable of turning base metals such as mercury into gold (chrysopoeia, from the Greek χρυσός, khrusos, 'gold', and ποιεῖν, poiēin, 'to make'). It is also called the elixir of life, useful for rejuvenation and for achieving immortality; for many centuries, it was the most sought-after goal in alchemy. The philosopher's stone was the central symbol of the mystical terminology of alchemy, symbolizing perfection at its finest, enlightenment, and heavenly bliss.",
+			"url": "https://en.wikipedia.org/wiki/Philosopher%27s_stone"
 		},
 		{
 			"name": "Winnowing Oar",
-			"className": "chicken",
-			"img": "",
-			"text": "",
-			"url": ""
+			"className": "winnowing-oar",
+			"img": "img/trophies-250px/winnowing-oar.jpg",
+			"text": "The Winnowing Oar (athereloigos - Greek ἀθηρηλοιγός) is an object that appears in  Homer's Odyssey. In the epic, Odysseus is instructed by Tiresias to take an oar from his ship and to walk inland until he finds a 'land that knows nothing of the sea', where the oar would be mistaken for a winnowing fan. At this point, he is to offer a sacrifice to Poseidon, and then at last his journeys would be over.",
+			"url": "https://en.wikipedia.org/wiki/Winnowing_Oar"
 		},
 		{
 			"name": "Sword of Damocles",
 			"className": "damocles-sword",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/sword-of-damocles.jpg",
+			"text": "According to the story, Dionysius offered to switch places with his courtier Damocles for one day. Damocles quickly and eagerly accepted the king's proposal. Damocles sat down in the king's throne surrounded by every luxury, but Dionysius arranged that a huge sword should hang above the throne, held at the pommel only by a single hair of a horse's tail. Damocles finally begged the king that he be allowed to depart because he no longer wanted to be so fortunate.",
+			"url": "https://en.wikipedia.org/wiki/Damocles"
 		},
 		{
 			"name": "Petasos",
 			"className": "petasos",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/petasos.jpg",
+			"text": "A petasos (Greek: πέτασος) is a sun hat of Thessalian origin worn by the ancient Greeks, often in combination with the chlamys cape. As a winged hat, it became the symbol of Hermes. Hermes was the emissary and messenger of the gods. He is described as moving freely between the worlds of the mortal and divine, and was the conductor of souls into the afterlife.",
+			"url": "https://en.wikipedia.org/wiki/Hermes"
 		},
 		{
 			"name": "Shield of Achilles",
 			"className": "achilles-shield",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/shield-of-achilles.jpg",
+			"text": "The Shield of Achilles is the shield that Achilles uses in his fight with Hector, famously described in a passage in Book 18, lines 478–608 of Homer's Iliad. In the poem, Achilles lends Patroclus his armor. Ultimately, Patroclus is killed in battle by Hector, and Achilles' armor is stripped from his body and taken by Hector as spoils. The loss of his best friend prompts Achilles to return to battle, so his mother Thetis, a nymph, asks the god Hephaestus to provide replacement armor for her son. He obliges, and forges a shield with spectacular decorative imagery.",
+			"url": "https://en.wikipedia.org/wiki/Shield_of_Achilles"
 		},
 		{
 			"name": "Gorgoneion",
 			"className": "gorgoneion",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/gorgoneion.jpg",
+			"text": "The Gorgoneion (Greek: Γοργόνειον) was a special apotropaic amulet showing the Gorgon head, used most famously by the Olympian deities Athena and Zeus: both are said to have worn the gorgoneion as a protective pendant. It was assumed, among other godlike attributes, as a royal aegis to imply divine birth.",
+			"url": "https://en.wikipedia.org/wiki/Gorgoneion"
 		},
 		{
 			"name": "Thyrsus",
 			"className": "thyrsus",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/thyrsus.jpg",
+			"text": "A thyrsus or thyrsos (Ancient Greek: θύρσος) was a wand or staff of giant fennel covered with ivy vines and leaves, sometimes wound with taeniae and always topped with a pine cone. The thyrsus, associated with Dionysus and his followers, is a symbol of prosperity, fertility, hedonism, and pleasure/enjoyment in general.",
+			"url": "https://en.wikipedia.org/wiki/Thyrsus"
 		},
 		{
 			"name": "Lotus Fruit",
 			"className": "lotus-fruit",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/lotus-fruit.jpg",
+			"text": "The lotus-eaters (Greek: λωτοφάγοι, lōtophagoi), were a race of people living on an island dominated by lotus plants. The lotus fruits and flowers were the primary food of the island and were a narcotic, causing the inhabitants to sleep in peaceful apathy. In the Odyssey Book IX, Odysseus encountered these people and almost lost several men to the addictive plant.",
+			"url": "https://en.wikipedia.org/wiki/Lotus-eaters"
 		},
 		{
-			"name": "Baetylus",
-			"className": "baetylus",
-			"img": "",
-			"text": "",
-			"url": ""
+			"name": "Omphalos",
+			"className": "omphalos",
+			"img": "img/trophies-250px/omphalos.jpg",
+			"text": "An omphalos is a religious stone artifact, or baetylus. In Greek, the word ὀμφαλός omphalos means 'navel'. In Greek lore, Zeus sent two eagles across the world to meet at its center, the 'navel' of the world. Omphalos stones marking the centre were erected in several places about the Mediterranean Sea; the most famous of those was at Delphi. Omphalos stones were believed to allow direct communication with the gods.",
+			"url": "https://en.wikipedia.org/wiki/Omphalos"
 		},
 		{
 			"name": "Harpe",
 			"className": "harpe",
-			"img": "",
-			"text": "",
-			"url": ""
+			"img": "img/trophies-250px/harpe.jpg",
+			"text": "The harpē (ἅρπη) was a type of sword or sickle; a sword with a sickle protrusion along one edge near the tip of the blade. The harpe sword is most notably identified as the weapon used by Cronus to castrate and depose his father, Uranus. The harpe was either a flint or adamantine (diamond) blade, and was provided to Cronus by his mother, Gaia.",
+			"url": "https://en.wikipedia.org/wiki/Harpe"
 		}
 	],
 
@@ -615,7 +615,7 @@ var gameText = {
 		},
 		{
 			"name": "Extra Oars",
-			"className": "oars",
+			"className": "ship-oars",
 			"desc": "More oars = more speed. Cut those travel times down and save on fuel."
 		},
 		{
