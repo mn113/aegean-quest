@@ -75,10 +75,11 @@ ul, ol {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	xwidth: 72px;
-	xheight: 72px;
-	xborder-radius: 3px;
+	border-radius: 3px;
 	border: 1px solid black;
+}
+.avatar.dead {
+	filter: grayscale();
 }
 .ui.avatar.image {
     margin-right: 0.25em;
@@ -166,6 +167,16 @@ ul, ol {
 .or {
 	margin-top: 0.5em !important;
 	z-index: 20 !important;
+}
+.sailor-checkbox-wrap {
+	position: relative;
+	display: inline-block;
+}
+.sailor-checkbox-wrap input {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: 10;
 }
 
 

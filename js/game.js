@@ -1,4 +1,4 @@
-/* global gameText, Ship, Sailor, ui */
+/* global $, gameText, Ship, Sailor, ui */
 
 var player = {
 	ships: [new Ship()],
@@ -24,10 +24,10 @@ var man3 = new Sailor();
 var man4 = new Sailor();
 var man5 = new Sailor();
 var man6 = new Sailor();
-console.log(man1);
 player.ships[0].addCrew([man1, man2, man3, man4, man5, man6]);
 
 function combat(sailors, enemy) {
+	console.log("Combat:", sailors, enemy);
 	var att1 = sailors.map(s => s.xp - s.age / 15).reduce((a,b) => a+b) / (sailors.length / 2);
 	var def1 = sailors.map(s => s.morale + s.age / 12).reduce((a,b) => a+b) / (sailors.length / 2);
 	var att2 = enemy.attack;
@@ -39,7 +39,7 @@ function combat(sailors, enemy) {
 
 	while (def1 > 0 && def2 > 0) {
 		// We attack:
-		var a = (att1 / 3) * (4 * Math.random() + 4) / 8;
+		var a = (att1 / 3) * (4 * Math.random() + 4) / 60;
 		console.log('a', a);
 		def2 -= a;
 		brav2 -= a / 3;
@@ -61,6 +61,10 @@ function combat(sailors, enemy) {
 		if (def1 <= 0) {
 			var lossQuota = Math.floor(Math.sqrt(sailors.length * Math.random()));
 			var lost = sailors.shuffle().slice(0,lossQuota);
+			// Remove from crew:
+			for (var s of lost) {
+				s;
+			}
 			return {
 				code: 0,
 				status: "Defeat.",
@@ -79,7 +83,7 @@ function endTurn() {
 		player.year--;
 		ui.popups.salary();
 	}
-	ui.updateSidebars();
+	ui.sidebars.updateAll();
 }
 
 function makeYear() {
@@ -87,4 +91,8 @@ function makeYear() {
 	return 700 + Math.floor(100 * Math.random());
 }
 
-ui.updateSidebars();
+ui.sidebars.updateAll();
+
+$(".sailor-checkbox-wrap :checkbox").on("click", function() {
+	$("#checkedCount").html($(".sailor-checkbox-wrap :checkbox:checked").length);
+});

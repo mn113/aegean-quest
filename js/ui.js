@@ -1,4 +1,4 @@
-/* global player, $, gameText */
+/* global player, $, gameText, combat */
 
 function capitalise(word) {
 	return word[0].toUpperCase() + word.substr(1);
@@ -7,116 +7,118 @@ function capitalise(word) {
 var recruits = [];
 
 var ui = {
-	// Full re-render of all sidebar panels
-	updateSidebars: function() {
-		ui.renderShipInfo(0);
-		ui.renderYear();
-		ui.renderGold();
-		ui.renderTrophies();
-		ui.renderGods();
-	},
 
-	// Render a ship's stats in left sidebar
-	renderShipInfo: function(sid = 0) {
-		var s = player.ships[sid];
-		var l = player.ships.length;
-		console.log(s);
-		var prev = player.ships[sid-1] % l;
-		var next = player.ships[sid+1] % l;
-		var html = `
-		<div class="ship_stats" id="ship${sid}">
-			<!--div>
-				<i class="angle double left icon" onclick="ui.renderShip(${prev})"></i>
-				<i class="angle double right icon" onclick="ui.renderShip(${next})"></i>
-			</div-->
-			<h2>“${s.name}”</h2>
-			<h3>${s.type} class</h3>
-			<p>Speed: ${s.speed}</p>
-			<div class="upgrades">
-				${ui._renderShipUpgrades(s.upgrades)}
-			</div>
-			<div class="supplies">
-				${ui._renderShipSupplies(s.supplies)}
-			</div>
-			<h4>Crew</h4>
-			<ul class="crew">
-				${ui._renderCrew(s.captain, s.crew)}
-			</ul>
-		</div>`;
-		// Render
-		$("#ship-ui").html(html);
-		ui.makePopups();
-	},
+	sidebars: {
+		// Full re-render of all sidebar panels
+		updateAll: function() {
+			ui.sidebars.renderShipInfo(0);
+			ui.sidebars.renderYear();
+			ui.sidebars.renderGold();
+			ui.sidebars.renderTrophies();
+			ui.sidebars.renderGods();
+		},
 
-	_renderShipUpgrades: function(upgrades) {
-		var html = "";
-		for (var u of upgrades) {
-			html += `<i class="gameitem ${u.className}"
-					data-title="${u.name}"
-					data-content="${u.desc}"
-					></i>`;
+		// Render a ship's stats in left sidebar
+		renderShipInfo: function(sid = 0) {
+			var s = player.ships[sid];
+			var l = player.ships.length;
+			console.log(s);
+			var prev = player.ships[sid-1] % l;
+			var next = player.ships[sid+1] % l;
+			var html = `
+			<div class="ship_stats" id="ship${sid}">
+				<!--div>
+					<i class="angle double left icon" onclick="ui.renderShip(${prev})"></i>
+					<i class="angle double right icon" onclick="ui.renderShip(${next})"></i>
+				</div-->
+				<h2>“${s.name}”</h2>
+				<h3>${s.type} class</h3>
+				<p>Speed: ${s.speed}</p>
+				<div class="upgrades">
+					${ui.sidebars._renderShipUpgrades(s.upgrades)}
+				</div>
+				<div class="supplies">
+					${ui.sidebars._renderShipSupplies(s.supplies)}
+				</div>
+				<h4>Crew</h4>
+				<ul class="crew">
+					${ui.sidebars._renderCrew(s.captain, s.crew)}
+				</ul>
+			</div>`;
+			// Render
+			$("#ship-ui").html(html);
+			ui.makePopups();
+		},
+
+		_renderShipUpgrades: function(upgrades) {
+			var html = "";
+			for (var u of upgrades) {
+				html += `<i class="gameitem ${u.className}"
+						data-title="${u.name}"
+						data-content="${u.desc}"
+						></i>`;
+			}
+			return html;
+		},
+
+		_renderShipSupplies: function(supplies) {
+			return `
+				<p><i class="gameitem bread"></i>Bread: ${supplies.bread}</p>
+				<p><i class="gameitem wine"></i>Wine: ${supplies.wine}</p>
+				<p><i class="gameitem chicken"></i>Chickens: ${supplies.chicken}</p>
+				<p><i class="gameitem fish"></i>Fish: ${supplies.fish}</p>
+			`;
+		},
+
+		// Render a list of avatars
+		_renderCrew: function(captain, sailors) {
+			var html = "<li class='avatar gold'>" + captain.renderAvatar() + "</li>";
+			sailors.filter(s => s !== captain)
+			.forEach(function(s) {
+				html += "<li class='avatar'>" + s.renderAvatar(); + "</li>";
+			});
+			return html;
+		},
+
+		renderYear: function() {
+			$("#year-ui").html(player.year + " BC");
+		},
+
+		// Render the player's gold amount in right sidebar
+		renderGold: function() {
+			var iconClass = (player.gold > 200) ? "gold-high" : (player.gold > 50) ? "gold-med" : "gold-low";
+			$("#gold-icon").removeClass("gold-high gold-med gold-low").addClass(iconClass);
+			$("#gold-ui").html(player.gold);
+		},
+
+		// Render the player's trophy icons in right sidebar
+		renderTrophies: function() {
+			var trophies = "";
+			for (var t of player.trophies) {
+				trophies += `<a class="gameitem ${t.className}"
+			 					data-title="${t.name}"
+								onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
+			}
+			$("#trophies-ui").html(trophies);
+			ui.makePopups();
+		},
+
+		// Render the gods faces display in right sidebar
+		renderGods: function() {
+			var godsHtml = "";
+			for (var god of gameText.gods) {
+				var score = player.godFavours[god.name.toLowerCase()],
+					scoreClass = "score"+Math.floor(score);
+
+				godsHtml += `<div class="god ${god.name.toLowerCase()} ${scoreClass}"
+								data-title="${god.name}"
+								data-content="${god.desc}"
+								data-score="${score}">
+								</div>`;
+			}
+			$("#gods-ui").html(godsHtml);
+			ui.makePopups();
 		}
-		return html;
-	},
-
-	_renderShipSupplies: function(supplies) {
-		return `
-			<p><i class="gameitem bread"></i>Bread: ${supplies.bread}</p>
-			<p><i class="gameitem wine"></i>Wine: ${supplies.wine}</p>
-			<p><i class="gameitem chicken"></i>Chickens: ${supplies.chicken}</p>
-			<p><i class="gameitem fish"></i>Fish: ${supplies.fish}</p>
-		`;
-	},
-
-	// Render a list of avatars
-	_renderCrew: function(captain, sailors) {
-		var html = "<li class='avatar gold'>" + captain.renderAvatar() + "</li>";
-		sailors.filter(s => s !== captain)
-		.forEach(function(s) {
-			html += "<li class='avatar'>" + s.renderAvatar(); + "</li>";
-		});
-		return html;
-	},
-
-	renderYear: function() {
-		$("#year-ui").html(player.year + " BC");
-	},
-
-	// Render the player's gold amount in right sidebar
-	renderGold: function() {
-		var iconClass = (player.gold > 200) ? "gold-high" : (player.gold > 50) ? "gold-med" : "gold-low";
-		$("#gold-icon").removeClass("gold-high gold-med gold-low").addClass(iconClass);
-		$("#gold-ui").html(player.gold);
-	},
-
-	// Render the player's trophy icons in right sidebar
-	renderTrophies: function() {
-		var trophies = "";
-		for (var t of player.trophies) {
-			trophies += `<a class="gameitem ${t.className}"
-		 					data-title="${t.name}"
-							data-content="${t.desc}"
-							onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
-		}
-		$("#trophies-ui").html(trophies);
-		ui.makePopups();
-	},
-
-	// Render the gods faces display in right sidebar
-	renderGods: function() {
-		var godsHtml = "";
-		for (var god of gameText.gods) {
-			var score = player.godFavours[god.name.toLowerCase()],
-				scoreClass = "score"+Math.floor(score);
-
-			godsHtml += `<div class="god ${god.name.toLowerCase()} ${scoreClass}"
-							data-title="${god.name}"
-							data-content="${god.desc}"
-							data-score="${score}">
-							</div>`;
-		}
-		$("#gods-ui").html(godsHtml);
-		ui.makePopups();
 	},
 
 	// The main 2-button modal card, used for most events
@@ -203,21 +205,36 @@ var ui = {
 	},
 
 	modals: {
-		// Modal container for choosing combatants	//TODO
+		// Modal container for choosing combatants:
 		preCombatCard: function(monster) {
 			var ship = player.ships[0];
 			var sailors = ship.crew.filter(s => s !== ship.captain);
 			var sailorInputs = sailors.map(s => {
-				return `<span><input type="checkbox" value="" checked>${s.renderAvatar()}</span>`;
+				return `<span class="sailor-checkbox-wrap"><input type="checkbox" value="${s.name} of ${s.origin}" checked>${s.renderAvatar()}</span>`;
 			});
-			console.log(sailorInputs);
 			var params = {
 				heading: `How many will fight ${monster.article} ${monster.name}?`,
+				img: "",
+				desc: "",
 				content: "Choose the men you will send into combat. The more warriors, the better their chances of victory - but the higher the risk.",
-				extras: sailorInputs.join("") + "<p><span>0</span> men selected</p>",
+				extra: sailorInputs.join("") + `<p><span id="checkedCount">${sailorInputs.length}</span> men selected</p>`,
 				buttons: {yes: "Fight!"}
 			};
+			params.callback1 = function() {
+				// Send the selected men to the fight:
+				var checked = $(".sailor-checkbox-wrap :checkbox:checked")
+					.map(function() {
+						return this.value;
+					}).get();
+				var chosenSailors = sailors.filter(s => checked.includes(`${s.name} of ${s.origin}`));
+				console.log(chosenSailors);
+				var outcome = combat(chosenSailors, monster);
+				setTimeout(function() {
+					ui.modals.postCombatCard(monster, outcome);
+				}, 750);
+			};
 			ui.renderModalCard(params);
+			$(".sailor-checkbox-wrap .avatar").popup();
 		},
 
 		// Results of combat info
@@ -225,10 +242,11 @@ var ui = {
 			var params = {};
 
 			if (result.code > 0) {
-				params.title = "Victory!";
-				params.content = (result.code > 1) ?
+				params.heading = "Victory!";
+				params.desc = (result.code > 1) ?
 					`Your men proved valiant enough to slay the ${monster.name}.` :
 					`The ${monster.name} ran away when the going got tough.`;	// FIXME plurals
+				params.content = "";
 				params.buttons = {yes: "Continue"};
 				// Wire up button:
 				params.callback1 = function() {
@@ -239,9 +257,10 @@ var ui = {
 				};
 			}
 			else if (result.code === 0) {
-				params.title = "Defeated.";
-				params.content = `The ${monster.name} was too strong. Your men were unable to hold it off.`;
-				params.extras = `
+				params.heading = "Defeated.";
+				params.desc = `The ${monster.name} was too strong. Your men were unable to hold it off.`;
+				params.content = "";
+				params.extra = `
 					<h4>The following men were lost in the battle:</h4>
 					${result.losses.map(s => s.renderAvatar('dead')).join("")}
 				`;	// FIXME
@@ -332,7 +351,7 @@ var ui = {
 			var params = {
 				heading: "Trophy Achieved!",
 				img: trophy.img,
-				desc: `For your recent accomplishment, you were awarded the ${trophy.name}.`,
+				desc: `For your recent accomplishment, you were awarded the <b>${trophy.name}</b>.`,
 				content: trophy.text + "<br><br>" + link,
 				buttons: {yes: "OK"},
 				callback1: () => false	// Simply dismiss
@@ -362,7 +381,7 @@ var ui = {
 			});
 			// Also update data:
 			player.godFavours[god] += delta;
-			ui.renderGods();
+			ui.sidebars.renderGods();
 		},
 
 		// Received gift popup, 1 button

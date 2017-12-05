@@ -30,13 +30,6 @@ body {
 	height: 100%;
 }
 
-.compass {
-	position: absolute;
-	bottom: 36px;
-	right: 0;
-	pointer-events: none;
-}
-
 path, line {
     fill: none;
     stroke: black;
@@ -78,14 +71,4 @@ svg {
 }
 button {
 	z-index: 10;
-}
-
-#ship {
-	width: 64px;
-	height: 68px;
-	top: 50%;
-	left: 50%;
-	background: url(../img/triremeR.png);
-	position: absolute;
-	z-index: 1;
 }

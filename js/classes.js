@@ -35,7 +35,7 @@ class Ship {	// eslint-disable-line
 		this.type = "Bireme";
 		this.speed = 10;	// kmh
 		this.defence = 10;
-		this.upgrades = gameText.upgrades;
+		this.upgrades = [];
 		this.max_crew = 20;
 		this.max_food = 1000;
 		this.max_wine = 250;
@@ -183,7 +183,7 @@ class Town {	// eslint-disable-line
 		this.sailors = 2;	// available on demand or quota'd?
 		this.buying = [];
 		this.selling = [];
-		this.status = "atPeace";	// must start atWar
+		this.status = "atWar";	// must start atWar
 		this.peaceEvent = null;
 		this.warEvent = null;
 		this.visited = false;
