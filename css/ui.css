@@ -70,6 +70,7 @@ ul, ol {
 	background: #876;
 	width: 50px;
 	height: 50px;
+	margin-bottom: 8px;
 }
 .avatar {
 	display: flex;
@@ -86,11 +87,13 @@ ul, ol {
     display: inline-block;
     width: 2.7em !important;
     height: 2.7em !important;
+	background: white;
 }
 .avatar.gold {
 	border: 2px solid gold;
 }
-#trophies-ui, #gods-ui {
+#trophies-ui > div,
+#gods-ui > div {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 }
@@ -164,9 +167,8 @@ ul, ol {
 .modal .content {
 	font-size: 1.5rem !important;
 }
-.or {
-	margin-top: 0.5em !important;
-	z-index: 20 !important;
+.modal.tiny .content {
+	text-align: center;
 }
 .sailor-checkbox-wrap {
 	position: relative;
@@ -177,6 +179,10 @@ ul, ol {
 	bottom: 0;
 	right: 0;
 	z-index: 10;
+}
+.or {
+	margin-top: 0.5em !important;
+	z-index: 20 !important;
 }
 
 

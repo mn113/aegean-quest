@@ -28,14 +28,32 @@ player.ships[0].addCrew([man1, man2, man3, man4, man5, man6]);
 
 function combat(sailors, enemy) {
 	console.log("Combat:", sailors, enemy);
-	var att1 = sailors.map(s => s.xp - s.age / 15).reduce((a,b) => a+b) / (sailors.length / 2);
-	var def1 = sailors.map(s => s.morale + s.age / 12).reduce((a,b) => a+b) / (sailors.length / 2);
-	var att2 = enemy.attack;
-	var def2 = enemy.health;
-	var brav2 = enemy.bravery;
-	console.log('Combat stats:', 'att1', att1, 'def1', def1, 'att2', att2, 'def2', def2, 'brav2', brav2);
 
-	// TODO: account for weapon skills & weaknesses
+	// To account for weapon skills & weaknesses:
+	var aptitudes = {
+		"Combat": 12,
+		"Weaponry": 10,
+		"Rowing": 6,
+		"Carpentry": 5,
+		"Fishing": 4,
+		"Navigation": 0,
+		"Seafaring": 0,
+		"Cartography": 0,
+		"Philosophy": -2,
+		"Music": -4
+	};
+
+	var def1 = sailors.map(s => s.morale + s.age / 12).reduce((a,b) => a+b) / (sailors.length);
+	var att1 = sailors.map(s => s.xp - s.age / 15).reduce((a,b) => a+b);
+	var skill = sailors.map(s => s.skills.map(sk => aptitudes[sk]).reduce((a,b) => a+b)).reduce((a,b) => a+b) / 3;
+	att1 += skill;
+	att1 /= (sailors.length / 2);
+	console.log('def1', def1, 'att1', att1, 'skill', skill);
+
+	var def2 = enemy.health;
+	var att2 = enemy.attack;
+	var brav2 = enemy.bravery;
+	console.log('att2', att2, 'def2', def2, 'brav2', brav2);
 
 	while (def1 > 0 && def2 > 0) {
 		// We attack:
@@ -74,7 +92,7 @@ function combat(sailors, enemy) {
 		}
 		// Repeat
 	}
-	// Both combatants cannot be dead
+	// Both combatants cannot simultaneously die
 }
 
 function endTurn() {
@@ -88,11 +106,13 @@ function endTurn() {
 
 function makeYear() {
 	// Choose a year from 800-600 BC:
-	return 700 + Math.floor(100 * Math.random());
+	return 600 + Math.floor(200 * Math.random());
 }
 
 ui.sidebars.updateAll();
 
+// FIXME
+// Make the total reflect the checked checkboxes in pre-combat card:
 $(".sailor-checkbox-wrap :checkbox").on("click", function() {
 	$("#checkedCount").html($(".sailor-checkbox-wrap :checkbox:checked").length);
 });

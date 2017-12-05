@@ -21,16 +21,9 @@ var ui = {
 		// Render a ship's stats in left sidebar
 		renderShipInfo: function(sid = 0) {
 			var s = player.ships[sid];
-			var l = player.ships.length;
 			console.log(s);
-			var prev = player.ships[sid-1] % l;
-			var next = player.ships[sid+1] % l;
 			var html = `
 			<div class="ship_stats" id="ship${sid}">
-				<!--div>
-					<i class="angle double left icon" onclick="ui.renderShip(${prev})"></i>
-					<i class="angle double right icon" onclick="ui.renderShip(${next})"></i>
-				</div-->
 				<h2>“${s.name}”</h2>
 				<h3>${s.type} class</h3>
 				<p>Speed: ${s.speed}</p>
@@ -42,7 +35,7 @@ var ui = {
 				</div>
 				<h4>Crew</h4>
 				<ul class="crew">
-					${ui.sidebars._renderCrew(s.captain, s.crew)}
+					${ui.sidebars._renderCrew(s.crew)}
 				</ul>
 			</div>`;
 			// Render
@@ -71,12 +64,16 @@ var ui = {
 		},
 
 		// Render a list of avatars
-		_renderCrew: function(captain, sailors) {
-			var html = "<li class='avatar gold'>" + captain.renderAvatar() + "</li>";
-			sailors.filter(s => s !== captain)
-			.forEach(function(s) {
-				html += "<li class='avatar'>" + s.renderAvatar(); + "</li>";
-			});
+		_renderCrew: function(sailors) {
+			var html = "";
+			for (var i = 0; i < sailors.length; i++) {
+				var s = sailors[i];
+				var captaincy = s.captain ? "gold" : '';
+				html += `<li class='avatar ${captaincy}'
+						onclick="ui.modals.sailorInfoCard(${i})">
+							${s.renderAvatar()}
+						</li>`;
+			}
 			return html;
 		},
 
@@ -99,12 +96,15 @@ var ui = {
 			 					data-title="${t.name}"
 								onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
 			}
-			$("#trophies-ui").html(trophies);
+			var html = `<h5>Trophies (${player.trophies.length} / ${gameText.trophies.length})</h5>
+						<div>${trophies}</div>`;
+			$("#trophies-ui").html(html);
 			ui.makePopups();
 		},
 
 		// Render the gods faces display in right sidebar
 		renderGods: function() {
+			var heading = "<h5>Gods</h5>";
 			var godsHtml = "";
 			for (var god of gameText.gods) {
 				var score = player.godFavours[god.name.toLowerCase()],
@@ -116,7 +116,7 @@ var ui = {
 								data-score="${score}">
 								</div>`;
 			}
-			$("#gods-ui").html(godsHtml);
+			$("#gods-ui").html(`${heading}<div>${godsHtml}</div>`);
 			ui.makePopups();
 		}
 	},
@@ -158,7 +158,7 @@ var ui = {
 				params.callback2();
 			}
 		})
-		.modal('show');	// Moves div outside of game area BUG?
+		.modal('show');
 	},
 
 	renderButtons: function(buttons) {
@@ -272,11 +272,21 @@ var ui = {
 		},
 
 		// Modal for viewing Sailor's stats, promotion or dismissal
-		sailorInfoCard: function(sailor) {		// TODO
-			var card = $("<div>")
-				.addClass("sailor modal")
-				.append(sailor.showStats());
-			$("#ui").append(card);
+		sailorInfoCard: function(index) {
+			// Retrieve Sailor object from crew by index:
+			var sailor = player.ships[0].crew[index];
+			var params = {
+				heading: `${sailor.name} of ${sailor.origin}`,
+				content: sailor.showStats(),
+				buttons: {
+					yes: "OK",
+					no: "Fire him"
+				},
+				callback1: () => false,
+				callback2: () => player.ships[0].fire(index)
+			};
+
+			ui.renderPopup(params);
 		},
 
 		// Modal container for the buy/sell interface
@@ -433,27 +443,26 @@ var ui = {
 		var html = `<div class="ui two cards">`;
 		for (var i = 0; i < recruits.length; i++) {
 			var s = recruits[i];
-			//html += s.showStats();
 			html += `
 				<div class="card" data-rid=${i}>
 			    	<div class="content">
 			      		<div class="header">
-							${s.renderAvatar()}
 							${s.name} of ${s.origin}
 						</div>
 			      		<div class="description">
-							<p><b>Age:</b> ${s.age} | <b>XP:</b> ${s.xp}</p>
-							<p><b>Skills:</b> ${s.skills.join(", ")}</p>
+							${s.showStats()}
 			      		</div>
 			    	</div>
-			    	<div class="ui bottom attached button" onclick="hire(${i})">
+			    	<div class="ui bottom attached button" onclick="player.ships[0].hire(${i})">
 			      		<i class="add icon"></i>
-			      		Hire (${s.salary} gold)
+			      		Hire him
 			    	</div>
 			  	</div>`;
 		}
 		html += `</div>`;
 		return html;
+		// Remove card: FIXME
+		// $(`.modal .card[data-rid="${i}"]`).remove();
 	},
 
 	// Enable Semantic UI tooltips:
@@ -466,13 +475,6 @@ var ui = {
 	}
 
 };
-
-function hire(i) {
-	player.ships[0].addCrew(recruits[i]);
-	ui.renderShipInfo();
-	// Remove card:
-	$(`.modal .card[data-rid="${i}"]`).remove();
-}
 
 function gainTrophy() {
 	// Select one randomly which we don't yet have:

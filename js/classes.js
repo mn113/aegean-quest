@@ -60,7 +60,11 @@ class Ship {	// eslint-disable-line
 			this.crew.push(newCrew);
 		}
 		// Captainify someone:
-		if (this.captain === null) this.captain = this.crew.random();
+		if (this.captain === null) {
+			var capt = this.crew.random();
+			capt.captain = true;
+			this.captain = capt;	// FIXME
+		}
 	}
 
 	getSpeed() {
@@ -122,6 +126,16 @@ class Ship {	// eslint-disable-line
 				break;
 		}
 	}
+
+	hire(i) {
+		this.addCrew(recruits[i]);
+		ui.sidebars.renderShipInfo();
+	}
+
+	fire(i) {
+		this.crew.splice(i, 1);
+		ui.sidebars.renderShipInfo();
+	}
 }
 
 class Sailor {
@@ -134,6 +148,7 @@ class Sailor {
 		this.xp = Math.floor(this.age / 10) + Math.floor(5 * Math.random());
 		this.morale = Math.ceil(7 + 3 * Math.random());
 		this.salary = Math.floor((this.age + this.xp + this.skills.length) / 3);
+		this.captain = false;
 		return this;
 	}
 
@@ -153,24 +168,19 @@ class Sailor {
 		return skills;
 	}
 
-	showStats() {
-		return this.renderAvatar() + `
-		<h3>${this.name}</h3>
-		<span>of ${this.origin}</span>
-		<dl>
-			<dt>Age</dt><dd>${this.age}</dd>
-			<dt>XP</dt><dd>${this.xp}</dd>
-			<dt>Salary</dt><dd>${this.salary}gpy</dd>
-			<dt>Skills</dt><dd>${this.skills.join(", ")}</dd>
-		</dl>`;
-	}
-
 	renderAvatar(className = "") {
 		// Includes tooltip text
 		return `<img class="ui avatar image ${className}"
 		data-title="${this.name} of ${this.origin}"
 		data-content="${this.skills.join(", ")}"
 		src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/50.png">`;
+	}
+
+	showStats() {
+		return `${this.renderAvatar()}
+				<p><b>Age:</b> ${this.age} | <b>XP:</b> ${this.xp}</p>
+				<p><b>Skills:</b> ${this.skills.join(", ")}</p>
+				<p><b>Salary:</b> ${this.salary} gold/year</p>`;
 	}
 }
 
@@ -193,7 +203,10 @@ class Town {	// eslint-disable-line
 	peaceTimeEvent() {
 		if (!this.peaceEvent) {
 			// Choose an event based on city name + salt:
-			var seed = (this.name + salt) & gameText.peaceTimeEvents.length;
+			var seed = (this.name + salt).hashCode();
+			console.log('seed', seed);
+			seed = Math.abs(seed) % gameText.peaceTimeEvents.length;
+			console.log('seedmod', seed);
 			var event = gameText.peaceTimeEvents[seed];
 			event.heading = `The townsfolk of <span class="town">${this.name}</span>
 			invite you to ${event.article} ${event.title}.`;
@@ -234,7 +247,10 @@ class Town {	// eslint-disable-line
 	underAttack() {
 		if (!this.warEvent) {
 			// Choose an event based on city name + salt:
-			var seed = (this.name + salt) & gameText.monsterEvents.length;
+			var seed = (this.name + salt).hashCode();
+			console.log('seed', seed);
+			seed = Math.abs(seed) % gameText.monsterEvents.length;
+			console.log('seedmod', seed);
 			var event = gameText.monsterEvents[seed];
 			console.log(event);
 			event.heading = `<h2>Attention all heroes!</h2>
@@ -260,7 +276,8 @@ class Town {	// eslint-disable-line
 				ui.renderPopup({
 					heading: "Your men fled back to the ship.",
 					content: `${event.name} continues to harrass ${this.name}.`,
-					buttons: {yes: "OK"}
+					buttons: {yes: "OK"},
+					callback1: () => false
 				});
 			}.bind(this);
 
