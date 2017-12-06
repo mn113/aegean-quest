@@ -35,7 +35,11 @@ ul, ol {
 .ui {
 	pointer-events: all;
 }
-
+data {
+	font-family: Helvetica, Arial, sans-serif !important;
+	font-size: 0.9em !important;
+	margin: 0 !important
+}
 
 /************/
 /* SIDEBARS */
@@ -43,7 +47,7 @@ ul, ol {
 #ui_ships {
 	width: 200px;
 	height: 600px;
-	padding: 4px 6px;
+	padding: 2px 5px;
 }
 #ui_ships > * {
 	border: 1px solid #421;
@@ -54,6 +58,10 @@ ul, ol {
 #ui_ships h2,
 #ui_ships h3 {
 	text-align: center;
+	margin-bottom: 0.2em !important;
+}
+#ui_ships h3 {
+	font-style: italic !important;
 }
 .ship_stats {
 	overflow: hidden;
@@ -158,14 +166,16 @@ ul, ol {
 	text-align: center !important;
 }
 .modal img {
-	max-width: 200px;
-	max-height: 200px;
+	width: 200px;
 }
 .town, .monster {
 	color: red;
 }
 .modal .content {
-	font-size: 1.5rem !important;
+	font-size: 1.2rem !important;
+}
+.modal .content .extra {
+	text-align: center;
 }
 .modal.tiny .content {
 	text-align: center;
@@ -181,7 +191,7 @@ ul, ol {
 	z-index: 10;
 }
 .or {
-	margin-top: 0.5em !important;
+	margin-top: 0.3em !important;
 	z-index: 20 !important;
 }
 

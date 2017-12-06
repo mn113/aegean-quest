@@ -81,7 +81,7 @@ function combat(sailors, enemy) {
 			var lost = sailors.shuffle().slice(0,lossQuota);
 			// Remove from crew:
 			for (var s of lost) {
-				s;
+				player.ships[0].fireMan(s);
 			}
 			return {
 				code: 0,

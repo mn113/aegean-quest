@@ -1,4 +1,4 @@
-/* global player, $, gameText, combat */
+/* global player, $, gameText, combat, currentCity */
 
 function capitalise(word) {
 	return word[0].toUpperCase() + word.substr(1);
@@ -26,14 +26,14 @@ var ui = {
 			<div class="ship_stats" id="ship${sid}">
 				<h2>“${s.name}”</h2>
 				<h3>${s.type} class</h3>
-				<p>Speed: ${s.speed}</p>
+				<p>Speed: <data>${s.speed}</data></p>
 				<div class="upgrades">
 					${ui.sidebars._renderShipUpgrades(s.upgrades)}
 				</div>
 				<div class="supplies">
 					${ui.sidebars._renderShipSupplies(s.supplies)}
 				</div>
-				<h4>Crew (${s.crew.length})</h4>
+				<h4>Crew (<data>${s.crew.length} / ${s.max_crew}</data>)</h4>
 				<ul class="crew">
 					${ui.sidebars._renderCrew(s.crew)}
 				</ul>
@@ -56,10 +56,10 @@ var ui = {
 
 		_renderShipSupplies: function(supplies) {
 			return `
-				<p><i class="gameitem bread"></i>Bread: ${supplies.bread}</p>
-				<p><i class="gameitem wine"></i>Wine: ${supplies.wine}</p>
-				<p><i class="gameitem chicken"></i>Chickens: ${supplies.chicken}</p>
-				<p><i class="gameitem fish"></i>Fish: ${supplies.fish}</p>
+				<p><i class="gameitem bread"></i>Bread: <data>${supplies.bread}</data></p>
+				<p><i class="gameitem wine"></i>Wine: <data>${supplies.wine}</data></p>
+				<p><i class="gameitem chicken"></i>Chickens: <data>${supplies.chicken}</data></p>
+				<p><i class="gameitem fish"></i>Fish: <data>${supplies.fish}</data></p>
 			`;
 		},
 
@@ -78,7 +78,7 @@ var ui = {
 		},
 
 		renderYear: function() {
-			$("#year-ui").html(player.year + " BC");
+			$("#year-ui").html(`<data>${player.year}</data> BC`);
 		},
 
 		// Render the player's gold amount in right sidebar
@@ -87,7 +87,7 @@ var ui = {
 			var html = `
 			<div class="yellow inverted statistic">
 				<i class="gameitem ${iconClass}"></i>
-				<span>${player.gold} Gold</span
+				<span><data>${player.gold}</data> Gold</span
 			</div>`;
 			$("#gold-ui").html(html);
 		},
@@ -100,7 +100,7 @@ var ui = {
 			 					data-title="${t.name}"
 								onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
 			}
-			var html = `<h5>Trophies (${player.trophies.length} / ${gameText.trophies.length})</h5>
+			var html = `<h5>Trophies (<data>${player.trophies.length} / ${gameText.trophies.length}</data>)</h5>
 						<div>${trophies}</div>`;
 			$("#trophies-ui").html(html);
 			ui.makePopups();
@@ -141,7 +141,7 @@ var ui = {
 			</div>
 			<div class="content">
 				<p>${params.content}</p>
-				<p>${params.extra}</p>
+				<p class="extra">${params.extra}</p>
 			</div>
 			<div class="actions">
 				${ui.renderButtons(params.buttons)}
@@ -167,7 +167,7 @@ var ui = {
 
 	renderButtons: function(buttons) {
 		var html = `<div class="ui buttons large">`;
-		if (buttons.yes) html += `<button class="ui approve button huge blue">${buttons.yes}</button>`;
+		if (buttons.yes) html += `<button class="ui approve button huge orange">${buttons.yes}</button>`;
 		if (buttons.yes && buttons.no) html += `<div class="or"></div>`;
 		if (buttons.no) html += `<button class="ui cancel button huge grey">${buttons.no}</button>`;
 		html += "</div>";
@@ -221,7 +221,7 @@ var ui = {
 				img: "",
 				desc: "",
 				content: "Choose the men you will send into combat. The more warriors, the better their chances of victory - but the higher the risk.",
-				extra: sailorInputs.join("") + `<p><span id="checkedCount">${sailorInputs.length}</span> men selected</p>`,
+				extra: sailorInputs.join("") + `<p><data id="checkedCount">${sailorInputs.length}</data> men selected</p>`,
 				buttons: {yes: "Fight!"}
 			};
 			params.callback1 = function() {
@@ -259,6 +259,7 @@ var ui = {
 					}, 750);
 					return false;
 				};
+				currentCity.status = 'atPeace';
 			}
 			else if (result.code === 0) {
 				params.heading = "Defeated.";
@@ -401,8 +402,8 @@ var ui = {
 		// Received gift popup, 1 button
 		giftPopup: function(gift, quantity, from) {
 			ui.renderPopup({
-				heading: "You received a gift from " + from,
-				content: `${from} gave you ${quantity} ${gift}! <i class="gameitem ${gift}"></i>`,	// TODO plurals
+				heading: "You received a gift!",
+				content: `${from} gave you <data>${quantity}</data> ${gift}! <i class="gameitem ${gift}"></i>`,	// TODO plurals
 				buttons: {yes: "OK"},
 				callback1: () => false	// Simply dismiss
 			});
@@ -416,7 +417,7 @@ var ui = {
 		fishPopup: function(quantity) {
 			ui.renderPopup({
 				heading: "A helping hand from Poseidon",
-				content: `You caught ${quantity} crates of fish <i class="gameitem fish"></i>`,
+				content: `You caught <data>${quantity}</data> crates of fish <i class="gameitem fish"></i>`,
 				buttons: {yes: "OK"},
 				callback1: () => false	// Simply dismiss
 			});

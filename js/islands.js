@@ -243,6 +243,7 @@ function enableZoom() {
 		});
 	citySVG.call(zoom);
 	zoom.scaleTo(citySVG, 1);
+	zoom.translateTo(citySVG, 600,450);
 }
 
 function centrePoint(x,y) {

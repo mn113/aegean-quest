@@ -29,6 +29,8 @@ function reSalt() {
 }
 var salt = reSalt();	// changes every 15 minutes provided reSalt called regularly
 
+var currentCity = null;
+
 class Ship {	// eslint-disable-line
 	constructor() {
 		this.name = gameText.shipNames.random();
@@ -133,7 +135,10 @@ class Ship {	// eslint-disable-line
 	}
 
 	fireMan(i) {
-		this.crew.splice(i, 1);
+		if (typeof i === 'object') {
+			i = this.crew.indexOf(i);
+		}
+		if (i > -1) this.crew.splice(i, 1);
 		ui.sidebars.renderShipInfo();
 	}
 }
@@ -178,9 +183,9 @@ class Sailor {
 
 	showStats() {
 		return `${this.renderAvatar()}
-				<p><b>Age:</b> ${this.age} | <b>XP:</b> ${this.xp}</p>
-				<p><b>Skills:</b> ${this.skills.join(", ")}</p>
-				<p><b>Salary:</b> ${this.salary} gold/year</p>`;
+				<p><b>Age:</b> <data>${this.age}</data> | <b>XP:</b> <data>${this.xp}</data></p>
+				<p><b>Skills:</b> <data>${this.skills.join(", ")}</data></p>
+				<p><b>Salary:</b> <data>${this.salary}</data> gold/year</p>`;
 	}
 }
 
@@ -221,6 +226,7 @@ class Town {	// eslint-disable-line
 			// Specify callbacks for event's action buttons:
 			// Accept: reward
 			event.callback1 = function() {
+				this.status = 'null';
 				var gift = event.reward.types.random(),
 					range = event.reward.max - event.reward.max,
 					quantity = event.reward.min + Math.floor(range * Math.random());
@@ -229,6 +235,7 @@ class Town {	// eslint-disable-line
 
 			// Decline: godReaction
 			event.callback2 = function() {
+				this.status = 'null';
 				var god = gameText.gods.random(),
 					delta = -0.5;
 				ui.popups.godReactionPopup(god.name, delta);
@@ -258,7 +265,8 @@ class Town {	// eslint-disable-line
 			<span class="monster">${event.article} ${event.name}</span>!`;
 			event.link = `<a href="${event.url}" target="_blank">Learn more...</a>`;
 			event.desc = event.text + "<br><br>" + event.link;
-			event.content = `<h2>Will you fight <span class="monster">${event.article} ${event.name}</span>?</h2>`;
+			event.content = "";
+			event.extra = `<h3>Will you fight <span class="monster">${event.article} ${event.name}</span>?</h3>`;
 			event.buttons = {
 				yes: "Fight",
 				no: "Flee"
@@ -275,7 +283,7 @@ class Town {	// eslint-disable-line
 				ui.popups.godReactionPopup(god.name, delta);
 				ui.renderPopup({
 					heading: "Your men fled back to the ship.",
-					content: `${event.name} continues to harrass ${this.name}.`,
+					content: `<span class="monster">${event.name}</span> continues to harrass <span class="monster">${this.name}</span>.`,
 					buttons: {yes: "OK"},
 					callback1: () => false
 				});
@@ -337,6 +345,7 @@ class Town {	// eslint-disable-line
 
 	visit() {
 		this.visited = true;
+		currentCity = this;
 		// When you visit, things can happen conditionally in this order:
 		if (this.status === 'atWar') this.underAttack();
 		else if (this.status === 'atPeace') this.peaceTimeEvent();
