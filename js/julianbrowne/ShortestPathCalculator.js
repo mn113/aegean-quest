@@ -39,6 +39,7 @@ ShortestPathCalculator.SpcError = function(code, message) {
 	return { code: code, message: message };
 };
 
+// Prepare the data structures we will need for pathfinding:
 ShortestPathCalculator.prototype.init = function() {
 	this.makeDistanceArrayFromNodes();
 	this.populateDistances();
@@ -46,6 +47,7 @@ ShortestPathCalculator.prototype.init = function() {
 	return this;
 };
 
+// Check the inputs, run the algorithm and format the result:
 ShortestPathCalculator.prototype.findRoute = function(source, target) {
 	// Is input valid?
 	if (!ShortestPathCalculator.isInteger(source) || !ShortestPathCalculator.isInteger(target))
@@ -60,6 +62,7 @@ ShortestPathCalculator.prototype.findRoute = function(source, target) {
 	return this.formatPath(this.result);
 };
 
+// Convert the nodeList path into a more helpful format:
 ShortestPathCalculator.prototype.formatPath = function(path) {
 	if (!path) return {mesg: "No path found"};
 
@@ -71,16 +74,17 @@ ShortestPathCalculator.prototype.formatPath = function(path) {
 	// Convert node array (length N) to sub-path array (length N-1):
 	for (var i = path.length - 1; i > 0; i--) {
 		newPath.push({source: path[i], target: path[i-1]});
-		totalDistance += this.distances[i][i-1];
+		totalDistance += this.distances[path[i]][path[i-1]];
 	}
 	return {mesg:'OK', path: newPath, source: start, target: end, distance:totalDistance};
 };
 
+// Make a 2-dimensional nodes matrix and fill every place with 'x':
 ShortestPathCalculator.prototype.makeDistanceArrayFromNodes = function() {
 
 	this.distances = [];
 
-	for(var i=0; i<this.nodes.length; i++) {
+	for (var i=0; i<this.nodes.length; i++) {
 
 		this.distances[i] = [];
 
@@ -91,9 +95,10 @@ ShortestPathCalculator.prototype.makeDistanceArrayFromNodes = function() {
 
 };
 
+// Look at every path that was inputted and copy its distance into the distances matrix:
 ShortestPathCalculator.prototype.populateDistances = function() {
 
-	for(var i=0; i<this.paths.length; i++) {
+	for (var i=0; i<this.paths.length; i++) {
 
 		var s = parseInt(this.paths[i].source);
 		var t = parseInt(this.paths[i].target);
@@ -105,6 +110,7 @@ ShortestPathCalculator.prototype.populateDistances = function() {
 
 };
 
+// Build a table of nodes and their attached nodes:
 ShortestPathCalculator.prototype.buildLinksGraph = function() {
 	var linkedNodes = {};
 	for (var node of this.nodes) {
@@ -125,6 +131,7 @@ ShortestPathCalculator.prototype.buildLinksGraph = function() {
 	return linkedNodes;
 };
 
+/*
 ShortestPathCalculator.prototype.clearDiv = function(elementId) {
 	var target = document.getElementById(elementId);
 
@@ -253,7 +260,7 @@ ShortestPathCalculator.prototype.formatResult = function() {
 	return res;
 
 };
-
+*/
 /*
 * Calculate shortest path between two nodes in a graph
 *
@@ -342,12 +349,14 @@ ShortestPathCalculator.prototype.dijkstra = function(start, end) {
 	}
 };
 
+// Quickly lookup a distance between 2 nodes:
 ShortestPathCalculator.prototype.distanceBetween = function(fromNode, toNode) {
 	var dist = this.distances[fromNode][toNode];
 	if (dist==='x') dist = infinity;
 	return dist;
 };
 
+// Compute the Manhattan (|dx|+|dy|) distance between 2 nodes:
 ShortestPathCalculator.prototype.manhattanHeuristic = function(fromNode, toNode) {
 	// Manhattan distance:
 	var dx = this.nodes[fromNode].coords[0] - this.nodes[toNode].coords[0],

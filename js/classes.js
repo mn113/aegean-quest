@@ -87,7 +87,7 @@ class Ship {	// eslint-disable-line
 
 	sail(distance) {
 		// Reduce food & morale
-		var deductions = Math.floor(distance / 10);
+		var deductions = Math.floor(distance / 50);	// max 10, initially
 		console.log("Deducting", deductions);
 		while (deductions > 0) {
 			if (this.supplies.bread > 0)   { this.supplies.bread--; deductions--; }
@@ -95,7 +95,7 @@ class Ship {	// eslint-disable-line
 			if (this.supplies.fish > 0)    { this.supplies.fish--; deductions--; }
 			if (this.supplies.wine > 0)    { this.supplies.wine--; deductions--; }
 		}
-		ui.renderShipInfo();
+		ui.sidebars.renderShipInfo();
 	}
 
 	fish() {
@@ -127,12 +127,12 @@ class Ship {	// eslint-disable-line
 		}
 	}
 
-	hire(i) {
+	hireMan(i) {
 		this.addCrew(recruits[i]);
 		ui.sidebars.renderShipInfo();
 	}
 
-	fire(i) {
+	fireMan(i) {
 		this.crew.splice(i, 1);
 		ui.sidebars.renderShipInfo();
 	}

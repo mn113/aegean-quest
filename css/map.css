@@ -47,7 +47,7 @@ path, line {
 }
 .slope { stroke-width: 1; }
 .river { stroke-width: 2; }
-.coast { stroke-width: 4; }
+.coast { stroke-width: 2; }
 .border {
     stroke-width: 5;
     stroke-dasharray: 4,4;

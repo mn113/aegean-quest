@@ -1,4 +1,4 @@
-/* global $, gameText, Ship, Sailor, ui */
+/* global $, Ship, Sailor, ui */
 
 var player = {
 	ships: [new Ship()],
@@ -7,7 +7,7 @@ var player = {
 	// 12 turns = 1 year
 	turns: 0,		// change game salt every 15 minutes or every 10 turns?
 	gold: 100,
-	trophies: [],//gameText.trophies,
+	trophies: [],
 	godFavours: {
 		poseidon: 0,
 		uranus: 0,

@@ -889,7 +889,6 @@ function visualizePoints(svg, points, showDebugText = false) {
 		.attr('id', function(d,i) { return 'pt_'+i; })
 		.classed('clickable', true)
 		.style('fill', 'yellow')
-		//.style('stroke', 'blue')
 		.on('click', function(d,i) {
 			console.log('index', i, 'height', d[i]);
 		})

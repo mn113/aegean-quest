@@ -52,7 +52,6 @@ function prepareNavPaths(h) {
 			paths.push(c+"_"+d);
 		}
 	}
-	//console.log('temp', paths);
 	// Format as object and append distances:
 	return paths.map(function(str) {
 		var arr = str.split("_");
@@ -91,7 +90,9 @@ function addNaviLayer(target, render) {
 // Create ship element and place on map:
 function addShipSvg(target) {
 	// Choose initial placement for ship (sea middle?):
-	var initNode = nodes.filter(n => n.coords && n.r && n.r < seaLevel).random().index;
+	var initNode = nodes.filter(n => n.r && n.r < seaLevel)
+						.filter(n => n.coords && Math.abs(n.coords[0]) < 0.3 && Math.abs(n.coords[1]) < 0.3)
+						.random().index;
 	var initCoords = nodes[initNode].coords;
 	//console.log('initNode', initNode, initCoords);
 	var x = 1000 * initCoords[0],
@@ -104,9 +105,9 @@ function addShipSvg(target) {
 		.raise();
 	// Image inside g has the permanent sprite offset:
 	svgShip.append("svg:image")
-		.attr("xlink:href", "img/trireme-blue-r.png")
-		.attr("transform", "translate(-25,-40)")
-		.attr("width", 50);
+		.attr("xlink:href", "img/trireme-red-l.svg")
+		.attr("transform", "translate(-30,-40)")
+		.attr("width", 60);
 
 	shipNode = initNode;
 }
@@ -117,7 +118,9 @@ function routeShip(dest, callback) {
 	var hopped = 0;
 	console.log('route', route);
 	if (!route.path) return;
-	// Infinite loop:
+	// Check voyage not too long:
+	if (route.distance > 500) return "too far";
+	// Infinite movement loop:
 	function doHop() {
 		var hop = route.path[hopped];
 		moveShip(hop.target, function() {
@@ -127,7 +130,10 @@ function routeShip(dest, callback) {
 			// Continue infinite loop:
 			if (hopped < route.path.length) doHop();
 			else if (shipNode === dest) {
-				callback();
+				// Make deductions:
+				player.ships[0].sail(route.distance);
+				// Action:
+				if (callback) callback();
 			}
 		});
 	}
@@ -215,7 +221,7 @@ function drawMap(render) {
 	//colorizePoints(view, Stage5Render.h);
 
 	drawPaths(view, 'coast', contour(render.h, 0.5));
-	drawPaths(view, 'river', getRivers(render.h, 0.01));
+	drawPaths(view, 'river', getRivers(render.h, 0.01));	// BUG not showing up
 	visualizeSlopes(view, render);
 	$("#game-loader").removeClass("active dimmer");
 }
@@ -281,13 +287,13 @@ function generateBaseMap(type, params) {
 			mountains(mesh, 10, 0.08)
 		);
 	}
-	else if (type === 5) {	// 3 corners + 40
+	else if (type === 5) {	// 15 hills
 		h = add(
-			//meshTransforms.cornerLand(mesh, 'topRight'),
 			mountains(mesh, 3, 0.06),
 			mountains(mesh, 3, 0.05),
 			mountains(mesh, 3, 0.04),
-			mountains(mesh, 3, 0.03)
+			mountains(mesh, 4, 0.03),
+			mountains(mesh, 5, 0.02)
 		);
 	}
 	else {
@@ -303,16 +309,16 @@ function generateBaseMap(type, params) {
 	}
 	h = peaky(h);
 	// Erode terrain:
-	h = doErosion(h, randomFrom(0, 0.1), 2);	// 5 times
+	h = doErosion(h, 0.12, 1);	// 0.12 x 1 or 0.7 x 2 looks ok
 	h = fillSinks(h);
 	h = normalize(h);
 
-	seaLevel = 0.5;//randomFrom(0.2, 0.6);		// why random?
+	seaLevel = 0.5;
 	h = setSeaLevel(h, seaLevel);
 	console.log('land:sea', landSeaRatio(h, seaLevel));
 
 	// Smooth coast:
-	h = cleanCoast(h, 6);	// FIXME smoother!
+	h = cleanCoast(h, 7);	// 5-7 cleans not bad FIXME smoother!
 
 	return normalize(h);
 }
@@ -320,7 +326,7 @@ function generateBaseMap(type, params) {
 // The whole map layer setup sequence:
 function buildGameWorld() {
 	mapRender = newRender(5);	// TODO: randomise between 3 decent generators
-	drawMap(mapRender);
+	drawMap(mapRender);			// includes coast, rivers, slopes
 
 	// Add cities:
 	for (var c = 15; c > 0; c--) {
@@ -347,4 +353,6 @@ $("#gamearea").one("click", function(e) {
 	e.stopPropagation();
 	e.preventDefault();
 	$("#logo").remove();
+	// Open sidebars:
+	$(".ui.sidebar").sidebar('toggle');
 });

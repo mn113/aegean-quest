@@ -92,7 +92,6 @@ var ui = {
 			$("#gold-ui").html(html);
 		},
 
-
 		// Render the player's trophy icons in right sidebar
 		renderTrophies: function() {
 			var trophies = "";
@@ -288,7 +287,7 @@ var ui = {
 					no: "Fire him"
 				},
 				callback1: () => false,
-				callback2: () => player.ships[0].fire(index)
+				callback2: () => player.ships[0].fireMan(index)
 			};
 
 			ui.renderPopup(params);
@@ -458,7 +457,7 @@ var ui = {
 							${s.showStats()}
 			      		</div>
 			    	</div>
-			    	<div class="ui bottom attached button" onclick="player.ships[0].hire(${i})">
+			    	<div class="ui bottom attached button" onclick="player.ships[0].hireMan(${i})">
 			      		<i class="add icon"></i>
 			      		Hire him
 			    	</div>
