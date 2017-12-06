@@ -1368,6 +1368,7 @@ function drawLabels(svg, render) {
 	}
 
 	function drawCityLabels() {
+		var outerG = svg.append('g').attr('id', "labels");
 		for (var i = 0; i < cities.length; i++) {
 			var cityIndex = cities[i].ptIndex;
 			var x = h.mesh.vxs[cityIndex][0];
@@ -1423,13 +1424,13 @@ function drawLabels(svg, render) {
 			label.size = size;
 			citylabels.push(label);
 		}
-		var texts = svg.selectAll('text.city').data(citylabels);
+		var texts = outerG.selectAll('text.city').data(citylabels);
 		texts.enter()
 		.append('text')
 		.classed('city', true);
 		texts.exit()
 		.remove();
-		svg.selectAll('text.city')
+		outerG.selectAll('text.city')
 		.attr('x', function(d) { return 1000*d.x; })
 		.attr('y', function(d) { return 1000*d.y; })
 		.style('font-size', function(d) { return d.size; })

@@ -33,7 +33,7 @@ var ui = {
 				<div class="supplies">
 					${ui.sidebars._renderShipSupplies(s.supplies)}
 				</div>
-				<h4>Crew</h4>
+				<h4>Crew (${s.crew.length})</h4>
 				<ul class="crew">
 					${ui.sidebars._renderCrew(s.crew)}
 				</ul>
@@ -84,9 +84,14 @@ var ui = {
 		// Render the player's gold amount in right sidebar
 		renderGold: function() {
 			var iconClass = (player.gold > 200) ? "gold-high" : (player.gold > 50) ? "gold-med" : "gold-low";
-			$("#gold-icon").removeClass("gold-high gold-med gold-low").addClass(iconClass);
-			$("#gold-ui").html(player.gold);
+			var html = `
+			<div class="yellow inverted statistic">
+				<i class="gameitem ${iconClass}"></i>
+				<span>${player.gold} Gold</span
+			</div>`;
+			$("#gold-ui").html(html);
 		},
+
 
 		// Render the player's trophy icons in right sidebar
 		renderTrophies: function() {
@@ -425,7 +430,7 @@ var ui = {
 		gameOverPopup: function(type) {
 			var params = {
 				heading: "Game Over!",
-				content: "You won!",
+				content: "You won!",	// TODO: win/loss images
 				buttons: {yes: "Play again"},
 				callback1: () => { window.location.reload(); }
 			};

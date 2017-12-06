@@ -1,4 +1,4 @@
-/*global ui, gameText, salt, player */
+/*global ui, gameText, salt, player, recruits */
 
 Array.prototype.random = function() {
 	return this[Math.floor(Math.random() * this.length)];

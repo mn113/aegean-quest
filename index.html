@@ -13,17 +13,17 @@
 	<script src="js/gameText.js"></script>
 </head>
 <body>
-	<h1>Aegean Quest</h1>
-
 	<div id="gamearea">
 		<div id="not-ui">
 			<div id="fifth">
 				<svg id="gamesvg" width="800" height="600" viewBox="0 0 800 600">
 					<defs>
+						<radialGradient id="SeaGradient" cx="50%" cy="50%" r="1">
+							<stop offset="30%" stop-color="white"/>
+							<stop offset="40%" stop-color="dodgerblue"/>
+					    </radialGradient>
 						<style type="text/css">
-						.clickable {
-							cursor: pointer;
-						}
+							.clickable { cursor: pointer; }
 						</style>
 					</defs>
 					<g id="container"></g>
@@ -52,20 +52,14 @@
 					<i class="close icon yellow"></i>
 				</a>
 				<section class="item" id="year-ui"></section>
-				<section class="item">
-					<div class="yellow inverted statistic">
-						<i class="gameitem gold-low" id="gold-icon"></i>
-						<div class="value" id="gold-ui"></div>
-						<div class="label">Gold</div>
-					</div>
+				<section class="item" id="gold-ui">
 				</section>
 				<section class="item" id="trophies-ui"></section>
 				<section class="item" id="gods-ui"></section>
 			</div>
 			<div id="game-centre" class="pusher">
-				<!--div class="ui segment" id="game-loader">
-					<div class="ui indeterminate text loader">Generating ancient world</div>
-				</div-->
+				<img src="img/logo-white.png" id="logo">
+				<div class="ui active centered inline text loader">Generating ancient world</div>
 			</div>
 		</div>
 	</div>

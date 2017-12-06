@@ -10,6 +10,16 @@ var mapRender, ShortPathCalc, svgShip, shipNode, paths, nodes;
 // Set up map with D3:
 var citySVG = d3.select("div#fifth svg");
 var view = citySVG.append('g').attr('id', 'view');
+// Oversized blue-white background:
+view.append('rect')
+	.attr('id', 'mapbg')
+	.attr("x",-600)
+	.attr("y",-450)
+	.attr("width",1200)
+	.attr("height",900)
+	.style('fill', 'url(#SeaGradient)')
+	.style('stroke', 'dodgerblue')
+	.style('stroke-width', 5);
 
 // Prepare nav nodes for A* pathfinding:
 function prepareNavNodes(h) {
@@ -65,7 +75,8 @@ function addNaviLayer(target, render) {
 	console.log('Calculated', nodes.length, 'navNodes');
 	console.log('Calculated', paths.length, 'navPaths');
 	ShortPathCalc = new ShortestPathCalculator(nodes, paths);
-	ShortPathCalc.init();
+	ShortPathCalc.init();	// TODO: callback
+	$(".loader").hide();
 
 	// Make map triangles clickable:
 	view.selectAll('path.field').on("click", function(d, clickedIndex) {
@@ -182,7 +193,7 @@ function linkCities(svg) {
 // Just wraps the heightmap in preparation for cities data:
 function newRender(type, h) {
 	type = type || 1;
-	h = h || generateBaseMap(type, {npts:2048, extent: defaultExtent});
+	h = h || generateBaseMap(type, {npts:4096, extent: defaultExtent});
 	addCentresToTriangles(h);
 	var render = {
 		params: defaultParams,
@@ -214,18 +225,22 @@ function enableZoom() {
 	// Pan & zoom:
 	var zoom = d3.zoom()
 		.scaleExtent([.75, 3])
-		.translateExtent([[0,0],[800,600]])	// trap to bounds (x=20, y=50)
+		.translateExtent([[0,0],[1200,900]])	// trap to bounds (x=20, y=50)
 		.on("zoom", function() {
 			//console.log(d3.event.transform);
 			var t = d3.event.transform,
-				x = t.x + 400 * t.k,
-				y = t.y + 300 * t.k;
+				x = t.x + 600 * t.k,
+				y = t.y + 450 * t.k;
 			view.attr("transform", "translate(" + x + "," + y + ") scale(" + t.k + ")");
 			// Keep ship sprite constant size across zoom levels:
 			d3.select("#shipSVG image").attr("transform", "translate(-25,-40) scale("+ 1.2 / t.k +")");
 		});
 	citySVG.call(zoom);
-	zoom.scaleTo(citySVG, .75);
+	zoom.scaleTo(citySVG, 1);
+}
+
+function centrePoint(x,y) {
+	d3.zoom;
 }
 
 // The first step in generating a map from primitives:
@@ -326,3 +341,10 @@ function buildGameWorld() {
 	return mapRender;
 }
 buildGameWorld();
+
+// Remove logo on first click:
+$("#gamearea").one("click", function(e) {
+	e.stopPropagation();
+	e.preventDefault();
+	$("#logo").remove();
+});

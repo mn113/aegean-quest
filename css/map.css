@@ -2,7 +2,7 @@ html {
 
 }
 body {
-	font-family: 'Lancelot', serif !important;
+	font-family: 'Flamenco', serif !important;
 }
 .greek {
 	font-family: 'GFS Neohellenic', serif;
@@ -18,6 +18,12 @@ body {
 }
 #gamearea > div {
 	position: absolute;
+}
+#game-centre {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 #map {
 	width: 100%;
