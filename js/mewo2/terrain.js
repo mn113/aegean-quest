@@ -1,4 +1,5 @@
-/* global d3, makeName, seaLevel */
+/* global d3, makeName, lang, seaLevel */
+/* eslint-disable no-unused-vars, no-redeclare, no-constant-condition */
 
 "use strict";
 
@@ -537,7 +538,7 @@ function getSlope(h) {
 	for (var i = 0; i < h.length; i++) {
 		var s = trislope(h, i);
 		slope[i] = Math.sqrt(s[0] * s[0] + s[1] * s[1]);
-		continue;
+		//continue;
 		if (dh[i] < 0) {
 			slope[i] = 0;
 		} else {

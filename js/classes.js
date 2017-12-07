@@ -1,4 +1,6 @@
-/*global ui, gameText, salt, player, recruits */
+/*global d3, ui, player, gameText, recruits, ShortPathCalc, triCentreDistance, mapRender, simplify, nodes, endTurn, currentCity */
+/* eslint-disable no-global-assign */
+
 
 Array.prototype.random = function() {
 	return this[Math.floor(Math.random() * this.length)];
@@ -30,23 +32,25 @@ function reSalt() {
 var salt = reSalt();	// changes every 15 minutes provided reSalt called regularly
 
 var myship = null;
-var currentCity = null;
 
 class Ship {	// eslint-disable-line
 	constructor() {
 		this.name = gameText.shipNames.random();
 		this.type = "Bireme";
+		this.node = null;	// set by addShipSvg()
 		this.speed = 10;	// kmh
 		this.defence = 10;
 		this.upgrades = [];
 		this.max_crew = 20;
-		this.max_food = 1000;
-		this.max_wine = 250;
 		this.supplies = {
 			bread: 65,
 			wine: 25,
 			chicken: 35,
-			fish: 0
+			fish: 0,
+			max_bread: 100,
+			max_wine: 75,
+			max_chicken: 75,
+			max_fish: 100,
 		};
 		this.health = 100;
 		this.captain = null;
@@ -105,16 +109,16 @@ class Ship {	// eslint-disable-line
 	fish(distance) {
 		var fishCaught = 5 * Math.ceil(distance/50 * Math.random());	// max 50 fish
 		// Gain as many fish as we can before hitting max:
-		if (this.supplies.fish === this.max_fish) {
+		if (this.supplies.fish === this.supplies.max_fish) {
 			return;
 		}
-		else if (this.supplies.fish + fishCaught <= this.max_fish) {
+		else if (this.supplies.fish + fishCaught <= this.supplies.max_fish) {
 			ui.popups.fishPopup(fishCaught);
 			this.supplies.fish += fishCaught;
 		}
-		else if (this.supplies.fish + fishCaught > this.max_fish) {
+		else if (this.supplies.fish + fishCaught > this.supplies.max_fish) {
 			ui.popups.fishPopup(fishCaught);
-			this.supplies.fish = this.max_fish;
+			this.supplies.fish = this.supplies.max_fish;
 		}
 		ui.sidebars.renderShipInfo();
 	}
@@ -154,6 +158,76 @@ class Ship {	// eslint-disable-line
 		if (i > -1) this.crew.splice(i, 1);
 		ui.sidebars.renderShipInfo();
 	}
+
+	// Make route for ship and set it moving:
+	findRoute(dest, callback) {
+		var route = ShortPathCalc.findRoute(this.node, dest);
+		var hopped = 0;
+		console.log('route', route);
+		if (!route.path) return;
+		// Check voyage not too long:
+		if (route.distance > 500) return "too far";
+		// Check food supply:
+		if (route.distance / 50 > myship.getFood()) {
+			ui.popups.insufficient('food');
+			return false;
+		}
+
+		// Use Simplify.js to smooth the path:
+		function simplifyRoute(route) {
+			var points = route.map(p => {
+				return {x: nodes[p.target].coords[0], y: nodes[p.target].coords[1]};
+			});
+			//var tolerance = 5;
+			return simplify(points);	// TODO
+		}
+
+		// Infinite movement loop:
+		function doHop() {
+			var hop = route.path[hopped];
+			myship.move(hop.target, function() {	// NOTE 'this' won't work inside
+				// Update location:
+				myship.node = hop.target;
+				hopped++;
+				// Continue infinite loop:
+				if (hopped < route.path.length) doHop();
+				else if (myship.node === dest) {
+					// Make deductions:
+					myship.sail(route.distance);
+					myship.fish(route.distance);
+					// Action:
+					if (callback) callback();
+				}
+			});
+		}
+		// Init loop:
+		doHop();
+	}
+
+	// Animate ship to a new node:
+	move(destNode, callback) {
+		// Get Pythagorean distance and use with ship's speed for animation duration:
+		var distance = 25000 * triCentreDistance(mapRender.h.mesh, this.node, destNode),
+			duration = distance / myship.speed;
+		//console.log('distance', distance, 'duration', duration);
+
+		var destCoords = mapRender.h.mesh.triCentres[destNode];
+		var x = 1000 * destCoords[0],
+			y = 1000 * destCoords[1];
+		//console.log(destNode, destCoords);
+
+		// Animate ship:
+		d3.select("#shipSVG")
+			.transition()
+			.duration(duration)
+			.attr("transform", "translate("+x+","+y+")");// scaleX(-1)");	// flippit
+
+		// Call callback when done animating:
+		setTimeout(function() {
+			if (callback !== undefined) callback();
+		}, duration);
+	}
+
 }
 
 class Sailor {
@@ -191,7 +265,7 @@ class Sailor {
 		return `<img class="ui avatar image ${className}"
 		data-title="${this.name} of ${this.origin}"
 		data-content="${this.skills.join(", ")}"
-		src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/50.png">`;
+		src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/45.png">`;
 	}
 
 	showStats() {
@@ -368,4 +442,15 @@ class Town {	// eslint-disable-line
 			endTurn();
 		}
 	}
+}
+
+function endTurn() {
+	player.turns += 1;
+	if (player.turns % 12 === 0) {
+		player.year--;
+		ui.popups.salary();
+	}
+	ui.sidebars.updateAll();
+	if (player.trophies.length === 15) ui.popups.gameOverPopup('win');
+	reSalt();
 }
