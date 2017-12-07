@@ -29,6 +29,7 @@ function reSalt() {
 }
 var salt = reSalt();	// changes every 15 minutes provided reSalt called regularly
 
+var myship = null;
 var currentCity = null;
 
 class Ship {	// eslint-disable-line
@@ -89,9 +90,10 @@ class Ship {	// eslint-disable-line
 
 	sail(distance) {
 		// Reduce food & morale
-		var deductions = Math.floor(distance / 50);	// max 10, initially
+		var deductions = Math.floor(distance / 40);	// max 12 deductions, initially
 		console.log("Deducting", deductions);
 		while (deductions > 0) {
+			// Prevent negative supplies:
 			if (this.supplies.bread > 0)   { this.supplies.bread--; deductions--; }
 			if (this.supplies.chicken > 0) { this.supplies.chicken--; deductions--; }
 			if (this.supplies.fish > 0)    { this.supplies.fish--; deductions--; }
@@ -100,10 +102,21 @@ class Ship {	// eslint-disable-line
 		ui.sidebars.renderShipInfo();
 	}
 
-	fish() {
-		var fishCaught = 5 * Math.ceil(10 * Math.random());
-		this.fish += fishCaught;
-		console.log("Caught", fishCaught, "kilos of fish");
+	fish(distance) {
+		var fishCaught = 5 * Math.ceil(distance/50 * Math.random());	// max 50 fish
+		// Gain as many fish as we can before hitting max:
+		if (this.supplies.fish === this.max_fish) {
+			return;
+		}
+		else if (this.supplies.fish + fishCaught <= this.max_fish) {
+			ui.popups.fishPopup(fishCaught);
+			this.supplies.fish += fishCaught;
+		}
+		else if (this.supplies.fish + fishCaught > this.max_fish) {
+			ui.popups.fishPopup(fishCaught);
+			this.supplies.fish = this.max_fish;
+		}
+		ui.sidebars.renderShipInfo();
 	}
 
 	buy(product, amount, cost) {
@@ -158,7 +171,7 @@ class Sailor {
 	}
 
 	pickAvatarSeed() {
-		const avSeeds = "a,b,d,e,f,g,h,i,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,ii,jj,kk,ll,nn,oo,pp,tt,ww,yy,zz,2,3,5,6,7,8,12,14,15,16,17,19,20,22,24,25,27,28,29,31,32,33,34,35,36,37,39".split(",");
+		const avSeeds = "a,b,d,e,f,g,h,i,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,ii,jj,kk,ll,nn,oo,pp,tt,ww,yy,zz,2,3,5,6,7,8,12,14,15,16,17,19,20,22,24,25,27,28,29,31,32,33,34,35,36,37,39,40,42,44,45,46,47,48,49".split(",");
 		return avSeeds.random();
 	}
 
@@ -349,10 +362,10 @@ class Town {	// eslint-disable-line
 		// When you visit, things can happen conditionally in this order:
 		if (this.status === 'atWar') this.underAttack();
 		else if (this.status === 'atPeace') this.peaceTimeEvent();
-		else if (player.ships[0].crew.length < 8) this.offerRecruits(2 + Math.floor(3 * Math.random()));
+		else if (myship.crew.length < 8) this.offerRecruits(2 + Math.floor(3 * Math.random()));
 		else if (Math.random() > 0.5) this.offerTrade();
 		else {
-			// Do nothing
+			endTurn();
 		}
 	}
 }

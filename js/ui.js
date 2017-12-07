@@ -1,4 +1,4 @@
-/* global player, $, gameText, combat, currentCity */
+/* global player, $, gameText, combat, currentCity, myship */
 
 function capitalise(word) {
 	return word[0].toUpperCase() + word.substr(1);
@@ -21,10 +21,11 @@ var ui = {
 		// Render a ship's stats in left sidebar
 		renderShipInfo: function(sid = 0) {
 			var s = player.ships[sid];
-			console.log(s);
+			var l = s.name.length;
+			var fontsize = l <= 7 ? 'large' : l <= 10 ? 'medium' : 'small';
 			var html = `
 			<div class="ship_stats" id="ship${sid}">
-				<h2>“${s.name}”</h2>
+				<h2 class="shipname-${fontsize}">“${s.name}”</h2>
 				<h3>${s.type} class</h3>
 				<p>Speed: <data>${s.speed}</data></p>
 				<div class="upgrades">
@@ -150,10 +151,13 @@ var ui = {
 		`;
 		$("#modal .modal").remove();
 		$("#modal").append(cardHtml);
-		//$(".small.modal").modal('show');
 		$('#modal .small.modal')
 		.modal({
 			closable: false,
+			context: "#gamearea",
+			transition:	"scale",
+			duration: 300,
+			queue: true,
 			// Wiring up of buttons to passed callback functions:
 			onApprove : function() {
 				params.callback1();
@@ -189,10 +193,13 @@ var ui = {
 		`;
 		$("#modal .modal").remove();
 		$("#modal").append(cardHtml);
-		//$("#modal .tiny.modal").modal('show');
 		$('#modal .tiny.modal')
 		.modal({
 			closable: true,
+			context: "#gamearea",
+			transition:	"scale",
+			duration: 300,
+			queue: true,
 			// Wiring up of buttons to passed callback functions:
 			onApprove : function() {
 				params.callback1();
@@ -211,8 +218,7 @@ var ui = {
 	modals: {
 		// Modal container for choosing combatants:
 		preCombatCard: function(monster) {
-			var ship = player.ships[0];
-			var sailors = ship.crew.filter(s => s !== ship.captain);
+			var sailors = myship.crew.filter(s => s !== myship.captain);
 			var sailorInputs = sailors.map(s => {
 				return `<span class="sailor-checkbox-wrap"><input type="checkbox" value="${s.name} of ${s.origin}" checked>${s.renderAvatar()}</span>`;
 			});
@@ -250,6 +256,7 @@ var ui = {
 				params.desc = (result.code > 1) ?
 					`Your men proved valiant enough to slay the ${monster.name}.` :
 					`The ${monster.name} ran away when the going got tough.`;	// FIXME plurals
+				params.img = monster.img;
 				params.content = "";
 				params.buttons = {yes: "Continue"};
 				// Wire up button:
@@ -264,10 +271,11 @@ var ui = {
 			else if (result.code === 0) {
 				params.heading = "Defeated.";
 				params.desc = `The ${monster.name} was too strong. Your men were unable to hold it off.`;
+				params.img = monster.img;
 				params.content = "";
 				params.extra = `
 					<h4>The following men were lost in the battle:</h4>
-					${result.losses.map(s => s.renderAvatar('dead')).join("")}
+					${result.losses.map(s => s.renderAvatar('dead') + `<span>${s.name} of ${s.origin}</span>`).join("")}
 				`;	// FIXME
 				params.buttons = {no: "Continue"};
 				params.callback2 = () => false; // Simply dismiss
@@ -279,7 +287,7 @@ var ui = {
 		// Modal for viewing Sailor's stats, promotion or dismissal
 		sailorInfoCard: function(index) {
 			// Retrieve Sailor object from crew by index:
-			var sailor = player.ships[0].crew[index];
+			var sailor = myship.crew[index];
 			var params = {
 				heading: `${sailor.name} of ${sailor.origin}`,
 				content: sailor.showStats(),
@@ -288,7 +296,7 @@ var ui = {
 					no: "Fire him"
 				},
 				callback1: () => false,
-				callback2: () => player.ships[0].fireMan(index)
+				callback2: () => myship.fireMan(index)
 			};
 
 			ui.renderPopup(params);
@@ -303,13 +311,13 @@ var ui = {
 					no: "No thanks"
 				}
 			};
-			params.extras = ui.renderTradeMenu('buy', buying) + ui.renderTradeMenu('sell', selling);
+			params.extras = ui.modals._renderTradeMenu('buy', buying) + ui.modals._renderTradeMenu('sell', selling);
 
 			ui.renderModalCard(params);
 		},
 
 		// Renders a button with a multi-level dropdown inside it
-		renderTradeMenu(type, data) {
+		_renderTradeMenu(type, data) {
 			// Wire up player's trading functions to buttons:
 			var doTrade = {
 				buy: player.buy,
@@ -368,11 +376,15 @@ var ui = {
 				img: trophy.img,
 				desc: `For your recent accomplishment, you were awarded the <b>${trophy.name}</b>.`,
 				content: trophy.text + "<br><br>" + link,
-				buttons: {yes: "OK"},
-				callback1: () => false	// Simply dismiss
+				buttons: {yes: "OK"}
+			};
+			params.callback1 = function() {
+				// Revisit city once the trophy is dismissed:
+				currentCity.visit();
+				return false;
 			};
 			ui.renderModalCard(params);
-			ui.renderTrophies();
+			ui.sidebars.renderTrophies();
 		},
 
 		// Further info popup
@@ -403,14 +415,16 @@ var ui = {
 		giftPopup: function(gift, quantity, from) {
 			ui.renderPopup({
 				heading: "You received a gift!",
-				content: `${from} gave you <data>${quantity}</data> ${gift}! <i class="gameitem ${gift}"></i>`,	// TODO plurals
+				content: `${from} gave you <data>${quantity}</data> ${gift}!
+				<i class="gameitem ${gift}"></i>`,	// TODO plurals
 				buttons: {yes: "OK"},
 				callback1: () => false	// Simply dismiss
 			});
 			// Also update data:
 			if (gift === "gold") player.gold += quantity;
-			else player.ships[0].supplies[gift] += quantity;
-			ui.renderShipInfo();
+			else myship.supplies[gift] += quantity;
+			ui.sidebars.renderShipInfo();
+			ui.sidebars.renderGold();
 		},
 
 		// Fishing haul popup, 1 button
@@ -421,9 +435,16 @@ var ui = {
 				buttons: {yes: "OK"},
 				callback1: () => false	// Simply dismiss
 			});
-			// Also update data:
-			player.ships[0].supplies.fish += quantity;
-			ui.renderShipInfo();
+		},
+
+		// Fishing haul popup, 1 button
+		insufficient: function(type) {
+			ui.renderPopup({
+				heading: "Insufficient " + type,
+				content: `It will take more ${type} to be able to do that.`,
+				buttons: {yes: "OK"},
+				callback1: () => false	// Simply dismiss
+			});
 		},
 
 		// Game over info, win/loss, 1 button
@@ -458,7 +479,7 @@ var ui = {
 							${s.showStats()}
 			      		</div>
 			    	</div>
-			    	<div class="ui bottom attached button" onclick="player.ships[0].hireMan(${i})">
+			    	<div class="ui bottom attached button" onclick="myship.hireMan(${i})">
 			      		<i class="add icon"></i>
 			      		Hire him
 			    	</div>

@@ -1,6 +1,6 @@
 /* global meshTransforms, generateGoodMesh, visualizeTriangles, drawPaths, contour, add, slope, randomVector, cone, mountains, normalize, peaky, relax, setSeaLevel, randomFrom, fillSinks, doErosion, cleanCoast, getRivers, visualizeSlopes, defaultExtent, defaultParams, placeCity, cityScores, visualizeCities, landSeaRatio, drawLabels, addCentresToTriangles, triCentreDistance */
 /* global $, d3, ShortestPathCalculator, simplify */
-/* global Town, player, svgShip */
+/* global Town, player, svgShip, ui */
 
 // A few globals
 var seaLevel = 0.5;
@@ -120,6 +120,11 @@ function routeShip(dest, callback) {
 	if (!route.path) return;
 	// Check voyage not too long:
 	if (route.distance > 500) return "too far";
+	// Check food supply:
+	if (route.distance / 50 > myship.getFood()) {
+		ui.popups.insufficient('food');
+		return false;
+	}
 	// Infinite movement loop:
 	function doHop() {
 		var hop = route.path[hopped];
@@ -131,7 +136,8 @@ function routeShip(dest, callback) {
 			if (hopped < route.path.length) doHop();
 			else if (shipNode === dest) {
 				// Make deductions:
-				player.ships[0].sail(route.distance);
+				myship.sail(route.distance);
+				myship.fish(route.distance);
 				// Action:
 				if (callback) callback();
 			}
@@ -154,7 +160,7 @@ function simplifyRoute(route) {
 function moveShip(destNode, callback) {
 	// Get Pythagorean distance and use with ship's speed for animation duration:
 	var distance = 25000 * triCentreDistance(mapRender.h.mesh, shipNode, destNode),
-		duration = distance / player.ships[0].speed;
+		duration = distance / myship.speed;
 	//console.log('distance', distance, 'duration', duration);
 
 	var destCoords = mapRender.h.mesh.triCentres[destNode];

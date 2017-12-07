@@ -1,7 +1,9 @@
-/* global $, Ship, Sailor, ui */
+/* global $, Ship, Sailor, ui, myship */
+myship = new Ship();
+console.log(myship);
 
 var player = {
-	ships: [new Ship()],
+	ships: [myship],
 	gametime: 0,	// TODO: timer
 	year: makeYear(),
 	// 12 turns = 1 year
@@ -24,7 +26,7 @@ var man3 = new Sailor();
 var man4 = new Sailor();
 var man5 = new Sailor();
 var man6 = new Sailor();
-player.ships[0].addCrew([man1, man2, man3, man4, man5, man6]);
+myship.addCrew([man1, man2, man3, man4, man5, man6]);
 
 function combat(sailors, enemy) {
 	console.log("Combat:", sailors, enemy);
@@ -57,7 +59,7 @@ function combat(sailors, enemy) {
 
 	while (def1 > 0 && def2 > 0) {
 		// We attack:
-		var a = (att1 / 3) * (4 * Math.random() + 4) / 60;
+		var a = (att1 / 3) * (4 * Math.random() + 4) / 6;
 		console.log('a', a);
 		def2 -= a;
 		brav2 -= a / 3;
@@ -102,6 +104,8 @@ function endTurn() {
 		ui.popups.salary();
 	}
 	ui.sidebars.updateAll();
+	if (player.trophies.length === 15) ui.popups.gameOverPopup('win');
+	reSalt();
 }
 
 function makeYear() {

@@ -44,66 +44,55 @@ data {
 /************/
 /* SIDEBARS */
 /************/
-#ui_ships {
-	width: 200px;
-	height: 600px;
-	padding: 2px 5px;
-}
-#ui_ships > * {
-	border: 1px solid #421;
-	background: #631;
-	padding: 4px 6px;
-}
-#ui_ships h1,
-#ui_ships h2,
-#ui_ships h3 {
-	text-align: center;
-	margin-bottom: 0.2em !important;
-}
-#ui_ships h3 {
-	font-style: italic !important;
-}
 .ship_stats {
 	overflow: hidden;
 }
+.ship_stats h1,
+.ship_stats h2,
+.ship_stats h3 {
+	text-align: center;
+	margin-bottom: 0.2em !important;
+}
+.ship_stats h3 {
+	font-style: italic !important;
+}
+.shipname-small { font-size: 20px; }	/* over 10 chars */
+.shipname-medium { font-size: 24px; }	/* 8-10 chars */
+.shipname-large { font-size: 28px; }	/* 7 chars & under */
 .upgrades {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr
 }
+#trophies-ui > div,
+#gods-ui > div,
 .crew {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 }
 .crew li {
 	background: #876;
+	border: 2px solid black;
+	border-radius: 5px;
 	width: 50px;
 	height: 50px;
 	margin-bottom: 8px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.crew li.gold {
+	border-color: gold;
 }
 .avatar {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 3px;
 	border: 1px solid black;
 }
 .avatar.dead {
 	filter: grayscale();
 }
 .ui.avatar.image {
-    margin-right: 0.25em;
-    display: inline-block;
-    width: 2.7em !important;
-    height: 2.7em !important;
+    width: 45px !important;
+    height: 45px !important;
 	background: white;
-}
-.avatar.gold {
-	border: 2px solid gold;
-}
-#trophies-ui > div,
-#gods-ui > div {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
 }
 
 
