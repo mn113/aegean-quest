@@ -55,6 +55,7 @@ data {
 }
 .ship_stats h3 {
 	font-style: italic !important;
+	margin-top: 0;
 }
 .shipname-small { font-size: 20px; }	/* over 10 chars */
 .shipname-medium { font-size: 24px; }	/* 8-10 chars */

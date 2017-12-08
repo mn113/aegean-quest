@@ -107,9 +107,12 @@ class Ship {	// eslint-disable-line
 	}
 
 	fish(distance) {
-		var fishCaught = 5 * Math.ceil(distance/50 * Math.random());	// max 50 fish
+		var fishCaught = 5 * Math.ceil(distance/75 * Math.random());	// max 50 fish
 		// Gain as many fish as we can before hitting max:
 		if (this.supplies.fish === this.supplies.max_fish) {
+			return;
+		}
+		else if (Math.random() > 0.3) {
 			return;
 		}
 		else if (this.supplies.fish + fishCaught <= this.supplies.max_fish) {

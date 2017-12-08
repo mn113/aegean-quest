@@ -100,7 +100,7 @@ var ui = {
 			for (var t of player.trophies) {
 				trophies += `<a class="gameitem ${t.className}"
 			 					data-title="${t.name}"
-								onclick="ui.modals.trophyInfoCard(${t.className})">&nbsp;</a>`;
+								onclick="ui.modals.trophyInfoCard('${t.className}')">&nbsp;</a>`;
 			}
 			var html = `<h5>Trophies (<data>${player.trophies.length} / ${gameText.trophies.length}</data>)</h5>
 						<div>${trophies}</div>`;
@@ -119,8 +119,9 @@ var ui = {
 				godsHtml += `<div class="god ${god.name.toLowerCase()} ${scoreClass}"
 								data-title="${god.name}"
 								data-content="${god.desc}"
-								data-score="${score}">
-								</div>`;
+								data-score="${score}"
+								onclick="ui.modals.godInfoCard('${god.name}')">
+							</div>`;
 			}
 			$("#gods-ui").html(`${heading}<div>${godsHtml}</div>`);
 			ui.makePopups();
@@ -391,10 +392,11 @@ var ui = {
 		// Further info popup
 		godInfoCard: function(god) {
 			var params = gameText.gods.filter(g => g.name === god)[0];
+			params.heading = params.name;
 			params.buttons = {yes: "OK"};
+			params.callback1 = () => false;		// Simply dismiss
 			ui.renderModalCard(params);
 		}
-
 	},
 
 	popups: {

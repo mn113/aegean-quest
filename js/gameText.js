@@ -516,42 +516,48 @@ var gameText = {
 		}
 	],
 
-	"gods": [	// Used in godInfoPopup
+	"gods": [	// Used in godInfoCard
 		{
 			"name": "Poseidon",
-			"desc": "God of the sea",
-			"content": "",
-			"img": ""
+			"desc": "God of the Seas",
+			"content": "Poseidon was one of the Twelve Olympians in ancient Greek religion and myth. He was god of the Sea and other waters; of earthquakes; and of horses. Poseidon was protector of seafarers, and of many Hellenic cities and colonies.",
+			"extra": "Keep Poseidon happy to avoid misfortune at sea.",
+			"img": "img/gods-200px/poseidon.png"
 		},
 		{
 			"name": "Demeter",
-			"desc": "God of the harvest",
-			"content": "",
-			"img": ""
+			"desc": "Goddess of the Harvest",
+			"content": "In ancient Greek religion and Greek mythology, Demeter is the goddess of the harvest and agriculture, who presided over grains and the fertility of the earth. Though Demeter is often described simply as the goddess of the harvest, she presided also over the sacred law, and the cycle of life and death.",
+			"extra": "Stay in Demeter's favour to ensure a supply of food.",
+			"img": "img/gods-200px/demeter.png"
 		},
 		{
 			"name": "Hephaestus",
-			"desc": "God of fire",
-			"content": "",
-			"img": ""
+			"desc": "God of Fire",
+			"content": "Hephaestus is the Greek god of blacksmiths, metalworking, carpenters, craftsmen, artisans, sculptors, metallurgy, fire, and volcanoes. Hephaestus was the son of Zeus and Hera, the king and queen of the gods. As a smithing god, Hephaestus made all the weapons of the gods in Olympus. He served as the blacksmith of the gods, and was worshipped in the manufacturing and industrial centers of Greece, particularly Athens.",
+			"extra": "Beware the wrath of Hephaestus, for he will arm your enemies.",
+			"img": "img/gods-200px/hephaestus.png"
 		},
 		{
 			"name": "Artemis",
-			"desc": "Goddess of hunting",
-			"content": "",
-			"img": ""
+			"desc": "Goddess of Hunting",
+			"content": "Artemis was one of the most widely venerated of the Ancient Greek deities. In the classical period of Greek mythology, Artemis was often described as the daughter of Zeus and Leto, and the twin sister of Apollo. She was the Hellenic goddess of the hunt, wild animals, wilderness, childbirth, virginity and protector of young girls, bringing and relieving disease in women; she often was depicted as a huntress carrying a bow and arrows.",
+			"extra": "Keep Artemis happy and your hunts will be successful.",
+			"img": "img/gods-200px/artemis.png"
 		},
 		{
 			"name": "Ares",
-			"desc": "God of war",
-			"content": "",
-			"img": ""
+			"desc": "God of War",
+			"content": "Ares is the Greek god of war. He is one of the Twelve Olympians, and the son of Zeus and Hera. In Greek literature, he often represents the physical or violent and untamed aspect of war, in contrast to his sister the armored Athena, whose functions as a goddess of intelligence include military strategy and generalship.",
+			"extra": "Stay on Ares' good side and combat will be a breeze.",
+			"img": "img/gods-200px/ares.png"
 		},
 		{
 			"name": "Uranus",
-			"desc": "God of the winds",
-			"content": "",
-			"img": ""
+			"desc": "God of the Winds",
+			"content": "Uranus was the primal Greek god personifying the sky. In Ancient Greek literature, Uranus or Father Sky was the son and husband of Gaia, Mother Earth. Uranus and Gaia were the parents of the first generation of Titans, and the ancestors of most of the Greek gods.",
+			"extra": "Don't anger Uranus, or he will blow your ship off course.",
+			"img": "img/gods-200px/uranus.png"
 		}
 	],
 
