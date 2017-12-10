@@ -126,6 +126,7 @@ data {
 .omphalos		{ background-position: -288px -32px; }
 .winnowing-oar	{ background-position: -320px -32px; }
 
+.gold,
 .gold-low		{ background-position: 0px -64px; }
 .gold-med		{ background-position: -32px -64px; }
 .gold-high		{ background-position: -64px -64px; }
@@ -158,6 +159,9 @@ data {
 .modal img {
 	width: 200px;
 }
+.modal .image.content {
+    align-items: flex-start;
+}
 .town, .monster {
 	color: red;
 }
@@ -165,10 +169,10 @@ data {
 	font-size: 1.2rem !important;
 }
 .modal .content .extra {
-	text-align: center;
+	text-align: center !important;
 }
 .modal.tiny .content {
-	text-align: center;
+	text-align: center !important;
 }
 .sailor-checkbox-wrap {
 	position: relative;

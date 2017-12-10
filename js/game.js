@@ -32,9 +32,3 @@ function makeYear() {
 }
 
 ui.sidebars.updateAll();
-
-// FIXME
-// Make the total reflect the checked checkboxes in pre-combat card:
-$(".sailor-checkbox-wrap :checkbox").on("click", function() {
-	$("#checkedCount").html($(".sailor-checkbox-wrap :checkbox:checked").length);
-});

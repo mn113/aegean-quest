@@ -1,4 +1,4 @@
-/*global d3, ui, player, gameText, recruits, ShortPathCalc, triCentreDistance, mapRender, simplify, nodes, endTurn, currentCity */
+/*global $, d3, ui, player, gameText, recruits, ShortPathCalc, triCentreDistance, mapRender, simplify, nodes, endTurn, currentCity */
 /* eslint-disable no-global-assign */
 
 
@@ -150,6 +150,8 @@ class Ship {	// eslint-disable-line
 	}
 
 	hireMan(i) {
+		// Remove card: FIXME
+		$(`.modal .card[data-rid="${i}"]`).remove();
 		this.addCrew(recruits[i]);
 		ui.sidebars.renderShipInfo();
 	}
@@ -274,7 +276,7 @@ class Sailor {
 	showStats() {
 		return `${this.renderAvatar()}
 				<p><b>Age:</b> <data>${this.age}</data> | <b>XP:</b> <data>${this.xp}</data></p>
-				<p><b>Skills:</b> <data>${this.skills.join(", ")}</data></p>
+				<p><b>Skills:</b> ${this.skills.join(", ")}</p>
 				<p><b>Salary:</b> <data>${this.salary}</data> gold/year</p>`;
 	}
 }
@@ -306,9 +308,9 @@ class Town {	// eslint-disable-line
 			event.heading = `The townsfolk of <span class="town">${this.name}</span>
 			invite you to ${event.article} ${event.title}.`;
 			event.link = `<a href="${event.url}" target="_blank">Learn more...</a>`;
-			event.desc = event.desc + "<br><br>" + event.link;
-			event.content = "";
-			event.extra = "";
+			//event.desc = event.desc + "<br><br>" + event.link;
+			event.content = event.link;
+			event.extra = "Will you participate?";
 			event.buttons = {
 				yes: "Accept",
 				no: "Decline"
@@ -316,11 +318,19 @@ class Town {	// eslint-disable-line
 			// Specify callbacks for event's action buttons:
 			// Accept: reward
 			event.callback1 = function() {
-				this.status = 'null';
-				var gift = event.reward.types.random(),
-					range = event.reward.max - event.reward.max,
-					quantity = event.reward.min + Math.floor(range * Math.random());
-				ui.popups.giftPopup(gift, quantity, `the townspeople of ${this.name}`);
+				this.status = 'null';	// Town not at war or at peace
+				// Give either produce reward, or god reaction:
+				if (Math.random() > 0.33) {
+					var gift = event.reward.types.random(),
+						range = event.reward.max - event.reward.max,
+						quantity = event.reward.min + Math.floor(range * Math.random());
+					ui.popups.giftPopup(gift, quantity, `The townspeople of ${this.name}`);
+				}
+				else {
+					var god = gameText.gods.random(),
+						delta = 1;
+					ui.popups.godReactionPopup(god.name, delta);
+				}
 			}.bind(this);	// 2nd param becomes 1st when fn called
 
 			// Decline: godReaction
@@ -351,12 +361,16 @@ class Town {	// eslint-disable-line
 			var event = gameText.monsterEvents[seed];
 			console.log(event);
 			event.heading = `<h2>Attention all heroes!</h2>
-			<span class="town">${this.name}</span> is being terrorised by
-			<span class="monster">${event.article} ${event.name}</span>!`;
+							<span class="town">${this.name}</span> is being terrorised by
+							<span class="monster">${event.article} ${event.name}</span>!`;
 			event.link = `<a href="${event.url}" target="_blank">Learn more...</a>`;
-			event.desc = event.text + "<br><br>" + event.link;
+			event.desc = event.text + `<br><br>
+						<b>Strength:</b> ${event.strength}<br>
+						<b>Weakness:</b> ${event.weakness}<br><br>
+						${event.link}`;
 			event.content = "";
-			event.extra = `<h3>Will you fight <span class="monster">${event.article} ${event.name}</span>?</h3>`;
+			event.extra = `<h3>Will you fight <span class="monster">
+							${event.article} ${event.name}</span>?</h3>`;
 			event.buttons = {
 				yes: "Fight",
 				no: "Flee"

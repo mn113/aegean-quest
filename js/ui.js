@@ -246,6 +246,12 @@ var ui = {
 				}, 750);
 			};
 			ui.renderModalCard(params);
+			// FIXME
+			// Make the total reflect the checked checkboxes in pre-combat card:
+			$(".sailor-checkbox-wrap :checkbox").on("click", function() {
+				$("#checkedCount").html($(".sailor-checkbox-wrap :checkbox:checked").length);
+			});
+			// Tooltip
 			$(".sailor-checkbox-wrap .avatar").popup();
 		},
 
@@ -410,7 +416,7 @@ var ui = {
 				callback1: () => false	// Simply dismiss
 			});
 			// Also update data:
-			player.godFavours[god] += delta;
+			player.godFavours[god.toLowerCase()] += delta;
 			ui.sidebars.renderGods();
 		},
 
@@ -490,8 +496,6 @@ var ui = {
 		}
 		html += `</div>`;
 		return html;
-		// Remove card: FIXME
-		// $(`.modal .card[data-rid="${i}"]`).remove();
 	},
 
 	// Enable Semantic UI tooltips:
@@ -531,8 +535,8 @@ function combat(sailors, enemy) {
 	};
 
 	var def1 = sailors.map(s => s.morale + s.age / 12).reduce((a,b) => a+b) / (sailors.length);
-	var att1 = sailors.map(s => s.xp - s.age / 15).reduce((a,b) => a+b);
-	var skill = sailors.map(s => s.skills.map(sk => aptitudes[sk]).reduce((a,b) => a+b)).reduce((a,b) => a+b) / 3;
+	var att1 = sailors.map(s => s.xp - s.age / 12).reduce((a,b) => a+b);
+	var skill = sailors.map(s => s.skills.map(sk => aptitudes[sk]).reduce((a,b) => a+b)).reduce((a,b) => a+b) / 7;
 	att1 += skill;
 	att1 /= (sailors.length / 2);
 	console.log('def1', def1, 'att1', att1, 'skill', skill);
