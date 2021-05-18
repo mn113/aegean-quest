@@ -270,7 +270,7 @@ class Sailor {
 		return `<img class="ui avatar image ${className}"
 		data-title="${this.name} of ${this.origin}"
 		data-content="${this.skills.join(", ")}"
-		src="https://avatars.dicebear.com/v1/male/${this.avatarSeed}\/45.png">`;
+		src="https://avatars.dicebear.com/api/male/${this.avatarSeed}.svg">`;
 	}
 
 	showStats() {
